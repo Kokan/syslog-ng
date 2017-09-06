@@ -10,7 +10,7 @@ source local {
 	unix-dgram("/var/run/log");
 	unix-dgram("/var/run/logpriv" perm(0600));
 	file("/dev/klog");
-	udp(ip(0.0.0.0) port(514));
+	network(transport("udp") ip(0.0.0.0) port(514));
 	internal();
 };
 

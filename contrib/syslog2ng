@@ -30,7 +30,7 @@ BEGIN {
 	print \
 "source local {\n" \
 "	" LOGDEVTYPE "(\"/dev/log\");\n" \
-"	udp(ip(0.0.0.0) port(514));\n" \
+"	network(transport(\"udp\") ip(0.0.0.0) port(514));\n" \
 "	internal();\n" \
 "};\n";
 }
@@ -129,7 +129,7 @@ function make_destination(d, destNo) {
 		printf "\tfile(\"" d "\" create_dirs(yes));\n";
 	}
 	else if (d ~ /^@/) {
-		printf "\tudp(\"" substr(d, 2) "\" port(514));\n";
+		printf "\tnetwork(\"" substr(d, 2) "\" transport(\"udp\") port(514));\n";
 	}
 	else {
 		printf "\tusertty(\"" d "\");\n";
