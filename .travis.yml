@@ -8,36 +8,45 @@ os: linux
 
 cache:
   apt: true
+  directories:
+    - $HOME/.cache/pip
+    - $HOME/Kokan/syslog-ng/modules/java-module/.gradle/cache
+addons:
+  apt:
+    sources:
+      - sourceline: 'deb http://download.opensuse.org/repositories/home:/laszlo_budai:/syslog-ng/xUbuntu_14.04 ./'
+        key_url: 'http://download.opensuse.org/repositories/home:/laszlo_budai:/syslog-ng/xUbuntu_14.04/Release.key'
+    packages:
+      - autoconf-archive
+      - bison
+      - criterion-dev
+      - docbook-xsl
+      - flex
+      - gradle-2.2.1
+      - libcap-dev
+      - libdbd-sqlite3
+      - libdbi0-dev
+      - libesmtp-dev
+      - libevtlog-dev
+      - libgeoip-dev
+      - libglib2.0-dev
+      - libhiredis-dev
+      - libivykis-dev
+      - libjson0-dev
+      - libmaxminddb-dev
+      - libnet1-dev
+      - libriemann-client-dev
+      - libwrap0-dev
+      - libxml2-utils
+      - pkg-config
+      - sqlite3
+      - xsltproc
+
+
 
 install:
-  - curl -4 http://download.opensuse.org/repositories/home:/laszlo_budai:/syslog-ng/xUbuntu_14.04/Release.key | sudo apt-key add -
-  - echo "deb http://download.opensuse.org/repositories/home:/laszlo_budai:/syslog-ng/xUbuntu_14.04 ./" | sudo tee --append /etc/apt/sources.list.d/syslog-ng-obs.list
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq
-      autoconf-archive
-      bison
-      docbook-xsl
-      flex
-      gradle-2.2.1
-      libcap-dev
-      libdbd-sqlite3
-      libdbi0-dev
-      libesmtp-dev
-      libgeoip-dev
-      libglib2.0-dev
-      libhiredis-dev
-      libivykis-dev
-      libjson0-dev
-      libnet1-dev
-      libriemann-client-dev
-      libwrap0-dev
-      pkg-config
-      sqlite3
-      xsltproc
-      criterion-dev
-      libmaxminddb-dev
-      libxml2-utils
-  - sudo pip install -r requirements.txt
+  - sudo -H pip install -r requirements.txt
+
 before_script:
   - echo 'Europe/Budapest' | sudo tee /etc/timezone
   - sudo dpkg-reconfigure --frontend noninteractive tzdata
