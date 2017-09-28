@@ -1,0 +1,95 @@
+/*
+ * Copyright (c) 2017 kokan
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License version 2 as published
+ * by the Free Software Foundation, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * As an additional exemption you are allowed to compile & link against the
+ * OpenSSL libraries as published by the OpenSSL project. See the file
+ * COPYING for details.
+ *
+ */
+
+%code top {
+#include "heartbeat-parser.h"
+#include "heartbeat-source-driver.h"
+#include "heartbeat-option.h"
+
+}
+
+
+%code {
+
+#include "cfg-parser.h"
+#include "heartbeat-grammar.h"
+#include "syslog-names.h"
+#include "messages.h"
+#include "plugin.h"
+#include "cfg-grammar.h"
+
+#include <string.h>
+
+}
+
+%name-prefix "heartbeat_"
+
+/* this parameter is needed in order to instruct bison to use a complete
+ * argument list for yylex/yyerror */
+
+%lex-param {CfgLexer *lexer}
+%parse-param {CfgLexer *lexer}
+%parse-param {LogDriver **instance}
+%parse-param {gpointer arg}
+
+/* INCLUDE_DECLS */
+
+%type <ptr> source_heartbeat
+
+%token KW_HEARTBEAT
+%token KW_FREQUENCY
+%token KW_MESSAGE_TEMPLATE
+
+%%
+
+start
+  : LL_CONTEXT_SOURCE source_heartbeat
+    {
+      YYACCEPT;
+    }
+  ;
+
+source_heartbeat
+  : KW_HEARTBEAT '(' 
+    {
+      last_driver = *instance = heartbeat_sd_new(configuration);
+      last_source_options = heartbeat_sd_get_option(last_driver);
+    }
+     hb_options ')'
+  ;
+
+hb_options
+  : hb_option hb_options
+  |
+  ;
+
+hb_option
+  : KW_FREQUENCY '(' LL_FLOAT ')' { heartbeat_option_set_freq(last_source_options, $3);  }
+  | KW_FREQUENCY '(' nonnegative_integer ')' { heartbeat_option_set_freq(last_source_options, $3);  }
+  | KW_MESSAGE_TEMPLATE '(' template_content ')' { heartbeat_option_set_template(last_source_options, $3);  }
+  | source_option
+  ;
+
+/* INCLUDE_RULES */
+
+%%
+
