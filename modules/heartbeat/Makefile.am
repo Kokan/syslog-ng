@@ -6,6 +6,17 @@ modules_heartbeat_libheartbeat_la_SOURCES = \
   modules/heartbeat/heartbeat-plugin.c        \
   modules/heartbeat/heartbeat-source-driver.c \
   modules/heartbeat/heartbeat-source.c        \
+  modules/heartbeat/heartbeat-grammar.c       \
+  modules/heartbeat/heartbeat-grammar.h       \
+  modules/heartbeat/heartbeat-option.c        \
+  modules/heartbeat/heartbeat-option.h        \
+  modules/heartbeat/heartbeat-parser.c        \
+  modules/heartbeat/heartbeat-parser.h        \
+  modules/heartbeat/heartbeat-plugin.c        \
+  modules/heartbeat/heartbeat-source.c        \
+  modules/heartbeat/heartbeat-source-driver.c \
+  modules/heartbeat/heartbeat-source-driver.h \
+  modules/heartbeat/heartbeat-source.h        \
   modules/heartbeat/heartbeat-option.c
 
 BUILT_SOURCES       +=      \
