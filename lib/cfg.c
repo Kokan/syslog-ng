@@ -497,6 +497,8 @@ cfg_free(GlobalConfig *self)
   if (self->source_mangle_callback_list)
     g_list_free(self->source_mangle_callback_list);
   g_free(self->bad_hostname_re);
+  g_free(self->jvm_options);
+  g_free(self->recv_time_zone);
   dns_cache_options_destroy(&self->dns_cache_options);
   g_free(self->custom_domain);
   plugin_free_plugins(self);
