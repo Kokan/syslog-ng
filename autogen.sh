@@ -47,23 +47,6 @@ autogen_submodules()
 {
 	origdir=`pwd`
 
-	submod_initialized=1
-	for submod in $SUBMODULES; do
-		if [ ! -f $submod/configure.gnu ]; then
-			submod_initialized=0
-		fi
-	done
-
-	if [ -n "$GIT" ] && [ -f .gitmodules ] && [ -d .git ] && [ $submod_initialized = 0 ]; then
-		# only clone submodules if none of them present
-		git submodule update --init
-		sed -e "s#git://#https://#" \
-			< modules/afamqp/rabbitmq-c/.gitmodules \
-			> modules/afamqp/rabbitmq-c/.gitmodules.new && \
-			mv modules/afamqp/rabbitmq-c/.gitmodules.new modules/afamqp/rabbitmq-c/.gitmodules
-		git submodule update --init --recursive
-	fi
-
 	for submod in $SUBMODULES; do
 		echo "Running autogen in '$submod'..."
 		cd "$submod"
@@ -87,6 +70,30 @@ autogen_submodules()
 		cd "$origdir"
 	done
 }
+
+submodules_update()
+{
+	submod_initialized=1
+	for submod in $SUBMODULES; do
+		if [ ! -f $submod/configure.gnu ]; then
+			submod_initialized=0
+		fi
+	done
+
+	if [ -n "$GIT" ] && [ -f .gitmodules ] && [ -d .git ] && [ $submod_initialized = 0 ]; then
+		# only clone submodules if none of them present
+		git submodule update --init
+		sed -e "s#git://#https://#" \
+			< modules/afamqp/rabbitmq-c/.gitmodules \
+			> modules/afamqp/rabbitmq-c/.gitmodules.new && \
+			mv modules/afamqp/rabbitmq-c/.gitmodules.new modules/afamqp/rabbitmq-c/.gitmodules
+		git submodule update --init --recursive
+	fi
+}
+
+if [ -z "$skip_submodules_update" ] ; then
+	submodules_update
+fi
 
 if [ -z "$skip_submodules" ]; then
 	autogen_submodules

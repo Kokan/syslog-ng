@@ -141,6 +141,69 @@ matrix:
             make V=1 install;
             return $S;
           }
+    - env: B=latest-deps
+      os: linux
+      compiler: clang
+      install:
+        - curl -4 http://download.opensuse.org/repositories/home:/laszlo_budai:/syslog-ng/xUbuntu_12.04/Release.key | sudo apt-key add -
+        - echo "deb http://download.opensuse.org/repositories/home:/laszlo_budai:/syslog-ng/xUbuntu_12.04 ./" | sudo tee --append /etc/apt/sources.list.d/syslog-ng-obs.list
+        - sudo apt-get update -qq
+        - sudo apt-get install -qq autoconf-archive bison docbook-xsl flex gradle-2.2.1 libcap-dev libdbd-sqlite3 libdbi0-dev libesmtp-dev libevtlog-dev libgeoip-dev libglib2.0-dev libhiredis-dev libivykis-dev libjson0-dev libnet1-dev libriemann-client-dev libwrap0-dev pkg-config sqlite3 xsltproc criterion-dev libmaxminddb-dev libxml2-utils
+        - sudo pip install -r requirements.txt
+      before_script:
+        - ./scripts/update-dependencies.sh
+        - skip_submodules_update=yes ./autogen.sh
+        - unset PYTHON_CFLAGS # HACK
+        - CONFIGURE_FLAGS="
+            --prefix=$HOME/install/syslog-ng
+            --with-ivykis=internal
+            --with-mongoc=internal
+            --with-librabbitmq=internal
+            --with-jsonc=system
+            --disable-env-wrapper
+            --disable-memtrace
+            --enable-tcp-wrapper
+            --enable-linux-caps
+            --disable-sun-streams
+            --enable-all-modules
+            --disable-sql
+            --enable-pacct
+            --enable-manpages
+            --with-python=2
+            --with-docbook=/usr/share/xml/docbook/stylesheet/docbook-xsl/manpages/docbook.xsl
+            --enable-extra-warnings
+            "
+        - if [ "$CC" = "clang" ]; then
+            CONFIGURE_FLAGS="$CONFIGURE_FLAGS --disable-mongodb" ;
+          fi
+        - ./configure $CONFIGURE_FLAGS
+      script:
+        - . tests/build-log-cflags-propagation.sh;
+          if [ "$CC" = "gcc" ]; then
+            export DISTCHECK_CONFIGURE_FLAGS="$CONFIGURE_FLAGS";
+            exec_prop_check "make distcheck -j 3 V=1 --keep-going" ||
+            {
+              S=$?;
+              make V=1 distcheck;
+              find . -name test-suite.log |
+              xargs cat;
+              return $S;
+            };
+          else
+            make --keep-going -j 3;
+            S=$?;
+            if [ "$S" = "0" ]; then
+              make install
+              . scripts/get-libjvm-path.sh || return $?;
+              export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$JNI_LIBDIR";
+              make func-test V=1;
+            elif [ "$S" = "42" ]; then
+              return $S;
+            else
+              make V=1 install;
+              return $S;
+            fi;
+          fi
     - env: B=check
       os: osx
       osx_image: xcode8
