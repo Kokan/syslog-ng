@@ -2,7 +2,9 @@ language: c
 git:
   submodules: false
 
-env: B=autotools
+env:
+ - B=autotools
+ - optional=false
 
 os: linux
 
@@ -100,7 +102,7 @@ compiler:
 matrix:
   fast_finish: true
   allow_failures:
-    - os: osx
+    - optional: true
   include:
     - env: B=style-check
       dist: trusty
@@ -141,7 +143,9 @@ matrix:
             make V=1 install;
             return $S;
           }
-    - env: B=latest-deps
+    - env:
+        - B=latest-deps
+        - optional=true
       os: linux
       compiler: clang
       install:
@@ -204,7 +208,9 @@ matrix:
               return $S;
             fi;
           fi
-    - env: B=check
+    - env:
+        - B=check
+        - optional=true
       os: osx
       osx_image: xcode8
       compiler: clang
