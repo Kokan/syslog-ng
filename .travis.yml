@@ -161,6 +161,8 @@ matrix:
       os: osx
       osx_image: xcode8
       compiler: clang
+      git:
+        submodules: true
       install:
         - brew update
         - brew install
@@ -181,24 +183,17 @@ matrix:
         - export PATH=/usr/local/opt/bison/bin:/usr/local/opt/libnet/bin:$PATH
         - export PKG_CONFIG_PATH=/usr/local/opt/openssl/lib/pkgconfig:$PKG_CONFIG_PATH
       before_script:
-        - ./autogen.sh
-        - ./configure
-            --disable-sun-streams
-            --disable-systemd
-            --disable-pacct
-            --enable-all-modules
-            --disable-smtp
-        - make --keep-going -j 3 ||
-          {
-            S=$?;
-            make V=1;
-            return $S;
-          }
+        - echo
       script:
-        - make --keep-going check ||
+        - mkdir build
+        - cd build
+        - cmake
+            -DCMAKE_C_FLAGS=-Werror
+            -DCMAKE_INSTALL_PREFIX=$HOME/install/syslog-ng
+            ..
+        - make --keep-going -j $(nproc) all test install ||
           {
             S=$?;
-            make V=1 check;
             find . -name test-suite.log |
             xargs cat;
             return $S;
