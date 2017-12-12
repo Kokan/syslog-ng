@@ -6,6 +6,8 @@ env: B=autotools
 
 os: linux
 
+group: travis_latest
+
 cache:
   apt: true
 
