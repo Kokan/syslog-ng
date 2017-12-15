@@ -22,7 +22,7 @@ set(AFMONGODB_SOURCES
 
 generate_y_from_ym(modules/afmongodb/afmongodb-grammar)
 
-bison_target(AMQPGrammar
+bison_target(MongoDBGrammar
     ${CMAKE_CURRENT_BINARY_DIR}/afmongodb-grammar.y
     ${CMAKE_CURRENT_BINARY_DIR}/afmongodb-grammar.c
     COMPILE_FLAGS ${BISON_FLAGS})
@@ -33,6 +33,10 @@ include_directories (${MONGOC_INCLUDE_DIR})
 add_library(afmongodb SHARED ${AFMONGODB_SOURCES})
 target_link_libraries(afmongodb PUBLIC ${MONGOC_LIBRARY})
 target_link_libraries(afmongodb PRIVATE syslog-ng)
+
+if (MONGOC_INTERNAL)
+   add_dependencies(afmongodb MONGOC)
+endif()
 
 install(TARGETS afmongodb LIBRARY DESTINATION lib/syslog-ng/ COMPONENT afmongodb)
 
