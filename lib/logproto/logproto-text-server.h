@@ -55,6 +55,9 @@ struct _LogProtoTextServer
 
   gint32 consumed_len;
   gint32 cached_eol_pos;
+  gboolean flush_now;
+
+  time_t ttl;
 };
 
 /* LogProtoTextServer
@@ -79,6 +82,14 @@ static inline gboolean
 log_proto_text_server_validate_options_method(LogProtoServer *s)
 {
   return log_proto_buffered_server_validate_options_method(s);
+}
+
+static void log_proto_text_server_flush(LogProtoBufferedServer *);
+
+static inline gboolean
+log_proto_text_server_should_flush(LogProtoBufferedServer *s)
+{
+   return ((LogProtoTextServer*)s)->flush_now;
 }
 
 #endif

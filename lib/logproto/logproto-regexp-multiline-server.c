@@ -192,6 +192,13 @@ log_proto_regexp_multiline_accumulate_line(LogProtoTextServer *s,
    *
    */
 
+  if (self->super.flush_now)
+    {
+      self->super.flush_now = FALSE;
+      return LPT_CONSUME_LINE | LPT_EXTRACTED;
+    }
+
+
   initial_line = (consumed_len < 0) || (msg_len <= consumed_len + 1);
   if (initial_line)
     {

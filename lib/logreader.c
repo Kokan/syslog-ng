@@ -45,6 +45,7 @@ struct _LogReader
 
   struct iv_task restart_task;
   struct iv_event schedule_wakeup;
+  struct iv_timer timeout_timer;
   MainLoopIOWorkerJob io_job;
   gboolean watches_running:1, suspended:1;
   gint notify_code;
@@ -63,8 +64,9 @@ struct _LogReader
 
 static gboolean log_reader_fetch_log(LogReader *self);
 
-static void log_reader_stop_watches(LogReader *self);
-static void log_reader_update_watches(LogReader *self);
+static void log_reader_stop_watches(LogReader *);
+static void log_reader_update_watches(LogReader *);
+static void log_reader_io_process_input(gpointer);
 
 static void
 log_reader_apply_proto_and_poll_events(LogReader *self, LogProtoServer *proto, PollEvents *poll_events)
@@ -125,6 +127,21 @@ log_reader_work_finished(void *s)
       log_reader_update_watches(self);
     }
   log_pipe_unref(&self->super.super);
+}
+
+static void
+log_reader_timeout_triggered(gpointer s)
+{
+  LogReader *self = (LogReader *) s;
+
+  log_proto_server_flush(self->proto);
+  log_reader_io_process_input(self);
+
+  self->timeout_timer.expires = iv_now;
+  self->timeout_timer.expires.tv_sec += 10; //multi line timeout
+  if (iv_timer_registered(&self->timeout_timer))
+    iv_timer_unregister(&self->timeout_timer);
+  iv_timer_register(&self->timeout_timer);
 }
 
 static void
@@ -204,6 +221,15 @@ log_reader_init_watches(LogReader *self)
   IV_EVENT_INIT(&self->schedule_wakeup);
   self->schedule_wakeup.cookie = self;
   self->schedule_wakeup.handler = log_reader_wakeup_triggered;
+
+  IV_TIMER_INIT(&self->timeout_timer);
+  self->timeout_timer.cookie = self;
+  self->timeout_timer.handler = log_reader_timeout_triggered;
+  self->timeout_timer.expires = iv_now;
+  self->timeout_timer.expires.tv_sec += 10; //multi line timeout
+  if (iv_timer_registered(&self->timeout_timer))
+    iv_timer_unregister(&self->timeout_timer);
+  iv_timer_register(&self->timeout_timer);
 
   main_loop_io_worker_job_init(&self->io_job);
   self->io_job.user_data = self;

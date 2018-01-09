@@ -28,6 +28,8 @@
 #include "logproto.h"
 #include "persist-state.h"
 #include "transport/transport-aux-data.h"
+#include "evtlog.h"
+#include "lib/messages.h"
 #include "bookmark.h"
 
 typedef struct _LogProtoServer LogProtoServer;
@@ -70,6 +72,7 @@ struct _LogProtoServer
   gboolean (*restart_with_state)(LogProtoServer *s, PersistState *state, const gchar *persist_name);
   LogProtoStatus (*fetch)(LogProtoServer *s, const guchar **msg, gsize *msg_len, gboolean *may_read, LogTransportAuxData *aux, Bookmark *bookmark);
   gboolean (*validate_options)(LogProtoServer *s);
+  void (*flush)(LogProtoServer *s);
   void (*free_fn)(LogProtoServer *s);
 };
 
@@ -105,6 +108,14 @@ log_proto_server_fetch(LogProtoServer *s, const guchar **msg, gsize *msg_len, gb
   if (s->status == LPS_SUCCESS)
     return s->fetch(s, msg, msg_len, may_read, aux, bookmark);
   return s->status;
+}
+
+static inline void
+log_proto_server_flush(LogProtoServer *s)
+{
+  if (s->flush)
+    s->flush(s);
+  msg_debug("log_proto_server_flush", evt_tag_int("s->flush", (int)s->flush));
 }
 
 static inline gint

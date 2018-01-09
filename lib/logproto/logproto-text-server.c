@@ -241,6 +241,12 @@ log_proto_text_server_try_extract(LogProtoTextServer *self, LogProtoBufferedServ
   *msg = buffer_start;
 
   verdict = log_proto_text_server_accumulate_line(self, *msg, *msg_len, self->consumed_len);
+  msg_debug("try extract", evt_tag_int("ttl", self->ttl));
+  if ((self->ttl>0) && (self->ttl + 10 < cached_g_current_time_sec()) && (verdict & LPT_WAITING))
+    {
+      msg_debug("set verdict extrac");
+      verdict = LPT_EXTRACTED | LPT_CONSUME_LINE;
+    }
   if (verdict & LPT_EXTRACTED)
     {
       if (verdict & LPT_CONSUME_LINE)
@@ -324,6 +330,8 @@ log_proto_text_server_yield_whole_buffer_as_message(LogProtoTextServer *self, Lo
   /* no EOL, our buffer is full, no way to move forward, return
    * everything we have in our buffer. */
 
+  log_proto_text_server_flush(&self->super);
+  self->flush_now = FALSE;
   *msg = buffer_start;
   *msg_len = buffer_bytes;
   self->consumed_len = -1;
@@ -357,6 +365,14 @@ log_proto_text_server_message_size_too_large(LogProtoTextServer *self, gsize buf
   return buffer_bytes >= self->super.super.options->max_msg_size;
 }
 
+
+static void
+log_proto_text_server_flush(LogProtoBufferedServer *s)
+{
+  LogProtoTextServer *self = (LogProtoTextServer *)s;
+  self->flush_now = TRUE;
+}
+
 /**
  * log_proto_text_server_fetch_from_buffer:
  * @self: LogReader instance
@@ -376,7 +392,12 @@ log_proto_text_server_fetch_from_buffer(LogProtoBufferedServer *s, const guchar 
 
   const guchar *eol = log_proto_text_server_locate_next_eol(self, state, buffer_start, buffer_bytes);
 
-  if (!eol)
+  if (self->flush_now)
+    {
+      log_proto_text_server_yield_whole_buffer_as_message(self, state, buffer_start, buffer_bytes, msg, msg_len);
+      self->flush_now = FALSE;
+    }
+  else if (!eol)
     {
       if (log_proto_text_server_message_size_too_large(self, buffer_bytes)
           || log_proto_buffered_server_is_input_closed(&self->super))
@@ -401,12 +422,18 @@ log_proto_text_server_fetch_from_buffer(LogProtoBufferedServer *s, const guchar 
           goto exit;
         }
     }
+  else
+    self->ttl = cached_g_current_time_sec();
+
 
   log_proto_text_server_remove_trailing_newline(msg, msg_len);
   result = TRUE;
 
 exit:
   log_proto_buffered_server_put_state(&self->super);
+
+  msg_debug("Fetch", evt_tag_int("ttl", self->ttl));
+
   return result;
 }
 
@@ -432,6 +459,8 @@ log_proto_text_server_init(LogProtoTextServer *self, LogTransport *transport, co
   self->super.stream_based = TRUE;
   self->reverse_convert = (GIConv) -1;
   self->consumed_len = -1;
+  self->ttl = 0;
+  self->flush_now = FALSE;
 }
 
 LogProtoServer *

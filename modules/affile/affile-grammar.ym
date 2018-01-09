@@ -68,6 +68,7 @@ LogProtoFileReaderOptions *last_log_proto_options;
 %token KW_MULTI_LINE_MODE
 %token KW_MULTI_LINE_PREFIX
 %token KW_MULTI_LINE_GARBAGE
+%token KW_MULTI_LINE_TIMEOUT
 
 %token KW_WILDCARD_FILE
 %token KW_BASE_DIR

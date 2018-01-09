@@ -45,6 +45,7 @@ typedef struct _PollFileChanges
   gint follow_freq;
   struct iv_timer follow_timer;
   LogPipe *control;
+  time_t last_callback;
 } PollFileChanges;
 
 /* follow timer callback. Check if the file has new content, or deleted or
@@ -94,6 +95,8 @@ poll_file_changes_check_file(gpointer s)
         {
           /* we have data to read */
           poll_events_invoke_callback(s);
+          self->last_callback = cached_g_current_time_sec();
+          msg_debug("poll_event", evt_tag_int("last_callback", self->last_callback));
           return;
         }
       else if (pos == st.st_size)
@@ -135,6 +138,15 @@ poll_file_changes_check_file(gpointer s)
     }
 reschedule:
   poll_events_update_watches(s, G_IO_IN);
+  msg_debug("poll_event", evt_tag_int("last_callback", self->last_callback));
+  if (self->last_callback + 10 < cached_g_current_time_sec())
+    {
+      /* we have data to read */
+      poll_events_invoke_callback(s);
+      self->last_callback = cached_g_current_time_sec();
+      msg_debug("poll_event called back", evt_tag_int("last_callback", self->last_callback));
+      return;
+    }
 }
 
 static void

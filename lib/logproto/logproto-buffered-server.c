@@ -767,11 +767,13 @@ log_proto_buffered_server_fetch(LogProtoServer *s, const guchar **msg, gsize *ms
 {
   LogProtoBufferedServer *self = (LogProtoBufferedServer *) s;
   LogProtoStatus result = LPS_SUCCESS;
+  gboolean buffer_try = FALSE;
 
   while (1)
     {
       if (self->fetch_state == LPBSF_FETCHING_FROM_BUFFER)
         {
+          buffer_try = TRUE;
           if (log_proto_buffered_server_fetch_from_buffer(self, msg, msg_len, aux))
             goto exit;
 
@@ -801,6 +803,9 @@ log_proto_buffered_server_fetch(LogProtoServer *s, const guchar **msg, gsize *ms
               break;
 
             case G_IO_STATUS_AGAIN:
+              //Note: try the buffer if there is some leftover
+              if (!buffer_try)
+                break;
               goto exit;
 
             case G_IO_STATUS_ERROR:
@@ -828,6 +833,12 @@ exit:
         }
     }
   return result;
+}
+
+static void
+log_proto_buffered_server_flush(LogProtoServer *s)
+{
+  msg_debug("log_proto_buffered_server_flush");
 }
 
 static gboolean
@@ -881,6 +892,7 @@ log_proto_buffered_server_init(LogProtoBufferedServer *self, LogTransport *trans
   self->super.restart_with_state = log_proto_buffered_server_restart_with_state;
   self->super.is_position_tracked = log_proto_buffered_server_is_position_tracked;
   self->super.validate_options = log_proto_buffered_server_validate_options_method;
+  self->super.flush = log_proto_buffered_server_flush;
   self->convert = (GIConv) -1;
   self->read_data = log_proto_buffered_server_read_data_method;
   self->io_status = G_IO_STATUS_NORMAL;

@@ -55,6 +55,13 @@ log_proto_indented_multiline_accumulate_line(LogProtoTextServer *s,
    */
 
   /* let's check if the current line is a continuation line or not */
+  LogProtoIMultiLineServer *self = (LogProtoIMultiLineServer *)s;
+  if (self->super.flush_now)
+    {
+      self->super.flush_now = FALSE;
+      return LPT_CONSUME_LINE | LPT_EXTRACTED;
+    }
+
   if (consumed_len >= 0 && msg_len > consumed_len + 1)
     {
       guchar first_character_of_the_current_line = msg[consumed_len + 1];
@@ -79,6 +86,7 @@ log_proto_indented_multiline_server_init(LogProtoIMultiLineServer *self,
 {
   log_proto_text_server_init(&self->super, transport, options);
   self->super.accumulate_line = log_proto_indented_multiline_accumulate_line;
+  self->super.flush_now = FALSE;
 }
 
 LogProtoServer *
