@@ -186,7 +186,6 @@ matrix:
             --disable-sun-streams
             --disable-systemd
             --disable-pacct
-            --enable-all-modules
             --disable-smtp
         - make --keep-going -j 3 ||
           {
