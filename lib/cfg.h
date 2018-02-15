@@ -108,7 +108,6 @@ struct _GlobalConfig
 
   gchar *file_template_name;
   gchar *proto_template_name;
-
   gchar *jvm_options;
 
   LogTemplate *file_template;

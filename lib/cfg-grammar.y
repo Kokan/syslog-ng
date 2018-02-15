@@ -158,6 +158,7 @@ extern struct _StatsOptions *last_stats_options;
 %token LL_CONTEXT_INNER_SRC           16
 %token LL_CONTEXT_CLIENT_PROTO        17
 %token LL_CONTEXT_SERVER_PROTO        18
+%token LL_CONTEXT_OPTIONS             19
 
 
 /* statements */
@@ -925,12 +926,26 @@ options_item
 	| KW_FILE_TEMPLATE '(' string ')'	{ configuration->file_template_name = g_strdup($3); free($3); }
 	| KW_PROTO_TEMPLATE '(' string ')'	{ configuration->proto_template_name = g_strdup($3); free($3); }
 	| KW_RECV_TIME_ZONE '(' string ')'      { configuration->recv_time_zone = g_strdup($3); free($3); }
-  | KW_JVM_OPTIONS '(' string ')' {configuration->jvm_options = g_strdup($3); free($3);}
+        | KW_JVM_OPTIONS '(' string ')' {configuration->jvm_options = g_strdup($3); free($3);}
 	| { last_template_options = &configuration->template_options; } template_option
 	| { last_host_resolve_options = &configuration->host_resolve_options; } host_resolve_option
 	| { last_stats_options = &configuration->stats_options; } stat_option
 	| { last_dns_cache_options = &configuration->dns_cache_options; } dns_cache_option
 	| { last_file_perm_options = &configuration->file_perm_options; } file_perm_option
+	| LL_IDENTIFIER
+          {
+            Plugin *p;
+            gint context = LL_CONTEXT_OPTIONS;
+            gpointer result;
+
+            p = cfg_find_plugin(configuration, context, $1);
+            CHECK_ERROR(p, @1, "%s plugin %s not found", cfg_lexer_lookup_context_name_by_type(context), $1);
+
+            result = cfg_parse_plugin(configuration, p, &@1, NULL);
+            free($1);
+            if (!result)
+              YYERROR;
+          }
 	;
 
 stat_option
