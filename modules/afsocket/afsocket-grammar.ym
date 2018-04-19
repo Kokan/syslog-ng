@@ -175,6 +175,7 @@ systemd_syslog_grammar_set_source_driver(SystemDSyslogSourceDriver *sd)
 %token KW_CIPHER_SUITE
 %token KW_ECDH_CURVE_LIST
 %token KW_SSL_OPTIONS
+%token KW_ALLOW_COMPRESS
 
 /* INCLUDE_DECLS */
 
@@ -775,6 +776,10 @@ tls_option
           {
             tls_context_set_ecdh_curve_list(last_tls_context, $3);
             free($3);
+          }
+        | KW_ALLOW_COMPRESS '(' yesno ')'
+          {
+            tls_context_set_allow_compress(last_tls_context, $3);
           }
 	| KW_SSL_OPTIONS '(' string_list ')'
 	  {

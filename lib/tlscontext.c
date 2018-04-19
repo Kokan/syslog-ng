@@ -54,6 +54,7 @@ struct _TLSContext
   GList *trusted_fingerprint_list;
   GList *trusted_dn_list;
   gint ssl_options;
+  gboolean allow_compress;
   gchar *location;
 };
 
@@ -709,6 +710,15 @@ tls_context_setup_context(TLSContext *self)
         goto error;
     }
 
+  if (self->allow_compress)
+    {
+      SSL_CTX_clear_options(self->ssl_ctx, SSL_OP_NO_COMPRESSION);
+    }
+  else
+    {
+      SSL_CTX_set_options(self->ssl_ctx, SSL_OP_NO_COMPRESSION);
+    }
+
   return TLS_CONTEXT_SETUP_OK;
 
 error:
@@ -917,6 +927,12 @@ tls_context_set_dhparam_file(TLSContext *self, const gchar *dhparam_file)
 {
   g_free(self->dhparam_file);
   self->dhparam_file = g_strdup(dhparam_file);
+}
+
+void
+tls_context_set_allow_compress(TLSContext *self, const gboolean enable)
+{
+  self->allow_compress = enable;
 }
 
 void
