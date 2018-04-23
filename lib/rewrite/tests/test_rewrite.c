@@ -336,6 +336,28 @@ Test(rewrite, groupunset_field_disappears)
   rewrite_teardown(msg);
 }
 
+Test(rewrite, groupunset_all_fields)
+{
+  LogRewrite *test_rewrite = create_rewrite_rule("groupunset(values('*'));");
+  LogMessage *msg = create_message_with_fields("field1", "oldvalue", "field2", "oldvalue2", "PROGRAM", "foobar", NULL);
+  invoke_rewrite_rule(test_rewrite, msg);
+  assert_msg_field_equals(msg, "field1", "", -1);
+  assert_msg_field_equals(msg, "field2", "", -1);
+  assert_msg_field_equals(msg, "PROGRAM", "", -1);
+  rewrite_teardown(msg);
+}
+
+Test(rewrite, groupset_all_fields)
+{
+  LogRewrite *test_rewrite = create_rewrite_rule("groupset(\"apple\" values('*'));");
+  LogMessage *msg = create_message_with_fields("field1", "oldvalue", "field2", "oldvalue2", "PROGRAM", "foobar", NULL);
+  invoke_rewrite_rule(test_rewrite, msg);
+  assert_msg_field_equals(msg, "field1", "apple", -1);
+  assert_msg_field_equals(msg, "field2", "apple", -1);
+  assert_msg_field_equals(msg, "PROGRAM", "apple", -1);
+  rewrite_teardown(msg);
+}
+
 void
 setup(void)
 {

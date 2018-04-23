@@ -75,7 +75,7 @@ log_rewrite_groupset_process(LogRewrite *s, LogMessage **msg, const LogPathOptio
   log_msg_make_writable(msg, path_options);
   userdata.msg = *msg;
   userdata.template = self->replacement;
-  value_pairs_foreach(self->query, self->vp_func, *msg, 0, LTZ_LOCAL, NULL, &userdata);
+  value_pairs_foreach(self->query, self->vp_func, *msg, 0, LTZ_LOCAL, &self->template_options, &userdata);
 }
 
 static void
@@ -97,6 +97,7 @@ log_rewrite_groupset_add_fields(LogRewrite *rewrite, GList *fields)
   g_list_foreach(fields, __free_field, NULL);
   g_list_free(fields);
 }
+
 static LogPipe *
 log_rewrite_groupset_clone(LogPipe *s)
 {
@@ -119,6 +120,7 @@ log_rewrite_groupset_free(LogPipe *s)
   LogRewriteGroupSet *self = (LogRewriteGroupSet *) s;
   value_pairs_unref(self->query);
   log_template_unref(self->replacement);
+  log_template_options_destroy(&self->template_options);
   log_rewrite_free_method(s);
 }
 
@@ -136,6 +138,9 @@ log_rewrite_groupset_new(LogTemplate *template, GlobalConfig *cfg)
   self->replacement = log_template_ref(template);
   self->query = value_pairs_new();
   self->vp_func = log_rewrite_groupset_foreach_func;
+
+  log_template_options_defaults(&self->template_options);
+  log_template_options_init(&self->template_options,cfg);
 
   return &self->super;
 }

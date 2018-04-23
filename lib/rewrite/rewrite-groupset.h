@@ -30,6 +30,7 @@ typedef struct _LogRewriteGroupSet
   LogRewrite super;
   ValuePairs *query;
   LogTemplate *replacement;
+  LogTemplateOptions template_options;
   VPForeachFunc vp_func;
 } LogRewriteGroupSet;
 
