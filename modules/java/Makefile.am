@@ -44,7 +44,9 @@ $(SYSLOG_NG_CORE_LIBS_DIR) $(SYSLOG_NG_CORE_CLASSES_DIR) $(SYSLOG_NG_CORE_PACKAG
 	mkdir -p $@
 
 $(JAVA_HEADER_FILES): $(JAVA_BUILDDIR)/org_syslog_ng_%.h: $(SYSLOG_NG_CORE_PACKAGE_DIR)/%.class
+if HAVE_JAVAH
 	$(AM_V_GEN)$(JAVAH) -classpath  $(SYSLOG_NG_CORE_CLASSES_DIR) -d $(JAVA_BUILDDIR) org.syslog_ng.$*
+endif
 
 all-local: java-binaries java-headers
 
@@ -73,7 +75,7 @@ modules_java_libmod_java_la_CFLAGS = \
     -I$(top_srcdir)/modules/java    \
     -I$(top_builddir)/modules/java	\
     -I$(top_srcdir)/modules/java/native \
-    -I$(top_builddir)/modules/java/native 
+    -I$(top_builddir)/modules/java/native
 
 modules_java_libmod_java_la_SOURCES = \
     modules/java/native/java-grammar.y \
@@ -155,6 +157,10 @@ endif
 .SECONDEXPANSION:
 
 $(JAVA_CLASS_FILES): $(SYSLOG_NG_CORE_PACKAGE_DIR)/%.class: $(SYSLOG_NG_CORE_SRC_DIR)/%.java $(SYSLOG_NG_CORE_CLASSES_DIR) $$($$*_CLASS_DEPS)
+if HAVE_JAVAH
 	$(AM_V_GEN)$(JAVAC) -classpath  $(SYSLOG_NG_CORE_CLASSES_DIR) -d $(SYSLOG_NG_CORE_CLASSES_DIR) $<
+else
+	$(AM_V_GEN)$(JAVAC) -h $(JAVA_BUILDDIR) -classpath  $(SYSLOG_NG_CORE_CLASSES_DIR) -d $(SYSLOG_NG_CORE_CLASSES_DIR) $<
+endif
 
 .PHONY: java-binaries java-headers java-install-exec-hook java-uninstall-exec-hook java-clean-hook all-local
