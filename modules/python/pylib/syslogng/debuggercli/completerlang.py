@@ -59,6 +59,8 @@ class CompleterLang(object):
             return
         elif p.type == 'TAB':
             parser_state = self._parser.state
+        else
+            return
 
             # now handle the error that the TAB token caused
             self._token_position = p.lexpos
