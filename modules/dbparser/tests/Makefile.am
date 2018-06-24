@@ -50,8 +50,8 @@ modules_dbparser_tests_test_parsers_e2e_LDFLAGS	=	\
 
 modules_dbparser_tests_test_radix_CFLAGS	=	\
 	$(TEST_CFLAGS)					\
-	-I$(top_srcdir)/modules/dbparser		\
-	@CFLAGS_NOWARN_POINTER_SIGN@
+	-I$(top_srcdir)/modules/dbparser
+
 modules_dbparser_tests_test_radix_LDADD		=	\
 	$(TEST_LDADD)					\
 	$(top_builddir)/modules/dbparser/libsyslog-ng-patterndb.la
@@ -60,8 +60,8 @@ modules_dbparser_tests_test_radix_LDFLAGS	=	\
 
 modules_dbparser_tests_test_parsers_CFLAGS	=	\
 	$(TEST_CFLAGS)					\
-	-I$(top_srcdir)/modules/dbparser		\
-	@CFLAGS_NOWARN_POINTER_SIGN@
+	-I$(top_srcdir)/modules/dbparser
+
 modules_dbparser_tests_test_parsers_LDADD		=	\
 	$(TEST_LDADD)					\
 	$(top_builddir)/modules/dbparser/libsyslog-ng-patterndb.la

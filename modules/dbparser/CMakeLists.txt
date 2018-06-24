@@ -43,13 +43,7 @@ set(PATTERNDB_SOURCES
 set(PATTERNDB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(patterndb ${PATTERNDB_SOURCES})
-# The radix tree uses unsigned char internally but passes these values to
-# string.h functions, which trigger a lot of harmless warnings.  Of course
-# these could be fixed by adding a lot of casts to the code, but I
-# considered these to be less readable, than simply adding -Wno-pointer-sign
-# warning option.
-#
-set_target_properties(patterndb PROPERTIES COMPILE_FLAGS "-fPIC -Wno-pointer-sign")
+set_target_properties(patterndb PROPERTIES COMPILE_FLAGS "-fPIC")
 target_include_directories(patterndb INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(patterndb PUBLIC syslog-ng)
 
