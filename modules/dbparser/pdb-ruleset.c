@@ -76,7 +76,7 @@ pdb_ruleset_lookup(PDBRuleSet *rule_set, PDBLookupParams *lookup, GArray *dbg_li
   RNode *node;
   LogMessage *msg = lookup->msg;
   GArray *prg_matches, *matches;
-  const gchar *program_value;
+  gchar *program_value;
   gssize program_len;
 
   if (G_UNLIKELY(!rule_set->programs))
@@ -84,7 +84,7 @@ pdb_ruleset_lookup(PDBRuleSet *rule_set, PDBLookupParams *lookup, GArray *dbg_li
 
   program_value = log_msg_get_value(msg, lookup->program_handle, &program_len);
   prg_matches = g_array_new(FALSE, TRUE, sizeof(RParserMatch));
-  node = r_find_node(rule_set->programs, (guint8 *) program_value, program_len, prg_matches);
+  node = r_find_node(rule_set->programs, program_value, program_len, prg_matches);
 
   if (node)
     {
@@ -117,9 +117,9 @@ pdb_ruleset_lookup(PDBRuleSet *rule_set, PDBLookupParams *lookup, GArray *dbg_li
             }
 
           if (G_UNLIKELY(dbg_list))
-            msg_node = r_find_node_dbg(program->rules, (guint8 *) message, message_len, matches, dbg_list);
+            msg_node = r_find_node_dbg(program->rules, message, message_len, matches, dbg_list);
           else
-            msg_node = r_find_node(program->rules, (guint8 *) message, message_len, matches);
+            msg_node = r_find_node(program->rules, message, message_len, matches);
 
           if (msg_node)
             {
