@@ -76,7 +76,7 @@ pdb_ruleset_lookup(PDBRuleSet *rule_set, PDBLookupParams *lookup, GArray *dbg_li
   RNode *node;
   LogMessage *msg = lookup->msg;
   GArray *prg_matches, *matches;
-  gchar *program_value;
+  const gchar *program_value;
   gssize program_len;
 
   if (G_UNLIKELY(!rule_set->programs))

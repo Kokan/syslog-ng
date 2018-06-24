@@ -29,7 +29,7 @@
 #include "radix.c"
 
 static gboolean
-_invoke_parser(gboolean (*parser)(gchar *str, gint *len, const gchar *param, gpointer state, RParserMatch *match),
+_invoke_parser(gboolean (*parser)(const gchar *str, gint *len, const gchar *param, gpointer state, RParserMatch *match),
                const gchar *str, gpointer param, gpointer state, gchar **result_string)
 {
   gboolean result;
