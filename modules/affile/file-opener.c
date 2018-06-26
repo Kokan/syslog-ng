@@ -158,7 +158,10 @@ file_opener_open_fd(FileOpener *self, const gchar *name, FileDirection dir, gint
     }
 
   if (!file_opener_prepare_open(self, name))
-    return FALSE;
+    {
+      g_process_cap_restore(saved_caps);
+      return FALSE;
+    }
 
   *fd = file_opener_open(self, name, file_opener_get_open_flags(self, dir));
 
