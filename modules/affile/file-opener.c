@@ -93,7 +93,7 @@ _is_path_spurious(const gchar *name)
   return _string_contains_fragment(name, spurious_paths);
 }
 
-static inline gboolean
+static inline void
 _obtain_capabilities(FileOpener *self, const gchar *name, cap_t *act_caps)
 {
   if (self->options->needs_privileges)
@@ -105,14 +105,6 @@ _obtain_capabilities(FileOpener *self, const gchar *name, cap_t *act_caps)
     {
       g_process_cap_modify(CAP_DAC_OVERRIDE, TRUE);
     }
-
-  if (self->options->create_dirs &&
-      !file_perm_options_create_containing_directory(&self->options->file_perm_options, name))
-    {
-      return FALSE;
-    }
-
-  return TRUE;
 }
 
 static inline void
@@ -156,7 +148,10 @@ file_opener_open_fd(FileOpener *self, const gchar *name, FileDirection dir, gint
 
   saved_caps = g_process_cap_save();
 
-  if (!_obtain_capabilities(self, name, &saved_caps))
+  _obtain_capabilities(self, name, &saved_caps);
+
+  if (self->options->create_dirs &&
+      !file_perm_options_create_containing_directory(&self->options->file_perm_options, name))
     {
       g_process_cap_restore(saved_caps);
       return FALSE;
