@@ -219,7 +219,6 @@ extern struct _StatsOptions *last_stats_options;
 %token KW_DNS_CACHE_HOSTS             10132
 
 %token KW_PERSIST_ONLY                10140
-%token KW_USE_RCPTID                  10141
 %token KW_USE_UNIQID                  10142
 
 %token KW_TZ_CONVERT                  10150
@@ -962,7 +961,6 @@ options_item
 	| KW_SUPPRESS '(' nonnegative_integer ')'		{ configuration->suppress = $3; }
 	| KW_THREADED '(' yesno ')'		{ configuration->threaded = $3; }
 	| KW_PASS_UNIX_CREDENTIALS '(' yesno ')' { configuration->pass_unix_credentials = $3; }
-	| KW_USE_RCPTID '(' yesno ')'		{ cfg_set_use_uniqid($3); }
 	| KW_USE_UNIQID '(' yesno ')'		{ cfg_set_use_uniqid($3); }
 	| KW_LOG_FIFO_SIZE '(' positive_integer ')'	{ configuration->log_fifo_size = $3; }
 	| KW_LOG_MSG_SIZE '(' positive_integer ')'	{ configuration->log_msg_size = $3; }
