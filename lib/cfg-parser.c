@@ -93,8 +93,6 @@ static CfgLexerKeyword main_keywords[] =
   { "flush_lines",        KW_FLUSH_LINES },
   { "flush_timeout",      KW_FLUSH_TIMEOUT },
   { "suppress",           KW_SUPPRESS },
-  { "sync_freq",          KW_FLUSH_LINES, KWS_OBSOLETE, "flush_lines" },
-  { "sync",               KW_FLUSH_LINES, KWS_OBSOLETE, "flush_lines" },
   { "long_hostnames",     KW_CHAIN_HOSTNAMES, KWS_OBSOLETE, "chain_hostnames" },
   { "chain_hostnames",    KW_CHAIN_HOSTNAMES },
   { "normalize_hostnames",KW_NORMALIZE_HOSTNAMES },
