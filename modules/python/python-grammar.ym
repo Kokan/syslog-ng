@@ -48,7 +48,6 @@
 
 %token KW_PYTHON
 %token KW_CLASS
-%token KW_IMPORTS
 %token KW_LOADERS
 
 %%
@@ -91,7 +90,6 @@ python_dd_option
             free($3);
           }
         | KW_LOADERS python_dd_loaders
-        | KW_IMPORTS python_dd_loaders
         | KW_OPTIONS '(' python_dd_custom_options ')'
         | threaded_dest_driver_option
         | value_pair_option
@@ -127,7 +125,6 @@ python_parser_option
             free($3);
           }
         | KW_LOADERS python_parser_loaders
-        | KW_IMPORTS python_parser_loaders
         | KW_OPTIONS '(' python_parser_custom_options ')'
         ;
 
