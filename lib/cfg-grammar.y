@@ -966,8 +966,6 @@ options_item
 	| KW_USE_RCPTID '(' yesno ')'		{ cfg_set_use_uniqid($3); }
 	| KW_USE_UNIQID '(' yesno ')'		{ cfg_set_use_uniqid($3); }
 	| KW_LOG_FIFO_SIZE '(' positive_integer ')'	{ configuration->log_fifo_size = $3; }
-	| KW_LOG_IW_SIZE '(' positive_integer ')'	{ msg_warning("WARNING: Support for the global log-iw-size() option was removed, please use a per-source log-iw-size()", cfg_lexer_format_location_tag(lexer, &@1)); }
-	| KW_LOG_FETCH_LIMIT '(' positive_integer ')'	{ msg_warning("WARNING: Support for the global log-fetch-limit() option was removed, please use a per-source log-fetch-limit()", cfg_lexer_format_location_tag(lexer, &@1)); }
 	| KW_LOG_MSG_SIZE '(' positive_integer ')'	{ configuration->log_msg_size = $3; }
 	| KW_KEEP_TIMESTAMP '(' yesno ')'	{ configuration->keep_timestamp = $3; }
 	| KW_CREATE_DIRS '(' yesno ')'		{ configuration->create_dirs = $3; }
