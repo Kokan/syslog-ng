@@ -966,7 +966,7 @@ options_item
 	| KW_LOG_MSG_SIZE '(' positive_integer ')'	{ configuration->log_msg_size = $3; }
 	| KW_KEEP_TIMESTAMP '(' yesno ')'	{ configuration->keep_timestamp = $3; }
 	| KW_CREATE_DIRS '(' yesno ')'		{ configuration->create_dirs = $3; }
-  | KW_CUSTOM_DOMAIN '(' string ')'       { configuration->custom_domain = g_strdup($3); free($3); }
+	| KW_CUSTOM_DOMAIN '(' string ')'       { configuration->custom_domain = g_strdup($3); free($3); }
 	| KW_FILE_TEMPLATE '(' string ')'	{ configuration->file_template_name = g_strdup($3); free($3); }
 	| KW_PROTO_TEMPLATE '(' string ')'	{ configuration->proto_template_name = g_strdup($3); free($3); }
 	| KW_RECV_TIME_ZONE '(' string ')'      { configuration->recv_time_zone = g_strdup($3); free($3); }
@@ -992,7 +992,7 @@ stat_option
 	: KW_STATS_FREQ '(' nonnegative_integer ')'          { last_stats_options->log_freq = $3; }
 	| KW_STATS_LEVEL '(' nonnegative_integer ')'         { last_stats_options->level = $3; }
 	| KW_STATS_LIFETIME '(' positive_integer ')'      { last_stats_options->lifetime = $3; }
-  | KW_STATS_MAX_DYNAMIC '(' nonnegative_integer ')'   { last_stats_options->max_dynamic = $3; }
+	| KW_STATS_MAX_DYNAMIC '(' nonnegative_integer ')'   { last_stats_options->max_dynamic = $3; }
 	;
 
 dns_cache_option
