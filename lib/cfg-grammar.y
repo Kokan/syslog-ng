@@ -229,7 +229,6 @@ extern struct _StatsOptions *last_stats_options;
 %token KW_LOG_FIFO_SIZE               10160
 %token KW_LOG_FETCH_LIMIT             10162
 %token KW_LOG_IW_SIZE                 10163
-%token KW_LOG_PREFIX                  10164
 %token KW_PROGRAM_OVERRIDE            10165
 %token KW_HOST_OVERRIDE               10166
 
@@ -1193,7 +1192,6 @@ source_option
 	| KW_KEEP_HOSTNAME '(' yesno ')'	{ last_source_options->keep_hostname = $3; }
 	| KW_PROGRAM_OVERRIDE '(' string ')'	{ last_source_options->program_override = g_strdup($3); free($3); }
 	| KW_HOST_OVERRIDE '(' string ')'	{ last_source_options->host_override = g_strdup($3); free($3); }
-	| KW_LOG_PREFIX '(' string ')'	        { gchar *p = strrchr($3, ':'); if (p) *p = 0; last_source_options->program_override = g_strdup($3); free($3); }
 	| KW_KEEP_TIMESTAMP '(' yesno ')'	{ last_source_options->keep_timestamp = $3; }
 	| KW_READ_OLD_RECORDS '(' yesno ')'	{ last_source_options->read_old_records = $3; }
         | KW_TAGS '(' string_list ')'		{ log_source_options_set_tags(last_source_options, $3); }
