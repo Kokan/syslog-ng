@@ -281,8 +281,6 @@ extern struct _StatsOptions *last_stats_options;
 %token KW_PORT                        10323
 /* misc options */
 
-%token KW_USE_TIME_RECVD              10340
-
 /* filter items*/
 %token KW_FACILITY                    10350
 %token KW_LEVEL                       10351
