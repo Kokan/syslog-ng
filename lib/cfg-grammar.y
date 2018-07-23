@@ -255,7 +255,6 @@ extern struct _StatsOptions *last_stats_options;
 /* timers */
 %token KW_TIME_REOPEN                 10210
 %token KW_TIME_REAP                   10211
-%token KW_TIME_SLEEP                  10212
 
 /* destination options */
 %token KW_TMPL_ESCAPE                 10220
@@ -961,7 +960,6 @@ options_item
 	| KW_BAD_HOSTNAME '(' string ')'	{ cfg_bad_hostname_set(configuration, $3); free($3); }
 	| KW_TIME_REOPEN '(' positive_integer ')'		{ configuration->time_reopen = $3; }
 	| KW_TIME_REAP '(' positive_integer ')'		{ configuration->time_reap = $3; }
-	| KW_TIME_SLEEP '(' nonnegative_integer ')'	{}
 	| KW_SUPPRESS '(' nonnegative_integer ')'		{ configuration->suppress = $3; }
 	| KW_THREADED '(' yesno ')'		{ configuration->threaded = $3; }
 	| KW_PASS_UNIX_CREDENTIALS '(' yesno ')' { configuration->pass_unix_credentials = $3; }
