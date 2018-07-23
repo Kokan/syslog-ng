@@ -44,7 +44,6 @@ static CfgLexerKeyword affile_keywords[] =
   { "monitor_method",     KW_MONITOR_METHOD },
 
   { "fsync",              KW_FSYNC },
-  { "remove_if_older",    KW_OVERWRITE_IF_OLDER, KWS_OBSOLETE, "overwrite_if_older" },
   { "overwrite_if_older", KW_OVERWRITE_IF_OLDER },
   { "follow_freq",        KW_FOLLOW_FREQ },
   { "multi_line_mode",    KW_MULTI_LINE_MODE  },
