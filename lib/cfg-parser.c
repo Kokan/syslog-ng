@@ -76,7 +76,6 @@ static CfgLexerKeyword main_keywords[] =
   { "rekey",              KW_REKEY },
   { "shift",              KW_SHIFT },
   { "add_prefix",         KW_ADD_PREFIX },
-  { "replace",            KW_REPLACE_PREFIX, KWS_OBSOLETE, "replace_prefix" },
   { "replace_prefix",     KW_REPLACE_PREFIX },
 
   /* option items */
