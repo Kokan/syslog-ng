@@ -173,6 +173,7 @@ void log_proto_client_free_method(LogProtoClient *s);
   {                                                                     \
     static LogProtoClientFactory proto = {                              \
       .construct = prefix ## _client_new,                               \
+      .stateful  = FALSE,                                               \
     };                                                                  \
     return &proto;                                                      \
   }
@@ -198,6 +199,7 @@ struct _LogProtoClientFactory
   LogProtoClient *(*construct)(LogTransport *transport, const LogProtoClientOptions *options);
   gint default_inet_port;
   gboolean use_multitransport;
+  gboolean stateful;
 };
 
 static inline LogProtoClient *
