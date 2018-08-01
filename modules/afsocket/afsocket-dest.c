@@ -514,6 +514,12 @@ _dd_init_dgram(AFSocketDestDriver *self)
 }
 
 static gboolean
+_dd_get_proto_stateful(AFSocketDestDriver *self)
+{
+  return self->proto_factory->stateful;
+}
+
+static gboolean
 _dd_init_socket(AFSocketDestDriver *self)
 {
   switch (self->transport_mapper->sock_type)
@@ -538,7 +544,17 @@ afsocket_dd_init(LogPipe *s)
       return FALSE;
     }
 
-  return _dd_init_socket(self);
+  if (!_dd_init_socket(self))
+    {
+      return FALSE;
+    }
+
+  if (!_dd_get_proto_stateful(self))
+    {
+      log_writer_msg_rewind((gpointer)self->writer);
+    }
+
+  return TRUE;
 }
 
 static void
