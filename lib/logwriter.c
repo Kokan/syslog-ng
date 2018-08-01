@@ -139,7 +139,7 @@ log_writer_msg_ack(gint num_msg_acked, gpointer user_data)
   log_queue_ack_backlog(self->queue, num_msg_acked);
 }
 
-static void
+void
 log_writer_msg_rewind(gpointer user_data)
 {
   LogWriter *self = (LogWriter *)user_data;
