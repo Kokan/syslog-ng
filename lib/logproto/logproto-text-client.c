@@ -71,23 +71,19 @@ log_proto_text_client_flush(LogProtoClient *s)
       self->partial_pos += rc;
       return LPS_SUCCESS;
     }
-  else
+
+  if (self->partial_free)
+    self->partial_free(self->partial);
+  self->partial = NULL;
+  if (self->next_state >= 0)
     {
-      if (self->partial_free)
-        self->partial_free(self->partial);
-      self->partial = NULL;
-      if (self->next_state >= 0)
-        {
-          self->state = self->next_state;
-          self->next_state = -1;
-        }
-
-      log_proto_client_msg_ack(&self->super, 1);
-
-      /* NOTE: we return here to give a chance to the framed protocol to send the frame header. */
-      return LPS_SUCCESS;
+      self->state = self->next_state;
+      self->next_state = -1;
     }
 
+  log_proto_client_msg_ack(&self->super, 1);
+
+  /* NOTE: we return here to give a chance to the framed protocol to send the frame header. */
   return LPS_SUCCESS;
 }
 
