@@ -63,6 +63,7 @@ struct _LogWriter
   LogQueue *queue;
   guint32 flags:31;
   gint32 seq_num;
+  gboolean partial_write;
   StatsCounterItem *dropped_messages;
   StatsCounterItem *suppressed_messages;
   StatsCounterItem *processed_messages;
@@ -1142,6 +1143,8 @@ log_writer_write_message(LogWriter *self, LogMessage *msg, LogPathOptions *path_
                                                     self->line_buffer->len,
                                                     &consumed);
 
+      self->partial_write = status == LPS_PARTIAL;
+
       if (consumed)
         log_writer_realloc_line_buffer(self);
 
@@ -1561,6 +1564,10 @@ log_writer_reopen_deferred(gpointer s)
   log_writer_stop_watches(self);
   log_writer_stop_idle_timer(self);
 
+  if (self->partial_write)
+    {
+      log_queue_rewind_backlog_all(self->queue);
+    }
   log_writer_free_proto(self);
   log_writer_set_proto(self, proto);
 
