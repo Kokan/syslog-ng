@@ -27,14 +27,21 @@ import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.Path;
 
 import java.io.IOException;
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class HdfsFile {
     private FSDataOutputStream fsDataOutputStream;
     private Path path;
+    private Date lastWrite;
+    private Timer timeReap;
 
     public HdfsFile(Path filepath, FSDataOutputStream outputstream) {
         this.path = filepath;
         this.fsDataOutputStream = outputstream;
+        this.lastWrite = null;
+        this.timeReap = null;
     }
 
     public Path getPath() {
@@ -51,6 +58,50 @@ public class HdfsFile {
 
     public void write(byte[] message) throws IOException {
          fsDataOutputStream.write(message);
+
+         lastWrite = new Date();
+         updateTimeReap();
+    }
+
+    protected void updateTimeReap() {
+         if (timeReap != null)
+            return; //Timer is active reschedule could be done, when the timer expires
+
+         timeReap = new Timer();
+         TimerTask tt = new TimerTask() {
+              private long timeSinceLastWrite() {
+                 Date now = new Date();
+
+                 return lastWrite.getTime() - now.getTime();
+              }
+
+              @Override
+              public void run() {
+                 if (timeSinceLastWrite() <= 10000) {
+                    //TODO: reschedule
+                    System.out.println("There was a write after starting the timer, it should be rescheduled.");
+                    timeReap.cancel();
+                    timeReap = null;
+                    return;
+                 }
+
+                 System.out.println("Close file" + path);
+
+                 //TODO: archive should be done also if needed
+                 //TODO: probably flush is not needed but what the hack
+                 try {
+                     flush();
+                     close();
+                 } catch (IOException e) {
+                     //TODO: proper print stacktrace
+                     System.out.println("Exception: " + e + "; but not much we could do about it.");
+                 } finally {
+                     timeReap.cancel(); 
+                     timeReap = null;
+                 }
+              };
+         };
+         timeReap.schedule(tt, 10000);
     }
 
     public void close() throws IOException {
@@ -59,5 +110,6 @@ public class HdfsFile {
 
           fsDataOutputStream.close();
           fsDataOutputStream = null;
+          lastWrite = null;
     }
 }
