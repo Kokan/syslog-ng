@@ -48,8 +48,12 @@ public class HdfsFile {
         return path;
     }
 
+    public boolean isOpen() {
+        return fsDataOutputStream != null;
+    }
+
     public void flush() throws IOException {
-         if (fsDataOutputStream == null)
+         if (!isOpen())
             return;
 
          fsDataOutputStream.hflush();
@@ -57,57 +61,70 @@ public class HdfsFile {
     }
 
     public void write(byte[] message) throws IOException {
+         if (!isOpen())
+            throw new IOException("File is not open: "+path);
+
          fsDataOutputStream.write(message);
 
-         lastWrite = new Date();
          updateTimeReap();
+         lastWrite = new Date();
+    }
+
+    private int TIME_REAP_DEFAULT = 10000;
+
+    class TimeReap extends TimerTask {
+        public TimeReap() {
+        }
+
+        private long timeSinceLastWrite() {
+           Date now = new Date();
+
+           return now.getTime() - lastWrite.getTime();
+        }
+
+        @Override
+        public void run() {
+           if (timeSinceLastWrite() < TIME_REAP_DEFAULT) {
+              //TODO: reschedule
+              System.out.println("There was a write after starting the timer, it should be rescheduled.");
+              timeReap.cancel();
+              timeReap = new Timer();
+              timeReap.schedule(new TimeReap(), TIME_REAP_DEFAULT);
+              return;
+           }
+
+           System.out.println("Close file" + path);
+
+           //TODO: archive should be done also if needed
+           //TODO: probably flush is not needed but what the hack
+           try {
+               flush();
+               close();
+               //TODO: it should also remove itself from the containnig file hashtable
+           } catch (IOException e) {
+               //TODO: proper print stacktrace
+               System.out.println("Exception: " + e + "; but not much we could do about it.");
+           } finally {
+               timeReap.cancel(); 
+               timeReap = null;
+           }
+        };
     }
 
     protected void updateTimeReap() {
          if (timeReap != null)
             return; //Timer is active reschedule could be done, when the timer expires
 
+
          timeReap = new Timer();
-         TimerTask tt = new TimerTask() {
-              private long timeSinceLastWrite() {
-                 Date now = new Date();
-
-                 return lastWrite.getTime() - now.getTime();
-              }
-
-              @Override
-              public void run() {
-                 if (timeSinceLastWrite() <= 10000) {
-                    //TODO: reschedule
-                    System.out.println("There was a write after starting the timer, it should be rescheduled.");
-                    timeReap.cancel();
-                    timeReap = null;
-                    return;
-                 }
-
-                 System.out.println("Close file" + path);
-
-                 //TODO: archive should be done also if needed
-                 //TODO: probably flush is not needed but what the hack
-                 try {
-                     flush();
-                     close();
-                 } catch (IOException e) {
-                     //TODO: proper print stacktrace
-                     System.out.println("Exception: " + e + "; but not much we could do about it.");
-                 } finally {
-                     timeReap.cancel(); 
-                     timeReap = null;
-                 }
-              };
-         };
-         timeReap.schedule(tt, 10000);
+         timeReap.schedule(new TimeReap(), TIME_REAP_DEFAULT);
     }
 
     public void close() throws IOException {
-         if (fsDataOutputStream == null)
+         if (!isOpen())
             return;
 
+          timeReap.cancel();
           fsDataOutputStream.close();
           fsDataOutputStream = null;
           lastWrite = null;

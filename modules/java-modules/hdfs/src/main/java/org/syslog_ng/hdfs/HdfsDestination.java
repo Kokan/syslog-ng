@@ -172,6 +172,10 @@ public class HdfsDestination extends StructuredLogDestination {
             hdfsFile = createHdfsFile(resolvedFileName);
             openedFiles.put(resolvedFileName, hdfsFile);
         }
+        if (!hdfsFile.isOpen()) {
+            hdfsFile = createHdfsFile(resolvedFileName);
+            openedFiles.put(resolvedFileName, hdfsFile);
+        }
         return hdfsFile;
     }
 
