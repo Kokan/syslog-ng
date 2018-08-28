@@ -28,20 +28,16 @@ import org.apache.hadoop.fs.Path;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class HdfsFile {
     private FSDataOutputStream fsDataOutputStream;
     private Path path;
     private Date lastWrite;
-    private Timer timeReap;
 
     public HdfsFile(Path filepath, FSDataOutputStream outputstream) {
         this.path = filepath;
         this.fsDataOutputStream = outputstream;
         this.lastWrite = null;
-        this.timeReap = null;
     }
 
     public Path getPath() {
@@ -66,65 +62,22 @@ public class HdfsFile {
 
          fsDataOutputStream.write(message);
 
-         updateTimeReap();
          lastWrite = new Date();
     }
 
-    private int TIME_REAP_DEFAULT = 10000;
+    public long timeSinceLastWrite() {
+       if (!isOpen())
+          return 0; //TODO: think this over, this means all closed file are written just now
 
-    class TimeReap extends TimerTask {
-        public TimeReap() {
-        }
+       Date now = new Date();
 
-        private long timeSinceLastWrite() {
-           Date now = new Date();
-
-           return now.getTime() - lastWrite.getTime();
-        }
-
-        @Override
-        public void run() {
-           if (timeSinceLastWrite() < TIME_REAP_DEFAULT) {
-              //TODO: reschedule
-              System.out.println("There was a write after starting the timer, it should be rescheduled.");
-              timeReap.cancel();
-              timeReap = new Timer();
-              timeReap.schedule(new TimeReap(), TIME_REAP_DEFAULT);
-              return;
-           }
-
-           System.out.println("Close file" + path);
-
-           //TODO: archive should be done also if needed
-           //TODO: probably flush is not needed but what the hack
-           try {
-               flush();
-               close();
-               //TODO: it should also remove itself from the containnig file hashtable
-           } catch (IOException e) {
-               //TODO: proper print stacktrace
-               System.out.println("Exception: " + e + "; but not much we could do about it.");
-           } finally {
-               timeReap.cancel(); 
-               timeReap = null;
-           }
-        };
-    }
-
-    protected void updateTimeReap() {
-         if (timeReap != null)
-            return; //Timer is active reschedule could be done, when the timer expires
-
-
-         timeReap = new Timer();
-         timeReap.schedule(new TimeReap(), TIME_REAP_DEFAULT);
+       return now.getTime() - lastWrite.getTime();
     }
 
     public void close() throws IOException {
          if (!isOpen())
             return;
 
-          timeReap.cancel();
           fsDataOutputStream.close();
           fsDataOutputStream = null;
           lastWrite = null;

@@ -43,6 +43,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class HdfsDestination extends StructuredLogDestination {
     private static final String LOG_TAG = "HDFS:";
     private static final String HADOOP_SECURITY_AUTH_KEY = "hadoop.security.authentication";
@@ -59,6 +62,56 @@ public class HdfsDestination extends StructuredLogDestination {
     private String archiveDir;
 
     HashMap<String, HdfsFile> openedFiles;
+
+    private Timer timeReap;
+
+    private int TIME_REAP_DEFAULT = 10000;
+
+    class TimeReap extends TimerTask {
+        private Map<String, HdfsFile> files;
+        public TimeReap(Map<String, HdfsFile> files) {
+            this.files = files;
+        }
+
+        private boolean closeFile(HdfsFile hdfsfile) {
+           System.out.println("Close file" + hdfsfile.getPath());
+
+           try {
+               hdfsfile.flush();
+               hdfsfile.close();
+               //TODO: it should also remove itself from the containnig file hashtable
+           } catch (IOException e) {
+               printStackTrace(e);
+               return false;
+           }
+
+           archiveFile(hdfsfile);
+
+           return true;
+        }
+
+        @Override
+        public void run() {
+           long nextTimerExpires = -1;
+           for (Map.Entry<String, HdfsFile> entry : files.entrySet()) {
+               long current = entry.getValue().timeSinceLastWrite();
+               if (current < nextTimerExpires || nextTimerExpires == -1) {
+                  nextTimerExpires = current;
+               }
+
+               if (current >= TIME_REAP_DEFAULT) //Expired
+                  closeFile(entry.getValue());
+           }
+
+           if (nextTimerExpires < TIME_REAP_DEFAULT) {
+              timeReap.cancel();
+              timeReap = new Timer();
+              timeReap.schedule(new TimeReap(files), nextTimerExpires);
+              return;
+           }
+
+        };
+    }
 
     public HdfsDestination(long handle) {
         super(handle);
@@ -137,6 +190,15 @@ public class HdfsDestination extends StructuredLogDestination {
         UserGroupInformation.loginUserFromKeytab(options.getKerberosPrincipal(), options.getKerberosKeytabFile());
     }
 
+
+    protected void updateFilesTimer(HdfsFile hdfsfile) {
+        if (timeReap != null)
+           return;
+
+        timeReap = new Timer();
+        timeReap.schedule( new TimeReap(openedFiles), TIME_REAP_DEFAULT);
+    }
+
     @Override
     public boolean send(LogMessage logMessage) {
         isOpened = false;
@@ -161,6 +223,8 @@ public class HdfsDestination extends StructuredLogDestination {
             closeAll(false);
             return false;
         }
+
+        updateFilesTimer(hdfsfile);
 
         isOpened = true;
         return true;
@@ -253,11 +317,17 @@ public class HdfsDestination extends StructuredLogDestination {
     @Override
     public void close() {
         logger.debug("Closing hdfs");
+
         closeAll(true);
         isOpened = false;
     }
 
     private void closeAll(boolean isArchiving) {
+        if (timeReap != null) {
+            timeReap.cancel();
+            timeReap = null;
+        }
+
         closeAllHdfsFiles();
 
         if (isArchiving) {
@@ -329,6 +399,7 @@ public class HdfsDestination extends StructuredLogDestination {
     @Override
     public void deinit() {
         logger.debug("Deinitialize hdfs destination");
+
         options.deinit();
     }
 
