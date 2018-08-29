@@ -45,6 +45,8 @@ import java.util.UUID;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class HdfsDestination extends StructuredLogDestination {
     private static final String LOG_TAG = "HDFS:";
@@ -65,6 +67,7 @@ public class HdfsDestination extends StructuredLogDestination {
 
     private Timer timeReap;
 
+    private Lock lock;
 
     class TimeReap extends TimerTask {
         private Map<String, HdfsFile> files;
@@ -91,6 +94,8 @@ public class HdfsDestination extends StructuredLogDestination {
 
         @Override
         public void run() {
+           lock.lock();
+           try {
            long nextTimerExpires = -1;
            for (Map.Entry<String, HdfsFile> entry : files.entrySet()) {
                long current = entry.getValue().timeSinceLastWrite();
@@ -108,7 +113,9 @@ public class HdfsDestination extends StructuredLogDestination {
               timeReap.schedule(new TimeReap(files), nextTimerExpires);
               return;
            }
-
+           } finally {
+             lock.unlock();
+           }
         };
     }
 
@@ -117,6 +124,7 @@ public class HdfsDestination extends StructuredLogDestination {
         logger = Logger.getRootLogger();
         SyslogNgInternalLogger.register(logger);
         options = new HdfsOptions(this);
+        lock = new ReentrantLock();
     }
 
     @Override
@@ -145,6 +153,7 @@ public class HdfsDestination extends StructuredLogDestination {
     @Override
     public boolean open() {
         logger.debug("Opening hdfs");
+        lock.lock();
         openedFiles = new HashMap<String, HdfsFile>();
         isOpened = false;
         try {
@@ -163,6 +172,8 @@ public class HdfsDestination extends StructuredLogDestination {
         } catch (Exception e) {
             printStackTrace(e);
             closeAll(false);
+        } finally {
+          lock.unlock();
         }
         return isOpened;
     }
@@ -205,6 +216,7 @@ public class HdfsDestination extends StructuredLogDestination {
     public boolean send(LogMessage logMessage) {
         isOpened = false;
         String resolvedFileName = options.getFileNameTemplate().getResolvedString(logMessage);
+        lock.lock();
         HdfsFile hdfsfile = getHdfsFile(resolvedFileName);
         if (hdfsfile == null) {
             // Unable to open file
@@ -224,6 +236,8 @@ public class HdfsDestination extends StructuredLogDestination {
             printStackTrace(e);
             closeAll(false);
             return false;
+        } finally {
+          lock.unlock();
         }
 
         updateFilesTimer(hdfsfile);
@@ -306,6 +320,8 @@ public class HdfsDestination extends StructuredLogDestination {
          */
 
         logger.debug("Flushing hdfs");
+        lock.lock();
+        try {
         for (Map.Entry<String, HdfsFile> entry : openedFiles.entrySet()) {
             HdfsFile hdfsfile = entry.getValue();
             try {
@@ -314,13 +330,21 @@ public class HdfsDestination extends StructuredLogDestination {
                 logger.debug(String.format("Flush failed on file %s, reason: %s", entry.getKey(), e.getMessage()));
             }
         }
+        } finally {
+          lock.unlock();
+        }
     }
 
     @Override
     public void close() {
         logger.debug("Closing hdfs");
 
+        lock.lock();
+        try {
         closeAll(true);
+        } finally {
+          lock.unlock();
+        }
         isOpened = false;
     }
 
