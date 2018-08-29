@@ -65,7 +65,6 @@ public class HdfsDestination extends StructuredLogDestination {
 
     private Timer timeReap;
 
-    private int TIME_REAP_DEFAULT = 10000;
 
     class TimeReap extends TimerTask {
         private Map<String, HdfsFile> files;
@@ -99,11 +98,11 @@ public class HdfsDestination extends StructuredLogDestination {
                   nextTimerExpires = current;
                }
 
-               if (current >= TIME_REAP_DEFAULT) //Expired
+               if (current >= options.getTimeReap()) //Expired
                   closeFile(entry.getValue());
            }
 
-           if (nextTimerExpires < TIME_REAP_DEFAULT) {
+           if (nextTimerExpires < options.getTimeReap()) {
               timeReap.cancel();
               timeReap = new Timer();
               timeReap.schedule(new TimeReap(files), nextTimerExpires);
@@ -192,11 +191,14 @@ public class HdfsDestination extends StructuredLogDestination {
 
 
     protected void updateFilesTimer(HdfsFile hdfsfile) {
+        if (options.getTimeReap() == 0)
+           return;
+
         if (timeReap != null)
            return;
 
         timeReap = new Timer();
-        timeReap.schedule( new TimeReap(openedFiles), TIME_REAP_DEFAULT);
+        timeReap.schedule( new TimeReap(openedFiles), options.getTimeReap());
     }
 
     @Override
