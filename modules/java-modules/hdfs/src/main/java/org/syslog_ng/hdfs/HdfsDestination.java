@@ -358,8 +358,7 @@ public class HdfsDestination extends StructuredLogDestination {
             hdfs.close();
         } catch (IOException e) {
             printStackTrace(e);
-        }
-        finally {
+        } finally {
             hdfs = null;
         }
     }
