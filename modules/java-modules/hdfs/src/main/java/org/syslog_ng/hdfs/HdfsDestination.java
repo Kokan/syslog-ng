@@ -47,6 +47,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import static java.lang.Math.abs;
+
 
 public class HdfsDestination extends StructuredLogDestination {
     private static final String LOG_TAG = "HDFS:";
@@ -72,16 +74,16 @@ public class HdfsDestination extends StructuredLogDestination {
     class TimeReap extends TimerTask {
         private Map<String, HdfsFile> files;
         public TimeReap(Map<String, HdfsFile> files) {
+            logger.trace("Create TimeReap");
             this.files = files;
         }
 
         private boolean closeFile(HdfsFile hdfsfile) {
-           System.out.println("Close file" + hdfsfile.getPath());
+           logger.info("Close file" + hdfsfile.getPath());
 
            try {
                hdfsfile.flush();
                hdfsfile.close();
-               //TODO: it should also remove itself from the containnig file hashtable
            } catch (IOException e) {
                printStackTrace(e);
                return false;
@@ -92,31 +94,62 @@ public class HdfsDestination extends StructuredLogDestination {
            return true;
         }
 
-        @Override
-        public void run() {
-           lock.lock();
-           try {
+        void closeExpiredFiles() {
+           for (Map.Entry<String, HdfsFile> entry : files.entrySet()) {
+               HdfsFile file = entry.getValue();
+               long current = file.timeSinceLastWrite();
+
+               if (current>0) {
+                  logger.trace("time-reap file " + file.getPath() + " since last write " + current);
+               }
+
+               if (current >= options.getTimeReap())
+                  closeFile(file);
+           }
+        }
+
+        long caculateNextWakeUp() {
+           if (files.isEmpty())
+              return 0;
+
            long nextTimerExpires = -1;
            for (Map.Entry<String, HdfsFile> entry : files.entrySet()) {
                long current = entry.getValue().timeSinceLastWrite();
-               if (current < nextTimerExpires || nextTimerExpires == -1) {
+
+               if (current > nextTimerExpires || nextTimerExpires == -1) {
                   nextTimerExpires = current;
                }
-
-               if (current >= options.getTimeReap()) //Expired
-                  closeFile(entry.getValue());
            }
 
-           if (nextTimerExpires < options.getTimeReap()) {
-              timeReap.cancel();
+           if (nextTimerExpires <= 0)
+              return 0;
+
+           nextTimerExpires = Math.abs(options.getTimeReap() - nextTimerExpires);
+           logger.debug("Next schedule in " + nextTimerExpires);
+
+           return nextTimerExpires;
+        }
+
+        @Override
+        public void run() {
+           logger.debug("time-reap run");
+           lock.lock();
+           try {
+           closeExpiredFiles();
+
+           long nextTimerExpires = caculateNextWakeUp();
+
+           timeReap.cancel();
+           timeReap = null;
+
+           if (nextTimerExpires > 0) {
               timeReap = new Timer();
               timeReap.schedule(new TimeReap(files), nextTimerExpires);
-              return;
            }
            } finally {
              lock.unlock();
            }
-        };
+        }
     }
 
     public HdfsDestination(long handle) {
@@ -232,6 +265,8 @@ public class HdfsDestination extends StructuredLogDestination {
             byte[] rawMessage = formattedMessage.getBytes(Charset.forName("UTF-8"));
 
             hdfsfile.write(rawMessage);
+
+            updateFilesTimer(hdfsfile);
         } catch (IOException e) {
             printStackTrace(e);
             closeAll(false);
@@ -240,7 +275,6 @@ public class HdfsDestination extends StructuredLogDestination {
           lock.unlock();
         }
 
-        updateFilesTimer(hdfsfile);
 
         isOpened = true;
         return true;
