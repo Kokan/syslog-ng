@@ -29,7 +29,7 @@ typedef struct _FilterOp
   FilterExprNode *left, *right;
 } FilterOp;
 
-static void
+static gboolean
 fop_init(FilterExprNode *s, GlobalConfig *cfg)
 {
   FilterOp *self = (FilterOp *) s;
@@ -41,6 +41,8 @@ fop_init(FilterExprNode *s, GlobalConfig *cfg)
   filter_expr_init(self->right, cfg);
 
   self->super.modify = self->left->modify || self->right->modify;
+
+  return TRUE;
 }
 
 static void
