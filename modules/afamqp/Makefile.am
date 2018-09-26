@@ -37,3 +37,5 @@ EXTRA_DIST				+=	\
 		modules/afamqp/CMakeLists.txt
 
 .PHONY: modules/afamqp/ mod-afamqp mod-amqp
+
+include modules/afamqp/tests/Makefile.am

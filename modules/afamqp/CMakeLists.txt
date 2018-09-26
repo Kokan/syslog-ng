@@ -38,4 +38,6 @@ target_link_libraries(afamqp PRIVATE ${RabbitMQ_LIBRARY} syslog-ng)
 
 install(TARGETS afamqp LIBRARY DESTINATION lib/syslog-ng/ COMPONENT afamqp)
 
+add_test_subdirectory(tests)
+
 endif()
