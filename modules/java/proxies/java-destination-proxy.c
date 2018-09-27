@@ -108,7 +108,7 @@ __load_destination_object(JavaDestinationProxy *self, const gchar *class_name, c
     }
 
   self->dest_impl.mi_on_message_queue_empty = CALL_JAVA_FUNCTION(java_env, GetMethodID, self->loaded_class,
-      "onMessageQueueEmptyProxy", "()V");
+                                              "onMessageQueueEmptyProxy", "()V");
   if (!self->dest_impl.mi_on_message_queue_empty)
     {
       msg_error("Can't find method in class",
@@ -151,10 +151,10 @@ __load_destination_object(JavaDestinationProxy *self, const gchar *class_name, c
     }
 
   self->dest_impl.mi_get_name_by_uniq_options = CALL_JAVA_FUNCTION(java_env,
-      GetMethodID,
-      self->loaded_class,
-      "getNameByUniqOptionsProxy",
-      "()Ljava/lang/String;"
+                                                GetMethodID,
+                                                self->loaded_class,
+                                                "getNameByUniqOptionsProxy",
+                                                "()Ljava/lang/String;"
                                                                   );
   if (!self->dest_impl.mi_get_name_by_uniq_options)
     {
