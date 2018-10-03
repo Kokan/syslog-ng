@@ -16,7 +16,7 @@ install:
       bison
       docbook-xsl
       flex
-      gradle-2.2.1
+      gradle
       libcap-dev
       libdbd-sqlite3
       libdbi0-dev
@@ -26,7 +26,7 @@ install:
       libhiredis-dev
       libivykis-dev
       librabbitmq-dev
-      libmongoc-dev
+      #libmongoc-dev
       libjson0-dev
       libnet1-dev
       libriemann-client-dev
@@ -34,8 +34,8 @@ install:
       pkg-config
       sqlite3
       xsltproc
-      criterion-dev
-      libmaxminddb-dev
+      #criterion-dev
+      #libmaxminddb-dev
       libxml2-utils
   - sudo pip install -r dbld/images/required-pip/devshell.txt
 before_script:
