@@ -50,6 +50,7 @@ static CfgLexerKeyword kafka_keywords[] =
   { "workers",        KW_WORKERS },
   { "kafka_c",        KW_KAFKA },   /* compatibility with incubator naming */
   { "kafka",          KW_KAFKA },
+  { "brokers",        KW_BROKERS },
   { NULL }
 };
 
