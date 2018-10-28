@@ -10,6 +10,7 @@ cache:
   apt: true
 
 install:
+  - sudo ./dbld/images/helpers/dependencies.sh install_criterion
   - curl -4 http://download.opensuse.org/repositories/home:/laszlo_budai:/syslog-ng/xUbuntu_14.04/Release.key | sudo apt-key add -
   - echo "deb http://download.opensuse.org/repositories/home:/laszlo_budai:/syslog-ng/xUbuntu_14.04 ./" | sudo tee --append /etc/apt/sources.list.d/syslog-ng-obs.list
   - sudo apt-get update -qq
@@ -36,7 +37,6 @@ install:
       pkg-config
       sqlite3
       xsltproc
-      criterion-dev
       libmaxminddb-dev
       libxml2-utils
   - sudo pip install -r requirements.txt
