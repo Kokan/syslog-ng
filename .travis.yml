@@ -9,28 +9,31 @@ os: linux
 cache:
   apt: true
 
+addons:
+  apt:
+    packages:
+    - autoconf-archive
+    - bison
+    - docbook-xsl
+    - flex
+    - gradle
+    - libcap-dev
+    - libdbd-sqlite3
+    - libdbi0-dev
+    - libesmtp-dev
+    - libgeoip-dev
+    - libglib2.0-dev
+    - libhiredis-dev
+    - libjson0-dev
+    - libnet1-dev
+    - libwrap0-dev
+    - pkg-config
+    - sqlite3
+    - xsltproc
+    - libxml2-utils
+
 install:
   - sudo ./dbld/images/helpers/dependencies.sh install_criterion
-  - sudo apt-get install -qq
-      autoconf-archive
-      bison
-      docbook-xsl
-      flex
-      gradle
-      libcap-dev
-      libdbd-sqlite3
-      libdbi0-dev
-      libesmtp-dev
-      libgeoip-dev
-      libglib2.0-dev
-      libhiredis-dev
-      libjson0-dev
-      libnet1-dev
-      libwrap0-dev
-      pkg-config
-      sqlite3
-      xsltproc
-      libxml2-utils
   - curl -4 http://download.opensuse.org/repositories/home:/laszlo_budai:/syslog-ng/xUbuntu_14.04/Release.key | sudo apt-key add -
   - echo "deb http://download.opensuse.org/repositories/home:/laszlo_budai:/syslog-ng/xUbuntu_14.04 ./" | sudo tee --append /etc/apt/sources.list.d/syslog-ng-obs.list
   - sudo apt-get update -qq
