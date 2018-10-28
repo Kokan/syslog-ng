@@ -11,9 +11,6 @@ cache:
 
 install:
   - sudo ./dbld/images/helpers/dependencies.sh install_criterion
-  - curl -4 http://download.opensuse.org/repositories/home:/laszlo_budai:/syslog-ng/xUbuntu_14.04/Release.key | sudo apt-key add -
-  - echo "deb http://download.opensuse.org/repositories/home:/laszlo_budai:/syslog-ng/xUbuntu_14.04 ./" | sudo tee --append /etc/apt/sources.list.d/syslog-ng-obs.list
-  - sudo apt-get update -qq
   - sudo apt-get install -qq
       autoconf-archive
       bison
@@ -27,18 +24,22 @@ install:
       libgeoip-dev
       libglib2.0-dev
       libhiredis-dev
-      libivykis-dev
-      librabbitmq-dev
-      libmongoc-dev
       libjson0-dev
       libnet1-dev
-      libriemann-client-dev
       libwrap0-dev
       pkg-config
       sqlite3
       xsltproc
-      libmaxminddb-dev
       libxml2-utils
+  - curl -4 http://download.opensuse.org/repositories/home:/laszlo_budai:/syslog-ng/xUbuntu_14.04/Release.key | sudo apt-key add -
+  - echo "deb http://download.opensuse.org/repositories/home:/laszlo_budai:/syslog-ng/xUbuntu_14.04 ./" | sudo tee --append /etc/apt/sources.list.d/syslog-ng-obs.list
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq
+      libivykis-dev
+      librabbitmq-dev
+      libmongoc-dev
+      libriemann-client-dev
+      libmaxminddb-dev
   - sudo pip install -r requirements.txt
 before_script:
   - echo 'Europe/Budapest' | sudo tee /etc/timezone
