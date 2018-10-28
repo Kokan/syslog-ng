@@ -18,7 +18,7 @@ install:
       bison
       docbook-xsl
       flex
-      gradle-2.2.1
+      gradle
       libcap-dev
       libdbd-sqlite3
       libdbi0-dev
