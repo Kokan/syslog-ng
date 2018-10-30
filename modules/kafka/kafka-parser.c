@@ -2,7 +2,7 @@
  * Copyright (c) 2014 Pierre-Yves Ritschard <pyr@spootnik.org>
  * Copyright (c) 2019 Balabit
  * Copyright (c) 2019 Balazs Scheidler
- *
+ * Copyright (c) 2019 Kokan <kokaipeter@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 as published
@@ -49,6 +49,7 @@ static CfgLexerKeyword kafka_keywords[] =
   { "kafka_bootstrap_servers", KW_BOOTSTRAP_SERVERS, KWS_OBSOLETE, "Please use bootstrap-servers option" },
   { "workers",        KW_WORKERS },
   { "kafka_c",        KW_KAFKA },   /* compatibility with incubator naming */
+  { "kafka",          KW_KAFKA },
   { NULL }
 };
 

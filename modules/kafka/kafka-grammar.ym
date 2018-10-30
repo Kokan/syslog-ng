@@ -36,6 +36,7 @@
 #include "plugin.h"
 #include "kafka-dest-driver.h"
 #include "kafka-props.h"
+#include "kafka-source.h"
 
 }
 
@@ -74,6 +75,11 @@ start
             last_driver = *instance = kafka_dd_new(configuration);
           }
           '(' kafka_options ')' { YYACCEPT; }
+        | LL_CONTEXT_SOURCE KW_KAFKA
+          {
+            last_driver = *instance = kafka_sd_new(configuration);
+          }
+          '(' kafka_source_options ')' { YYACCEPT; }
         ;
 
 kafka_options
@@ -145,6 +151,17 @@ kafka_property
 	    $$ = prop;
         }
         ;
+
+
+kafka_source_options
+  : kafka_source_option kafka_source_options
+  |
+  ;
+
+kafka_source_option
+  : source_option
+  | source_driver_option
+  ;
 
 /* INCLUDE_RULES */
 
