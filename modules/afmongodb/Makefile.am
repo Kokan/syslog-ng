@@ -12,21 +12,8 @@ modules_afmongodb_libafmongodb_la_SOURCES	=	\
 	modules/afmongodb/afmongodb-grammar.y		\
 	modules/afmongodb/afmongodb.c			\
 	modules/afmongodb/afmongodb.h			\
-	modules/afmongodb/afmongodb-private.h			\
 	modules/afmongodb/afmongodb-parser.c		\
-	modules/afmongodb/afmongodb-parser.h		\
-	${DUMMY_C}
-
-if ENABLE_LEGACY_MONGODB_OPTIONS
-modules_afmongodb_libafmongodb_la_SOURCES	+=	\
-	modules/afmongodb/afmongodb-legacy-uri.c			\
-	modules/afmongodb/afmongodb-legacy-uri.h			\
-	modules/afmongodb/afmongodb-legacy-grammar.c			\
-	modules/afmongodb/afmongodb-legacy-grammar.h			\
-	modules/afmongodb/afmongodb-legacy-private.h			\
-	modules/afmongodb/host-list.c				\
-	modules/afmongodb/host-list.h
-endif
+	modules/afmongodb/afmongodb-parser.h
 
 modules_afmongodb_libafmongodb_la_LIBADD	=	\
 	$(MODULE_DEPS_LIBS) $(LIBMONGO_LIBS)
