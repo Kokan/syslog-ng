@@ -67,6 +67,7 @@ AM_CFLAGS += \
 if ENABLE_EXTRA_WARNINGS
 AM_CFLAGS += \
 	-Wimplicit-function-declaration \
+	-Wbad-function-cast \
 	-Wnested-externs \
 	-Wold-style-declaration \
 	-Wstrict-prototypes \

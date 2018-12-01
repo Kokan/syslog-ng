@@ -219,6 +219,7 @@ option(ENABLE_EXTRA_WARNINGS "Enable extra warnings" ON)
 if (ENABLE_EXTRA_WARNINGS)
   set(EXTRA_WARNINGS
     -Wimplicit-function-declaration
+    -Wbad-function-cast
     -Wnested-externs
     -Wold-style-declaration
     -Wstrict-prototypes
