@@ -27,6 +27,7 @@ add_subdirectory(str-timestamp)
 add_subdirectory(eventlog)
 add_subdirectory(secret-storage)
 add_subdirectory(logthrsource)
+add_subdirectory(http-auth)
 
 set(LIB_SUBDIR_HEADERS
     ${COMPAT_HEADERS}
@@ -47,6 +48,7 @@ set(LIB_SUBDIR_HEADERS
     ${STR_REPR_HEADERS}
     ${STR_TIMESTAMP_HEADERS}
     ${LOGTHRSOURCE_HEADERS}
+    ${HTTP_AUTH_HEADERS}
     ${CMAKE_CURRENT_BINARY_DIR}/filter/filter-expr-grammar.h
     ${CMAKE_CURRENT_BINARY_DIR}/rewrite/rewrite-expr-grammar.h
     ${CMAKE_CURRENT_BINARY_DIR}/parser/parser-expr-grammar.h
@@ -345,6 +347,7 @@ install(FILES ${TEMPLATE_HEADERS} DESTINATION include/syslog-ng/template)
 install(FILES ${TRANSPORT_HEADERS} DESTINATION include/syslog-ng/transport)
 install(FILES ${CSV_SCANNER_HEADERS} DESTINATION include/syslog-ng/scanner/csv-scanner)
 install(FILES ${LOGTHRSOURCE_HEADERS} DESTINATION include/syslog-ng/logthrsource)
+install(FILES ${HTTP_AUTH_HEADERS} DESTINATION include/syslog-ng/http-auth)
 
 set(TOOLS
     merge-grammar.py
