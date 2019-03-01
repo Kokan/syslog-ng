@@ -1,7 +1,7 @@
 # pip packages for successful run make check
 hy                      [centos, debian, ubuntu]
 nose                    [centos, debian, ubuntu]
-pep8                    [centos, debian, ubuntu]
+pycodestyle             [centos, debian, ubuntu]
 ply                     [centos, debian, ubuntu]
 pylint                  [centos-7, debian, ubuntu]
 
