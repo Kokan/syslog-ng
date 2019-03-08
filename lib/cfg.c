@@ -543,6 +543,10 @@ _load_file_into_string(const gchar *fname)
 
   if (!g_file_get_contents(fname, &buff, NULL, NULL))
     {
+      msg_error("Error opening configuration file",
+                evt_tag_str(EVT_TAG_FILENAME, fname),
+                evt_tag_error(EVT_TAG_OSERROR));
+
       return content;
     }
 
@@ -562,10 +566,6 @@ cfg_read_config(GlobalConfig *self, const gchar *fname, gchar *preprocess_into)
 
   if ((cfg_file = fopen(fname, "r")) == NULL)
     {
-      msg_error("Error opening configuration file",
-                evt_tag_str(EVT_TAG_FILENAME, fname),
-                evt_tag_error(EVT_TAG_OSERROR));
-
       return FALSE;
     }
 
