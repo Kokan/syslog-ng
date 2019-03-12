@@ -122,6 +122,7 @@ static CfgLexerKeyword main_keywords[] =
   { "proto_template",     KW_PROTO_TEMPLATE },
   { "default_level",      KW_DEFAULT_LEVEL },
   { "default_priority",   KW_DEFAULT_LEVEL },
+  { "default_severity",   KW_DEFAULT_LEVEL },
   { "default_facility",   KW_DEFAULT_FACILITY },
   { "threaded",           KW_THREADED },
   { "use_rcptid",         KW_USE_RCPTID, KWS_OBSOLETE, "This has been deprecated, try use_uniqid() instead" },

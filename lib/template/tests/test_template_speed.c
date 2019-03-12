@@ -53,7 +53,7 @@ Test(template_speed, test_template_speed)
   perftest_template("$TAGS\n");
   perftest_template("$(echo $MSG)\n");
   perftest_template("$(+ $FACILITY_NUM $FACILITY_NUM)\n");
-  perftest_template("$DATE $FACILITY.$PRIORITY $HOST $MSGHDR$MSG $SEQNO\n");
+  perftest_template("$DATE $FACILITY.$SEVERITY $HOST $MSGHDR$MSG $SEQNO\n");
   perftest_template("${APP.VALUE} ${APP.VALUE2}\n");
   perftest_template("$DATE ${HOST:--} ${PROGRAM:--} ${PID:--} ${MSGID:--} ${SDATA:--} $MSG\n");
 

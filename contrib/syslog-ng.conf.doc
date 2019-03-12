@@ -370,7 +370,8 @@ source s_tcp
 #    MIN                The minute the message was sent.
 #    MONTH              The month the message was sent.
 #    MSG or MESSAGE     Message contents. 
-#    PRIORITY or LEVEL  The priority of the message. 
+#    SEVERITY, LEVEL,   The severity of the message.
+#    PRIORITY
 #    PROGRAM            The name of the program the message was sent by.
 #    SEC                The second the message was sent.
 #    TAG                The priority and facility encoded as a 2 digit 

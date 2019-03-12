@@ -138,6 +138,14 @@ teardown(void)
 
 TestSuite(template, .init = setup, .fini = teardown);
 
+Test(template, severity)
+{
+  assert_template_format("$PRIORITY", "err");
+  assert_template_format("$LEVEL", "err");
+  assert_template_format("$LEVEL_NUM", "3");
+  assert_template_format("$SEVERITY", "err");
+  assert_template_format("$SEVERITY_NUM", "3");
+}
 
 Test(template, test_macros)
 {
@@ -145,9 +153,6 @@ Test(template, test_macros)
 
   assert_template_format("$FACILITY", "local3");
   assert_template_format("$FACILITY_NUM", "19");
-  assert_template_format("$PRIORITY", "err");
-  assert_template_format("$LEVEL", "err");
-  assert_template_format("$LEVEL_NUM", "3");
   assert_template_format("$TAG", "9b");
   assert_template_format("$TAGS", "alma,korte,citrom,\"tag,containing,comma\"");
   assert_template_format("$PRI", "155");

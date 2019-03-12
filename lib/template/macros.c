@@ -50,6 +50,8 @@ LogMacroDef macros[] =
   { "PRIORITY", M_LEVEL },
   { "LEVEL", M_LEVEL },
   { "LEVEL_NUM", M_LEVEL_NUM },
+  { "SEVERITY", M_LEVEL },
+  { "SEVERITY_NUM", M_LEVEL_NUM },
   { "TAG", M_TAG },
   { "TAGS", M_TAGS },
   { "BSDTAG", M_BSDTAG },
