@@ -49,6 +49,7 @@ static CfgLexerKeyword filter_expr_keywords[] =
   { ">",                  KW_NUM_GT },
   { "level",              KW_LEVEL },
   { "priority",           KW_LEVEL },
+  { "severity",           KW_LEVEL },
   { "facility",           KW_FACILITY },
   { "program",      KW_PROGRAM },
   { "host",               KW_HOST },
