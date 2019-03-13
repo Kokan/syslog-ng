@@ -214,7 +214,7 @@ _format_request_headers(HTTPDestinationWorker *self, LogMessage *msg)
                             syslog_name_lookup_name_by_value(msg->pri & LOG_FACMASK, sl_facilities));
       headers = _add_header(headers,
                             "X-Syslog-Level",
-                            syslog_name_lookup_name_by_value(msg->pri & LOG_PRIMASK, sl_levels));
+                            syslog_name_lookup_name_by_value(msg->pri & LOG_PRIMASK, sl_severities));
     }
 
   for (l = owner->headers; l; l = l->next)

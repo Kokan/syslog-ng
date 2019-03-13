@@ -284,7 +284,7 @@ extern struct _StatsOptions *last_stats_options;
 %token KW_TEMPLATE_FUNCTION           10272
 
 %token KW_DEFAULT_FACILITY            10300
-%token KW_DEFAULT_LEVEL               10301
+%token KW_DEFAULT_SEVERITY            10301
 
 %token KW_PORT                        10323
 /* misc options */
@@ -449,7 +449,7 @@ DNSCacheOptions *last_dns_cache_options;
 %type   <ptr> string_list
 %type   <ptr> string_list_build
 %type   <num> facility_string
-%type   <num> level_string
+%type   <num> severity_string
 
 %type   <num> positive_integer
 %type   <num> positive_integer64
@@ -1083,12 +1083,12 @@ semicolons
         | ';' semicolons
         ;
 
-level_string
+severity_string
         : string
 	  {
-	    /* return the numeric value of the "level" */
-	    int n = syslog_name_lookup_level_by_name($1);
-	    CHECK_ERROR((n != -1), @1, "Unknown priority level\"%s\"", $1);
+	    /* return the numeric value of the severity */
+	    int n = syslog_name_lookup_severity_by_name($1);
+	    CHECK_ERROR((n != -1), @1, "Unknown severity\"%s\"", $1);
 	    free($1);
             $$ = n;
 	  }
@@ -1264,7 +1264,7 @@ host_resolve_option
 
 msg_format_option
 	: KW_TIME_ZONE '(' string ')'		{ last_msg_format_options->recv_time_zone = g_strdup($3); free($3); }
-	| KW_DEFAULT_LEVEL '(' level_string ')'
+	| KW_DEFAULT_SEVERITY '(' severity_string ')'
 	  {
 	    if (last_msg_format_options->default_pri == 0xFFFF)
 	      last_msg_format_options->default_pri = LOG_USER;

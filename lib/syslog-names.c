@@ -30,7 +30,7 @@
 #define FACILITY_CODE(n) ((n) << 3)
 
 
-struct sl_name sl_levels[] =
+struct sl_name sl_severities[] =
 {
   {"emerg",     SEVERITY_CODE(0) },
   {"panic",     SEVERITY_CODE(0) },

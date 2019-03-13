@@ -47,8 +47,8 @@ LogTemplate *create_template(const gchar *template);
 FilterExprNode *compile_pattern(FilterRE *f, const gchar *regexp, const gchar *type, gint flags);
 
 gint facility_bits(const gchar *fac);
-gint level_bits(const gchar *lev);
-gint level_range(const gchar *from, const gchar *to);
+gint severity_bits(const gchar *lev);
+gint severity_range(const gchar *from, const gchar *to);
 
 void setup(void);
 
