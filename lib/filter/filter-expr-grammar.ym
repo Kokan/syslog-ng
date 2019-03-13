@@ -61,6 +61,12 @@ FilterRE *last_re_filter;
 %token KW_PROGRAM
 %token KW_IN_LIST
 %token KW_VALUE
+%token KW_FACILITY
+%token KW_LEVEL
+%token KW_MATCH
+%token KW_MESSAGE
+%token KW_NETMASK
+%token KW_NETMASK6
 
 %left   ';'
 %left	KW_OR

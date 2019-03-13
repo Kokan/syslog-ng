@@ -292,14 +292,8 @@ extern struct _StatsOptions *last_stats_options;
 %token KW_USE_TIME_RECVD              10340
 
 /* filter items*/
-%token KW_FACILITY                    10350
-%token KW_LEVEL                       10351
 %token KW_HOST                        10352
-%token KW_MATCH                       10353
-%token KW_MESSAGE                     10354
-%token KW_NETMASK                     10355
 %token KW_TAGS                        10356
-%token KW_NETMASK6                    10357
 
 /* parser items */
 
