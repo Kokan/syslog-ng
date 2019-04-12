@@ -562,6 +562,15 @@ _load_file_into_string(const gchar *fname)
   return content;
 }
 
+static gint
+cfg_preprocess_config(GlobalConfig *self, GString *config, GString *preprocessed)
+{
+
+  g_string_append(preprocessed, config->str);
+
+   return TRUE;
+}
+
 gboolean
 cfg_read_config(GlobalConfig *self, const gchar *fname, gchar *preprocess_into)
 {
@@ -576,13 +585,16 @@ cfg_read_config(GlobalConfig *self, const gchar *fname, gchar *preprocess_into)
       return FALSE;
     }
 
-  lexer = cfg_lexer_new(self, fname, self->original_config, self->preprocess_config);
-  res = cfg_run_parser(self, lexer, &main_parser, (gpointer *) &self, NULL);
+  res = cfg_preprocess_config(self, self->original_config, self->preprocess_config);
 
   if (preprocess_into)
     {
       cfg_dump_processed_config(self->preprocess_config, preprocess_into);
+      return res;
     }
+
+  lexer = cfg_lexer_new(self, fname, self->original_config, self->preprocess_config);
+  res = cfg_run_parser(self, lexer, &main_parser, (gpointer *) &self, NULL);
 
   return (res);
 }
