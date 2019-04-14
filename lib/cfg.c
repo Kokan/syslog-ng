@@ -23,6 +23,7 @@
  */
 
 #include "cfg.h"
+#include "pathutils.h"
 #include "cfg-grammar.h"
 #include "module-config.h"
 #include "cfg-tree.h"
@@ -562,13 +563,58 @@ _load_file_into_string(const gchar *fname)
   return content;
 }
 
+static void
+_get_next_line(gchar **pos, gint *len)
+{
+  *pos += *len;
+  gchar *cur = *pos;
+  while (*cur != '\0' && *cur != '\n') ++cur;
+
+  *len = cur - *pos + 1;
+}
+
 static gint
 cfg_preprocess_config(GlobalConfig *self, GString *config, GString *preprocessed)
 {
+  const gint inc_len = strlen("@include");
+  gchar *current = config->str;
+  gint len = 0;
+  for (_get_next_line(&current, &len); *current; _get_next_line(&current, &len))
+    {
+      if (strncmp("@include", current, inc_len)==0)
+        {
 
-  g_string_append(preprocessed, config->str);
+          gchar *begin = strstr(current+inc_len, "\"");
+          if (!begin) return FALSE;
 
-   return TRUE;
+          gchar *end = strstr(begin+1, "\"");
+          if (!end) return FALSE;
+
+
+          gchar *filename_ = g_strndup(begin+1, end-(begin+1));
+
+          gchar *filename = find_file_in_path(cfg_args_get(self->globals, "include-path"), filename_, G_FILE_TEST_EXISTS);
+
+          GString *fcont = _load_file_into_string(filename);
+
+          if (fcont)
+            {
+              g_string_append(preprocessed, "#include");
+              g_string_append_len(preprocessed, current+inc_len, len-inc_len);
+              cfg_preprocess_config(self, fcont, preprocessed);
+            }
+          else
+            {
+              g_string_append_len(preprocessed, current, len);
+            }
+
+          //g_string_append(preprocessed, fcont->str);
+        }
+      else
+        g_string_append_len(preprocessed, current, len);
+    }
+
+  return TRUE;
 }
 
 gboolean
@@ -576,6 +622,8 @@ cfg_read_config(GlobalConfig *self, const gchar *fname, gchar *preprocess_into)
 {
   gint res;
   CfgLexer *lexer;
+
+  cfg_set_global_paths(self);
 
   self->filename = fname;
   self->preprocess_config = g_string_sized_new(8192);
