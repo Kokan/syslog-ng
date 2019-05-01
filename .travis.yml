@@ -98,6 +98,7 @@ script:
         . scripts/get-libjvm-path.sh || return $?;
         export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$JNI_LIBDIR";
         make func-test V=1;
+        export PYTEST_ADDOPTS="-o log_cli=true"
         make pytest-self-check;
         make pytest-check;
       elif [ "$S" = "42" ]; then
@@ -149,6 +150,7 @@ matrix:
             ..
         - make --keep-going -j $(nproc) ARGS="-j $(nproc)" all test install
         - make VERBOSE=1 func-test
+        - export PYTEST_ADDOPTS="-o log_cli=true"
         - make pytest-self-check
         - make pytest-check
     - env: B=trusty-cmake
