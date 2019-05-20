@@ -251,7 +251,6 @@ grouping_by_emit_synthetic(GroupingBy *self, CorrellationContext *context)
     msg = synthetic_message_generate_with_context(self->synthetic_message, context, buffer);
     g_string_free(buffer, TRUE);
 
-    stateful_parser_emit_synthetic(&self->super, msg);
     return msg;
 }
 
@@ -277,6 +276,7 @@ grouping_by_expire_entry(TimerWheel *wheel, guint64 now, gpointer user_data)
     }
   else
     {
+      stateful_parser_emit_synthetic(&self->super, msg);
       log_msg_unref(msg);
     }
   g_hash_table_remove(self->correllation->state, &context->key);
