@@ -237,7 +237,7 @@ _evaluate_trigger(GroupingBy *self, CorrellationContext *context)
 }
 
 static LogMessage*
-grouping_by_emit_synthetic(GroupingBy *self, CorrellationContext *context)
+grouping_by_generate_synthetic_msg(GroupingBy *self, CorrellationContext *context)
 {
   LogMessage *msg = NULL;
 
@@ -267,7 +267,7 @@ grouping_by_expire_entry(TimerWheel *wheel, guint64 now, gpointer user_data)
 
   if (self->sort_key_template)
     correllation_context_sort(context, self->sort_key_template);
-  LogMessage *msg = grouping_by_emit_synthetic(self, context);
+  LogMessage *msg = grouping_by_generate_synthetic_msg(self, context);
   if (!msg)
     {
       msg_debug("groupingby() dropping context, because having() is FALSE",
