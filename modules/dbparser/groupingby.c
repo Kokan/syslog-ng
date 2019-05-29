@@ -310,7 +310,6 @@ _perform_groupby(GroupingBy *self, LogMessage *msg)
        return TRUE;
     }
   
-  CorrellationContext *context = NULL;
   CorrellationKey key;
   GString *buffer = g_string_sized_new(32);
 
@@ -319,7 +318,7 @@ _perform_groupby(GroupingBy *self, LogMessage *msg)
 
   correllation_key_init(&key, self->scope, msg, buffer->str);
   g_string_steal(buffer);
-  context = g_hash_table_lookup(self->correllation->state, &key);
+  CorrellationContext *context = g_hash_table_lookup(self->correllation->state, &key);
   if (!context)
     {
       msg_debug("Correllation context lookup failure, starting a new context",
