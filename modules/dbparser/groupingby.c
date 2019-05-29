@@ -382,12 +382,12 @@ _perform_groupby(GroupingBy *self, LogMessage *msg)
 
       LogMessage *genmsg = grp_sort_remove_context(self, context);
 
+      g_static_mutex_unlock(&self->lock);
+
       stateful_parser_emit_synthetic(&self->super, genmsg);
       log_msg_unref(genmsg);
 
       log_msg_write_protect(msg);
-
-      g_static_mutex_unlock(&self->lock);
 
       return TRUE;
     }
