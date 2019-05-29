@@ -216,13 +216,13 @@ _is_action_within_rate_limit(PatternDB *db, PDBProcessParams *process_params)
 
   g_string_printf(buffer, "%s:%d", rule->rule_id, action->id);
   correllation_key_init(&key, rule->context.scope, msg, buffer->str);
+  g_string_steal(buffer);
 
   rl = g_hash_table_lookup(db->rate_limits, &key);
   if (!rl)
     {
       rl = pdb_rate_limit_new(&key);
       g_hash_table_insert(db->rate_limits, &rl->key, rl);
-      g_string_steal(buffer);
     }
   now = timer_wheel_get_time(db->timer_wheel);
   if (rl->last_check == 0)
@@ -245,6 +245,9 @@ _is_action_within_rate_limit(PatternDB *db, PDBProcessParams *process_params)
           rl->last_check = now;
         }
     }
+
+  correllation_key_deinit(&key);
+
   if (rl->buckets)
     {
       rl->buckets--;
@@ -343,9 +346,10 @@ _execute_action_create_context(PatternDB *db, PDBProcessParams *process_params)
             evt_tag_int("context_expiration", timer_wheel_get_time(db->timer_wheel) + syn_context->timeout));
 
   correllation_key_init(&key, syn_context->scope, context_msg, buffer->str);
-  new_context = pdb_context_new(&key);
-  g_hash_table_insert(db->correllation.state, &new_context->super.key, new_context);
   g_string_steal(buffer);
+  new_context = pdb_context_new(&key);
+  correllation_key_deinit(&key);
+  g_hash_table_insert(db->correllation.state, &new_context->super.key, new_context);
 
   g_ptr_array_add(new_context->super.messages, context_msg);
 
@@ -631,6 +635,7 @@ _pattern_db_process_matching_rule(PatternDB *self, PDBProcessParams *process_par
                     evt_tag_int("context_expiration", timer_wheel_get_time(self->timer_wheel) + rule->context.timeout),
                     evt_tag_int("num_messages", context->super.messages->len));
         }
+      correllation_key_deinit(&key);
 
       g_ptr_array_add(context->super.messages, log_msg_ref(msg));
 

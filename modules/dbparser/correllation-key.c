@@ -109,6 +109,15 @@ correllation_key_init(CorrellationKey *self, CorrellationScope scope, LogMessage
     }
 }
 
+void
+correllation_key_deinit(CorrellationKey *self)
+{
+  g_free(self->pid);
+  g_free(self->program);
+  g_free(self->host);
+  g_free(self->session_id);
+}
+
 gint
 correllation_key_lookup_scope(const gchar *scope)
 {

@@ -104,13 +104,7 @@ correllation_context_free_method(CorrellationContext *self)
     }
   g_ptr_array_free(self->messages, TRUE);
 
-  if (self->key.host)
-    g_free((gchar *) self->key.host);
-  if (self->key.program)
-    g_free((gchar *) self->key.program);
-  if (self->key.pid)
-    g_free((gchar *) self->key.pid);
-  g_free(self->key.session_id);
+  correllation_key_deinit(&self->key);
 }
 
 CorrellationContext *

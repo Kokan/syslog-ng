@@ -318,6 +318,7 @@ _perform_groupby(GroupingBy *self, LogMessage *msg)
   log_msg_set_value(msg, context_id_handle, buffer->str, -1);
 
   correllation_key_init(&key, self->scope, msg, buffer->str);
+  g_string_steal(buffer);
   context = g_hash_table_lookup(self->correllation->state, &key);
   if (!context)
     {
@@ -329,7 +330,6 @@ _perform_groupby(GroupingBy *self, LogMessage *msg)
 
       context = correllation_context_new(&key);
       g_hash_table_insert(self->correllation->state, &context->key, context);
-      g_string_steal(buffer);
     }
   else
     {
@@ -341,6 +341,7 @@ _perform_groupby(GroupingBy *self, LogMessage *msg)
                 log_pipe_location_tag(&self->super.super.super));
     }
 
+  correllation_key_deinit(&key);
   g_ptr_array_add(context->messages, log_msg_ref(msg));
 
   if (_evaluate_trigger(self, context))
@@ -371,8 +372,6 @@ _perform_groupby(GroupingBy *self, LogMessage *msg)
     }
 
   log_msg_write_protect(msg);
-
-  g_string_free(buffer, TRUE);
 
   g_static_mutex_unlock(&self->lock);
 
