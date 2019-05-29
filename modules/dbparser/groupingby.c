@@ -297,13 +297,10 @@ grouping_by_format_persist_name(LogParser *s)
   return persist_name;
 }
 
-static gboolean
-_perform_groupby(GroupingBy *self, LogMessage *msg)
+static CorrellationContext*
+_lookup_or_create_context(GroupingBy *self, LogMessage *msg)
 {
-
-  g_static_mutex_lock(&self->lock);
-  grouping_by_set_time(self, &msg->timestamps[LM_TS_STAMP]);
-  
+  CorrellationContext *context;
   CorrellationKey key;
   GString *buffer = g_string_sized_new(32);
 
@@ -312,7 +309,7 @@ _perform_groupby(GroupingBy *self, LogMessage *msg)
 
   correllation_key_init(&key, self->scope, msg, buffer->str);
   g_string_steal(buffer);
-  CorrellationContext *context = g_hash_table_lookup(self->correllation->state, &key);
+  context = g_hash_table_lookup(self->correllation->state, &key);
   if (!context)
     {
       msg_debug("Correllation context lookup failure, starting a new context",
@@ -335,6 +332,18 @@ _perform_groupby(GroupingBy *self, LogMessage *msg)
     }
 
   correllation_key_deinit(&key);
+
+  return context;
+}
+
+static gboolean
+_perform_groupby(GroupingBy *self, LogMessage *msg)
+{
+
+  g_static_mutex_lock(&self->lock);
+  grouping_by_set_time(self, &msg->timestamps[LM_TS_STAMP]);
+
+  CorrellationContext *context = _lookup_or_create_context(self, msg);
   g_ptr_array_add(context->messages, log_msg_ref(msg));
 
   if (_evaluate_trigger(self, context))
