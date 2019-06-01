@@ -168,6 +168,8 @@ static CfgLexerKeyword main_keywords[] =
   /* filter items */
   { "type",               KW_TYPE },
   { "tags",               KW_TAGS },
+  /* logthreaded dst items */
+  { "stats_name",         KW_STATS_NAME },
 
   /* on/off switches */
   { "yes",                KW_YES },

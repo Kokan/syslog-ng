@@ -308,6 +308,8 @@ extern struct _StatsOptions *last_stats_options;
 /* rewrite items */
 %token KW_REWRITE                     10370
 
+%token KW_STATS_NAME                  10371
+
 /* yes/no switches */
 
 %token KW_YES                         10380
@@ -1202,6 +1204,7 @@ threaded_dest_driver_option
         }
         | KW_BATCH_LINES '(' nonnegative_integer ')' { log_threaded_dest_driver_set_batch_lines(last_driver, $3); }
         | KW_BATCH_TIMEOUT '(' positive_integer ')' { log_threaded_dest_driver_set_batch_timeout(last_driver, $3); }
+        | KW_STATS_NAME '(' string ')' { log_threaded_dest_driver_set_stats_name(last_driver, $3); }
         | dest_driver_option
         ;
 
