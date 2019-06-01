@@ -669,7 +669,7 @@ afsmtp_dd_new(GlobalConfig *cfg)
   self->super.worker.insert = afsmtp_worker_insert;
 
   self->super.format_stats_instance = afsmtp_dd_format_stats_instance;
-  self->super.stats_source = stats_register_type("smtp");
+  log_threaded_dest_driver_set_stats_name(&self->super, "smtp");
 
   afsmtp_dd_set_host((LogDriver *)self, "127.0.0.1");
   afsmtp_dd_set_port((LogDriver *)self, 25);

@@ -308,7 +308,7 @@ java_dd_new(GlobalConfig *cfg)
   self->super.worker.flush = java_worker_flush;
 
   self->super.format_stats_instance = java_dd_format_stats_instance;
-  self->super.stats_source = stats_register_type("java");
+  log_threaded_dest_driver_set_stats_name(&self->super, "java");
 
   self->template = log_template_new(cfg, NULL);
   self->class_path = g_string_new(".");

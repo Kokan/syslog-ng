@@ -1195,7 +1195,7 @@ afsql_dd_new(GlobalConfig *cfg)
   self->dbd_options_numeric = g_hash_table_new_full(g_str_hash, g_int_equal, g_free, NULL);
 
   log_template_options_defaults(&self->template_options);
-  self->super.stats_source = stats_register_type("sql");
+  log_threaded_dest_driver_set_stats_name(&self->super, "sql");
 
   return &self->super.super.super;
 }

@@ -335,7 +335,7 @@ riemann_dd_new(GlobalConfig *cfg)
   self->super.worker.construct = riemann_dw_new;
 
   self->super.format_stats_instance = riemann_dd_format_stats_instance;
-  self->super.stats_source = stats_register_type("riemann");
+  log_threaded_dest_driver_set_stats_name(&self->super, "riemann");
 
   self->port = -1;
   self->type = RIEMANN_CLIENT_TCP;
