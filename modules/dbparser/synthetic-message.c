@@ -240,7 +240,11 @@ synthetic_message_generate_without_context(SyntheticMessage *self, LogMessage *m
   GPtrArray dummy_ptr_array = { .pdata = (void **) dummy_msgs, .len = 2 };
   CorrellationContext dummy_context = { .messages = &dummy_ptr_array, 0 };
 
+  NVTable *genmsg_nvtable = nv_table_ref(genmsg->payload);
+  NVTable *msg_nvtable = nv_table_ref(msg->payload);
   synthetic_message_apply(self, &dummy_context, genmsg, buffer);
+  nv_table_unref(genmsg_nvtable);
+  nv_table_unref(msg_nvtable);
   return genmsg;
 }
 
