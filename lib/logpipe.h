@@ -240,6 +240,7 @@ struct _LogPipe
 
   void (*free_fn)(LogPipe *self);
   void (*notify)(LogPipe *self, gint notify_code, gpointer user_data);
+  void (*optimize)(LogPipe *self, gpointer user_data);
 };
 
 /*
@@ -273,6 +274,13 @@ static inline void
 log_pipe_set_config(LogPipe *s, GlobalConfig *cfg)
 {
   s->cfg = cfg;
+}
+
+static inline void
+log_pipe_optimize(LogPipe *self, gpointer user_data)
+{
+   if (self->optimize)
+      self->optimize(self, user_data);
 }
 
 static inline void
