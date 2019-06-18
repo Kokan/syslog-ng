@@ -1371,13 +1371,10 @@ _verify_unique_persist_names_among_pipes(const GPtrArray *initialized_pipes)
   return result;
 }
 
-gboolean
-cfg_tree_start(CfgTree *self)
+static gboolean
+cfg_tree_init_all_pipe(CfgTree *self)
 {
   gint i;
-
-  if (!cfg_tree_compile(self))
-    return FALSE;
 
   for (i = 0; i < self->initialized_pipes->len; i++)
     {
@@ -1391,6 +1388,18 @@ cfg_tree_start(CfgTree *self)
           return FALSE;
         }
     }
+
+    return TRUE;
+}
+
+gboolean
+cfg_tree_start(CfgTree *self)
+{
+  if (!cfg_tree_compile(self))
+    return FALSE;
+
+  if (!cfg_tree_init_all_pipe(self))
+    return FALSE;
 
   return _verify_unique_persist_names_among_pipes(self->initialized_pipes);
 }
