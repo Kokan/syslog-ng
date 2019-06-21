@@ -25,9 +25,10 @@
 #include "filter/filter-expr-parser.h"
 #include "filter/filter-expr-grammar.h"
 #include "filter/filter-expr.h"
+#include "filter/filter-pipe.h"
 
 extern int filter_expr_debug;
-int filter_expr_parse(CfgLexer *lexer, FilterExprNode **node, gpointer arg);
+int filter_expr_parse(CfgLexer *lexer, LogFilterPipe **node, gpointer arg);
 
 static CfgLexerKeyword filter_expr_keywords[] =
 {
@@ -78,4 +79,4 @@ CfgParser filter_expr_parser =
   .parse = (gint (*)(CfgLexer *, gpointer *, gpointer)) filter_expr_parse,
 };
 
-CFG_PARSER_IMPLEMENT_LEXER_BINDING(filter_expr_, FilterExprNode **)
+CFG_PARSER_IMPLEMENT_LEXER_BINDING(filter_expr_, LogFilterPipe **)

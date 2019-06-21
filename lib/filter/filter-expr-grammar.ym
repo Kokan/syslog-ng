@@ -40,12 +40,14 @@
 #include "filter/filter-call.h"
 #include "filter/filter-re.h"
 #include "filter/filter-pri.h"
+#include "filter/filter-pipe.h"
 #include "messages.h"
 #include "template/templates.h"
 #include "syslog-names.h"
 #include "plugin.h"
 #include "cfg-grammar.h"
 
+LogFilterPipe *last_filter;
 FilterExprNode *last_filter_expr;
 
 }
@@ -53,7 +55,7 @@ FilterExprNode *last_filter_expr;
 %name-prefix "filter_expr_"
 %lex-param {CfgLexer *lexer}
 %parse-param {CfgLexer *lexer}
-%parse-param {FilterExprNode **result}
+%parse-param {LogFilterPipe **result}
 %parse-param {gpointer arg}
 
 /* INCLUDE_DECLS */
@@ -140,7 +142,7 @@ filter_simple_expr
             free($3);
             free($6);
           }
-	| filter_re					{ $$ = last_filter_expr; }
+	| filter_re					{ $$ = last_filter; }
 	| filter_plugin
 	| filter_comparison
 	;
@@ -151,12 +153,12 @@ filter_plugin
           {
             Plugin *p;
             gint context = LL_CONTEXT_FILTER;
-            FilterExprNode *node;
+            LogFilterPipe *node;
 
             p = cfg_find_plugin(configuration, context, $1);
             CHECK_ERROR(p, @1, "%s plugin %s not found OR you may not used double quotes in your filter expression", cfg_lexer_lookup_context_name_by_type(context), $1);
 
-            node = (FilterExprNode *) cfg_parse_plugin(configuration, p, &@1, NULL);
+            node = (LogFilterPipe *) cfg_parse_plugin(configuration, p, &@1, NULL);
             free($1);
             if (!node)
               {
@@ -199,11 +201,11 @@ operator
 	;
 
 filter_re
-        : KW_PROGRAM { last_filter_expr = filter_re_new(LM_V_PROGRAM); } filter_re_params
-	| KW_HOST    { last_filter_expr = filter_re_new(LM_V_HOST); } filter_re_params
-	| KW_MESSAGE { last_filter_expr = filter_re_new(LM_V_MESSAGE); } filter_re_params
-        | KW_SOURCE  { last_filter_expr = filter_source_new();  } filter_re_params
-	| KW_MATCH   { last_filter_expr = filter_match_new(); } filter_match_params
+        : KW_PROGRAM { last_filter = log_filter_pipe_new(filter_re_new(LM_V_PROGRAM), configuration); } filter_re_params
+	| KW_HOST    { last_filter = log_filter_pipe_new(filter_re_new(LM_V_HOST), configuration); } filter_re_params
+	| KW_MESSAGE { last_filter = log_filter_pipe_new(filter_re_new(LM_V_MESSAGE), configuration); } filter_re_params
+        | KW_SOURCE  { last_filter = log_filter_pipe_new(filter_source_new(), configuration);  } filter_re_params
+	| KW_MATCH   { last_filter = log_filter_pipe_new(filter_match_new(), configuration); } filter_match_params
 	;
 
 filter_re_params
@@ -211,7 +213,7 @@ filter_re_params
           {
             GError *error = NULL;
 
-            CHECK_ERROR_GERROR(filter_re_compile_pattern(last_filter_expr, configuration, $2, &error), @2, error, "compiling the regexp failed");
+            CHECK_ERROR_GERROR(filter_re_compile_pattern(last_filter->expr, configuration, $2, &error), @2, error, "compiling the regexp failed");
             free($2);
           }
 	;
@@ -222,7 +224,7 @@ filter_re_opts
         ;
 
 filter_re_opt
-	: { last_matcher_options = filter_re_get_matcher_options(last_filter_expr); } matcher_option
+	: { last_matcher_options = filter_re_get_matcher_options(last_filter->expr); } matcher_option
         ;
 
 
@@ -231,10 +233,10 @@ filter_match_params
           {
             GError *error = NULL;
 
-            CHECK_ERROR_GERROR(filter_re_compile_pattern(last_filter_expr, configuration, $2, &error), @2, error, "compiling the regexp failed");
+            CHECK_ERROR_GERROR(filter_re_compile_pattern(last_filter->expr, configuration, $2, &error), @2, error, "compiling the regexp failed");
             free($2);
 
-            if (filter_match_is_usage_obsolete(last_filter_expr))
+            if (filter_match_is_usage_obsolete(last_filter->expr))
               {
                 msg_warning_once("WARNING: the match() filter without the use of the value() "
                                  "option is deprecated and hinders performance, please use a "
@@ -269,12 +271,12 @@ filter_match_opt
                 free($3);
                 YYERROR;
               }
-            filter_match_set_value_handle(last_filter_expr, log_msg_get_value_handle(p));
+            filter_match_set_value_handle(last_filter->expr, log_msg_get_value_handle(p));
             free($3);
           }
 	| KW_TEMPLATE '(' template_content ')'
 	  {
-            filter_match_set_template_ref(last_filter_expr, $3);
+            filter_match_set_template_ref(last_filter->expr, $3);
           }
         ;
 

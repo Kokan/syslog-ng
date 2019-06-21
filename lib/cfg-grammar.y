@@ -648,11 +648,11 @@ source_afinter_option
 
 filter_content
         : {
-            FilterExprNode *last_filter_expr = NULL;
+            LogFilterPipe *last_filter= NULL;
 
-	    CHECK_ERROR_WITHOUT_MESSAGE(cfg_parser_parse(&filter_expr_parser, lexer, (gpointer *) &last_filter_expr, NULL), @$);
+	    CHECK_ERROR_WITHOUT_MESSAGE(cfg_parser_parse(&filter_expr_parser, lexer, (gpointer *) &last_filter, NULL), @$);
 
-            $$ = log_expr_node_new_pipe(log_filter_pipe_new(last_filter_expr, configuration), &@$);
+            $$ = log_expr_node_new_pipe(last_filter, &@$);
 	  }
 	;
 

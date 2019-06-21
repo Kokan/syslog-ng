@@ -27,9 +27,10 @@
 
 #include "cfg-parser.h"
 #include "filter/filter-expr.h"
+#include "filter/filter-pipe.h"
 
 extern CfgParser filter_expr_parser;
 
-CFG_PARSER_DECLARE_LEXER_BINDING(filter_expr_, FilterExprNode **)
+CFG_PARSER_DECLARE_LEXER_BINDING(filter_expr_, LogFilterPipe **)
 
 #endif

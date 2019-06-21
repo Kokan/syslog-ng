@@ -212,10 +212,10 @@ rewrite_expr_opt
 rewrite_condition_opt
         : KW_CONDITION '('
           {
-            FilterExprNode *filter_expr;
+            LogFilterPipe *filter;
 
-            CHECK_ERROR_WITHOUT_MESSAGE(cfg_parser_parse(&filter_expr_parser, lexer, (gpointer *) &filter_expr, NULL), @1);
-            log_rewrite_set_condition(last_rewrite, filter_expr);
+            CHECK_ERROR_WITHOUT_MESSAGE(cfg_parser_parse(&filter_expr_parser, lexer, (gpointer *) &filter, NULL), @1);
+            log_rewrite_set_condition(last_rewrite, filter->expr);
           } ')'
         ;
 
