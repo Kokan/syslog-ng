@@ -32,7 +32,6 @@ int filter_expr_parse(CfgLexer *lexer, LogFilterPipe **node, gpointer arg);
 
 static CfgLexerKeyword filter_expr_keywords[] =
 {
-  { "or",                 KW_OR },
   { "and",                KW_AND },
   { "not",                KW_NOT },
   { "lt",                 KW_LT },

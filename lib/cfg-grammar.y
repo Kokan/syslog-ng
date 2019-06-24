@@ -182,6 +182,9 @@ extern struct _StatsOptions *last_stats_options;
 %token KW_ELSE                        10011
 %token KW_ELIF                        10012
 
+
+%left KW_AND
+
 /* source & destination items */
 %token KW_INTERNAL                    10020
 %token KW_SYSLOG                      10060
@@ -427,7 +430,8 @@ DNSCacheOptions *last_dns_cache_options;
 
 %type   <ptr> template_content
 
-%type   <ptr> filter_content
+%type   <node> filter_content
+%type   <node> filter_expr_simple
 
 %type   <ptr> parser_content
 
@@ -645,8 +649,18 @@ source_afinter_option
         : source_option
         ;
 
-
 filter_content
+	: filter_expr_simple { $$ = $1; }
+	| filter_content KW_AND filter_content
+	{
+		LogExprNode *first_filter = log_expr_node_new_pipe($1, @$);
+		log_expr_node_new_filter($1, @$);
+                log_expr_node_new(ENL_SEQUENCE, ENC_FILTER, NULL, NULL, 0, yylloc);
+		$$ = $1;
+	}
+	;
+
+filter_expr_simple
         : {
             LogFilterPipe *last_filter= NULL;
 
