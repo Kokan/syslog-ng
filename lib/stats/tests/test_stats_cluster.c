@@ -91,9 +91,17 @@ assert_stats_cluster_mismatches_and_free(StatsCluster *sc1, StatsCluster *sc2)
 Test(stats_cluster, test_stats_cluster_equal_if_component_id_and_instance_are_the_same)
 {
   StatsClusterKey sc_key;
+  StatsClusterKey sc_key2;
   stats_cluster_logpipe_key_set(&sc_key, SCS_SOURCE | SCS_FILE, "id", "instance" );
+  stats_cluster_logpipe_key_set(&sc_key2, SCS_SOURCE | SCS_FILE, "id", "instance" );
+
+  //assert that the key is equal with itself
   assert_stats_cluster_equals_and_free(stats_cluster_new(&sc_key),
                                        stats_cluster_new(&sc_key));
+
+  //compare two key, that should be equal
+  assert_stats_cluster_equals_and_free(stats_cluster_new(&sc_key),
+                                       stats_cluster_new(&sc_key2));
 
   stats_cluster_logpipe_key_set(&sc_key, SCS_SOURCE | SCS_FILE, "id", "instance1" );
   StatsClusterKey sc_key2;
