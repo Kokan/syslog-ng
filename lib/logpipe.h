@@ -240,6 +240,8 @@ struct _LogPipe
 
   void (*free_fn)(LogPipe *self);
   void (*notify)(LogPipe *self, gint notify_code, gpointer user_data);
+
+  void (*optimize)(LogPipe *self);
 };
 
 /*
@@ -383,6 +385,14 @@ log_pipe_notify(LogPipe *s, gint notify_code, gpointer user_data)
 {
   if (s->notify)
     s->notify(s, notify_code, user_data);
+}
+
+static inline void
+log_pipe_optimize(LogPipe *s)
+{
+  g_assert(!(s->flags & PIF_INITIALIZED));
+  if (s->optimize)
+    s->optimize(s);
 }
 
 static inline void
