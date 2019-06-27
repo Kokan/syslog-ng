@@ -30,7 +30,6 @@
 #include "stats/stats-registry.h"
 
 
-struct _GlobalConfig;
 typedef struct _FilterExprNode FilterExprNode;
 
 struct _FilterExprNode
