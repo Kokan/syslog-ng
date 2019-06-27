@@ -1392,11 +1392,24 @@ cfg_tree_init_pipes(CfgTree *self)
   return TRUE;
 }
 
+static void
+cfg_tree_optimize_pipes(CfgTree *self)
+{
+  for (gint i = 0; i < self->initialized_pipes->len; i++)
+    {
+      LogPipe *pipe = g_ptr_array_index(self->initialized_pipes, i);
+
+      log_pipe_optimize(pipe);
+    }
+}
+
 gboolean
 cfg_tree_start(CfgTree *self)
 {
   if (!cfg_tree_compile(self))
     return FALSE;
+
+  cfg_tree_optimize_pipes(self);
 
   if (!cfg_tree_init_pipes(self))
     return FALSE;
