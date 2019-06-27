@@ -1379,12 +1379,6 @@ cfg_tree_start(CfgTree *self)
   if (!cfg_tree_compile(self))
     return FALSE;
 
-  /*
-   *   As there are pipes that are dynamically created during init, these
-   *   pipes must be deinited before destroying the configuration, otherwise
-   *   circular references will inhibit the free of the configuration
-   *   structure.
-   */
   for (i = 0; i < self->initialized_pipes->len; i++)
     {
       LogPipe *pipe = g_ptr_array_index(self->initialized_pipes, i);
@@ -1407,6 +1401,12 @@ cfg_tree_stop(CfgTree *self)
   gboolean success = TRUE;
   gint i;
 
+  /*
+   *   As there are pipes that are dynamically created during init, these
+   *   pipes must be deinited before destroying the configuration, otherwise
+   *   circular references will inhibit the free of the configuration
+   *   structure.
+   */
   for (i = 0; i < self->initialized_pipes->len; i++)
     {
       if (!log_pipe_deinit(g_ptr_array_index(self->initialized_pipes, i)))
