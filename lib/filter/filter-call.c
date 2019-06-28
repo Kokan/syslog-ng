@@ -57,6 +57,16 @@ filter_call_eval(FilterExprNode *s, LogMessage **msgs, gint num_msg)
   return res ^ s->comp;
 }
 
+static void
+filter_call_walk(FilterExprNode *s, FilterExprNodeWalkCallbackFunction func, gpointer user_data)
+{
+  FilterCall *self = (FilterCall *)s;
+
+  filter_expr_walk(self->filter_expr, func, user_data);
+
+  func(s, NULL, NULL, user_data); //TODO: parent, child argument
+}
+
 static gboolean
 filter_call_init(FilterExprNode *s, GlobalConfig *cfg)
 {
@@ -137,6 +147,7 @@ filter_call_new(gchar *rule, GlobalConfig *cfg)
   self->super.eval = filter_call_eval;
   self->super.free_fn = filter_call_free;
   self->super.type = g_strdup_printf("filter(%s)", rule);
+  self->super.walk = filter_call_walk;
   self->rule = g_strdup(rule);
 
   return &self->super;

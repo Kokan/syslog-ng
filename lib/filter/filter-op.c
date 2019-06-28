@@ -58,10 +58,22 @@ fop_free(FilterExprNode *s)
 }
 
 static void
+fop_walk(FilterExprNode *s, FilterExprNodeWalkCallbackFunction func, gpointer user_data)
+{
+  FilterOp *self = (FilterOp *)s;
+
+  filter_expr_walk(self->left, func, user_data);
+  filter_expr_walk(self->right, func, user_data);
+
+  func(s, NULL, NULL, user_data); //TODO: parent, child argument
+}
+
+static void
 fop_init_instance(FilterOp *self)
 {
   filter_expr_node_init_instance(&self->super);
   self->super.init = fop_init;
+  self->super.walk = fop_walk;
   self->super.free_fn = fop_free;
 }
 

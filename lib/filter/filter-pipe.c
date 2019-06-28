@@ -112,6 +112,24 @@ log_filter_pipe_free(LogPipe *s)
   log_pipe_free_method(s);
 }
 
+static void
+print_expr(FilterExprNode *current, FilterExprNode *parent,
+           FilterExprNode *childs, gpointer user_data)
+{
+  EVTTAG *loc = (EVTTAG *)user_data;
+  msg_error("--|>");
+}
+
+static void
+log_filter_pipe_optimize(LogPipe *s)
+{
+  LogFilterPipe *self = (LogFilterPipe *)s;
+
+  EVTTAG *loc = log_pipe_location_tag(s);
+
+  filter_expr_walk(self->expr, print_expr, (gpointer)loc);
+}
+
 LogPipe *
 log_filter_pipe_new(FilterExprNode *expr, GlobalConfig *cfg)
 {
@@ -122,6 +140,7 @@ log_filter_pipe_new(FilterExprNode *expr, GlobalConfig *cfg)
   self->super.queue = log_filter_pipe_queue;
   self->super.free_fn = log_filter_pipe_free;
   self->super.clone = log_filter_pipe_clone;
+  self->super.optimize = log_filter_pipe_optimize;
   self->expr = expr;
   return &self->super;
 }

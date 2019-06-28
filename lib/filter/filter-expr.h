@@ -32,6 +32,9 @@
 
 typedef struct _FilterExprNode FilterExprNode;
 
+typedef void (*FilterExprNodeWalkCallbackFunction)(FilterExprNode *current, FilterExprNode *parent,
+                                                   FilterExprNode *childs, gpointer user_date);
+
 struct _FilterExprNode
 {
   guint32 ref_cnt;
@@ -40,6 +43,7 @@ struct _FilterExprNode
   const gchar *type;
   gboolean (*init)(FilterExprNode *self, GlobalConfig *cfg);
   gboolean (*eval)(FilterExprNode *self, LogMessage **msg, gint num_msg);
+  void (*walk)(FilterExprNode *self, FilterExprNodeWalkCallbackFunction func, gpointer user_data);
   void (*free_fn)(FilterExprNode *self);
   StatsCounterItem *matched;
   StatsCounterItem *not_matched;
@@ -52,6 +56,14 @@ filter_expr_init(FilterExprNode *self, GlobalConfig *cfg)
     return self->init(self, cfg);
 
   return TRUE;
+}
+
+
+static inline void
+filter_expr_walk(FilterExprNode *self, FilterExprNodeWalkCallbackFunction callback, gpointer user_data)
+{
+  if (self->walk)
+    self->walk(self, callback, user_data);
 }
 
 gboolean filter_expr_eval(FilterExprNode *self, LogMessage *msg);
