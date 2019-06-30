@@ -500,20 +500,20 @@ cfg_run_parser(GlobalConfig *self, CfgLexer *lexer, CfgParser *parser, gpointer 
 {
   gboolean res;
   GlobalConfig *old_cfg;
-  CfgLexer *old_lexer;
+  //CfgLexer *old_lexer;
 
   old_cfg = configuration;
   configuration = self;
-  old_lexer = self->lexer;
+  //old_lexer = self->lexer;
   self->lexer = lexer;
 
   cfg_set_global_paths(self);
 
   res = cfg_parser_parse(parser, lexer, result, arg);
 
-  cfg_lexer_free(lexer);
-  self->lexer = NULL;
-  self->lexer = old_lexer;
+  //cfg_lexer_free(lexer);
+  //self->lexer = NULL;
+  //self->lexer = old_lexer;
   configuration = old_cfg;
   return res;
 }
@@ -625,6 +625,7 @@ cfg_free(GlobalConfig *self)
   cfg_tree_free_instance(&self->tree);
   g_hash_table_unref(self->module_config);
   cfg_args_unref(self->globals);
+  cfg_lexer_free(self->lexer);
 
   if (self->state)
     persist_state_free(self->state);
