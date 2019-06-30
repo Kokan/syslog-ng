@@ -1395,6 +1395,8 @@ cfg_tree_start(CfgTree *self)
           msg_error("Error initializing message pipeline",
                     evt_tag_str("plugin_name", pipe->plugin_name ? pipe->plugin_name : "not a plugin"),
                     log_pipe_location_tag(pipe));
+          pipe->expr_node->level->lloc.first_line = pipe->expr_node->line;
+          pipe->expr_node->level->lloc.last_line = pipe->expr_node->line;
           return FALSE;
         }
     }
