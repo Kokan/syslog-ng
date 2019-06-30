@@ -343,7 +343,7 @@ cfg_init(GlobalConfig *cfg)
   log_template_options_init(&cfg->template_options, cfg);
   if (!cfg_init_modules(cfg))
     return FALSE;
-  return cfg_tree_start(&cfg->tree);
+  return cfg_tree_start1(&cfg->tree, cfg->lexer);
 }
 
 gboolean

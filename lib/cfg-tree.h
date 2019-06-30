@@ -182,6 +182,7 @@ LogTemplate *cfg_tree_check_inline_template(CfgTree *self, const gchar *template
 gchar *cfg_tree_get_rule_name(CfgTree *self, gint content, LogExprNode *node);
 gchar *cfg_tree_get_child_id(CfgTree *self, gint content, LogExprNode *node);
 
+gboolean cfg_tree_start1(CfgTree *self, CfgLexer *lexer);
 gboolean cfg_tree_start(CfgTree *self);
 gboolean cfg_tree_stop(CfgTree *self);
 

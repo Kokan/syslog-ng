@@ -1373,7 +1373,7 @@ _verify_unique_persist_names_among_pipes(const GPtrArray *initialized_pipes)
 }
 
 gboolean
-cfg_tree_start(CfgTree *self)
+cfg_tree_start1(CfgTree *self, CfgLexer *lexer)
 {
   gint i;
 
@@ -1397,11 +1397,19 @@ cfg_tree_start(CfgTree *self)
                     log_pipe_location_tag(pipe));
           pipe->expr_node->level->lloc.first_line = pipe->expr_node->line;
           pipe->expr_node->level->lloc.last_line = pipe->expr_node->line;
+          report_error_with_config_backtrace(lexer, pipe->expr_node->level, "Error initializing message pipeline",
+                                             "");
           return FALSE;
         }
     }
 
   return _verify_unique_persist_names_among_pipes(self->initialized_pipes);
+}
+
+gboolean
+cfg_tree_start(CfgTree *self)
+{
+  return cfg_tree_start1(self, NULL);
 }
 
 gboolean
