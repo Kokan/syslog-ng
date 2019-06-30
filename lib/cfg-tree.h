@@ -123,6 +123,7 @@ struct _LogExprNode
   gchar *filename;
   gint line, column;
   gint child_id;
+  CfgIncludeLevel *level;//CfgLexer owns this pointer, only a view
 };
 
 gint log_expr_node_lookup_flag(const gchar *flag);
