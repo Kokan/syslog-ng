@@ -319,7 +319,17 @@ exit:
 void
 report_syntax_error(CfgLexer *lexer, YYLTYPE *yylloc, const char *what, const char *msg, gboolean in_main_grammar)
 {
-  CfgIncludeLevel *level = yylloc->level, *from;
+  report_error_with_config_backtrace(lexer, yylloc->level, what, msg);
+
+  if (in_main_grammar)
+    fprintf(stderr, "\nsyslog-ng documentation: https://www.balabit.com/support/documentation?product=%s\n"
+            "contact: %s\n", PRODUCT_NAME, PRODUCT_CONTACT);
+}
+
+void
+report_error_with_config_backtrace(CfgLexer *lexer, CfgIncludeLevel *level, const char *what, const char *msg)
+{
+  CfgIncludeLevel *from;
 
   for (from = level; from >= lexer->include_stack; from--)
     {
@@ -352,11 +362,6 @@ report_syntax_error(CfgLexer *lexer, YYLTYPE *yylloc, const char *what, const ch
         }
       fprintf(stderr, "\n");
     }
-
-  if (in_main_grammar)
-    fprintf(stderr, "\nsyslog-ng documentation: https://www.balabit.com/support/documentation?product=%s\n"
-            "contact: %s\n", PRODUCT_NAME, PRODUCT_CONTACT);
-
 }
 
 /* the debug flag for the main parser will be used for all parsers */
