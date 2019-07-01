@@ -440,8 +440,12 @@ static inline gboolean
 _init_filters(FilterExprNode *self, GlobalConfig *cfg)
 {
   if (self)
-    return filter_expr_init(self, cfg);
+    {
+      if (!filter_expr_init(self, cfg))
+        return FALSE;
+    }
 
+  filter_expr_traversal(self, NULL);
   return TRUE;
 }
 
