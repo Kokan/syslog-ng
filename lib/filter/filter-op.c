@@ -64,7 +64,6 @@ _traversal(FilterExprNode *s, FilterExprNode *parent, FilterExprNodeTraversalCal
   filter_expr_traversal(self->left, s, func, cookie);
   filter_expr_traversal(self->right, s, func, cookie);
 
-
   GPtrArray *childs = g_ptr_array_sized_new(2);
   g_ptr_array_add(childs, self->left);
   g_ptr_array_add(childs, self->right);
