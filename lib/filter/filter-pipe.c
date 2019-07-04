@@ -138,7 +138,7 @@ _run_optimizers(LogFilterPipe *self)
         {
           msg_debug("Running filter-optimizer", evt_tag_str("name", optimizer->name));
           filter_expr_traversal(self->expr, NULL, optimizer->cb, cookie);
-          optimizer->deinit(&cookie);
+          optimizer->deinit(cookie);
         }
       else
         {

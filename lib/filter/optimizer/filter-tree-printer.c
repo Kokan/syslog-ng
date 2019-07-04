@@ -10,9 +10,9 @@ _filter_tree_printer_init(FilterExprNode *root)
 }
 
 static void
-_filter_tree_printer_deinit(gpointer *cookie)
+_filter_tree_printer_deinit(gpointer cookie)
 {
-  g_free(*cookie);
+  g_free(cookie);
 }
 
 static void

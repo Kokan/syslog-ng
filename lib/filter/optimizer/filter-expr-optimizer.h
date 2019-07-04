@@ -33,7 +33,7 @@ struct _FilterExprOptimizer
 {
   const gchar *name;
   gpointer (*init)(FilterExprNode *root);
-  void (*deinit)(gpointer *cookie);
+  void (*deinit)(gpointer cookie);
   FilterExprNodeTraversalCallbackFunction cb;
 };
 
