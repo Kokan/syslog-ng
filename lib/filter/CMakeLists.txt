@@ -31,3 +31,4 @@ set(FILTER_SOURCES
     )
 
 add_test_subdirectory(tests)
+add_subdirectory(optimizer)
