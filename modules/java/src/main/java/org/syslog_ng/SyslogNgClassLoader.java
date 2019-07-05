@@ -44,10 +44,21 @@ public class SyslogNgClassLoader {
     System.loadLibrary("mod-java");
   }
 
-  private ClassLoader classLoader;
+  class DummyClassloader extends URLClassLoader {
+
+      public DummyClassloader(URL[] urls, ClassLoader parent) {
+          super(urls, parent);
+      }
+
+      public void addURL(URL url) {
+          super.addURL(url);
+      }
+  }
+
+  private DummyClassloader classLoader;
 
   public SyslogNgClassLoader() {
-    classLoader = ClassLoader.getSystemClassLoader();
+    classLoader = new DummyClassloader(new URL[0], this.getClass().getClassLoader());
   }
 
   public void initCurrentThread() {
@@ -138,10 +149,8 @@ public class SyslogNgClassLoader {
   }
 
   private void expandClassPath(URL[] urls) throws Exception {
-      Method method = URLClassLoader.class.getDeclaredMethod("addURL", new Class[]{URL.class});
-      method.setAccessible(true);
       for (URL url:urls) {
-          method.invoke(classLoader, new Object[]{url});
+          classLoader.addURL(url);
       }
   }
 }
