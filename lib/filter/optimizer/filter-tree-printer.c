@@ -1,4 +1,4 @@
-#include "lib/filter/optimizer/filter-tree-printer.h"
+#include "filter/optimizer/filter-tree-printer.h"
 
 static gpointer
 _filter_tree_printer_init(FilterExprNode *root)

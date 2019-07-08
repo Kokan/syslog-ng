@@ -25,8 +25,8 @@
 #ifndef FILTER_TREE_PRINTER_H_INCLUDED
 #define FILTER_TREE_PRINTER_H_INCLUDED
 
-#include "lib/filter/filter-expr.h"
-#include "lib/filter/optimizer/filter-expr-optimizer.h"
+#include "filter/filter-expr.h"
+#include "filter/optimizer/filter-expr-optimizer.h"
 
 extern FilterExprOptimizer filter_tree_printer;
 
