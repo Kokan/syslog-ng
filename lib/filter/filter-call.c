@@ -152,6 +152,8 @@ filter_call_new(gchar *rule, GlobalConfig *cfg)
   self->super.eval = filter_call_eval;
   self->super.free_fn = filter_call_free;
   self->super.type = g_strdup_printf("filter(%s)", rule);
+  self->super.pattern = NULL;
+  self->super.template = NULL;
   self->rule = g_strdup(rule);
   self->super.traversal = _traversal;
 

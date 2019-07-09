@@ -65,7 +65,9 @@ filter_facility_new(guint32 facilities)
   filter_expr_node_init_instance(&self->super);
   self->super.eval = filter_facility_eval;
   self->valid = facilities;
-  self->super.type = "facility";
+  self->super.type = g_strdup("facility");
+  self->super.pattern = "slkfj"; //TODO: 
+  self->super.template = g_strdup("$FACILITY");
   return &self->super;
 }
 
@@ -95,6 +97,8 @@ filter_level_new(guint32 levels)
   filter_expr_node_init_instance(&self->super);
   self->super.eval = filter_level_eval;
   self->valid = levels;
-  self->super.type = "level";
+  self->super.type = g_strdup("level");
+  self->super.pattern = "slkfj"; //TODO: 
+  self->super.template = g_strdup("$LEVEL");
   return &self->super;
 }
