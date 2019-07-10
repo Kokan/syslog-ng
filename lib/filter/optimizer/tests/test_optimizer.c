@@ -4,6 +4,7 @@
 #include "cfg-lexer.h"
 #include "filter/optimizer/filter-expr-optimizer.h"
 #include "filter/optimizer/concatenate-or-filters.h"
+#include "apphook.h"
 
 
 gint counter;
@@ -52,7 +53,7 @@ Test(filter_optimizer, dummy_optimizer)
   FilterExprNode *expr = _compile_standalone_filter("program('foo');");
 
   cr_assert(filter_expr_optimizer_run(expr,  &dummy));
-  cr_assert_eq(counter, 3, "%d==%d", counter, 3);
+  cr_assert_eq(counter, 4, "%d==%d", counter, 4);
 
   app_shutdown();
 }
@@ -63,7 +64,7 @@ Test(filter_optimizer, multiple_filter_expr)
   FilterExprNode *expr = _compile_standalone_filter("program('foo') and message('blaze');");
 
   cr_assert(filter_expr_optimizer_run(expr,  &dummy));
-  cr_assert_eq(counter, 5);
+  cr_assert_eq(counter, 6);
 
   app_shutdown();
 }
