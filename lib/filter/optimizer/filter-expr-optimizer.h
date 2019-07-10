@@ -49,7 +49,7 @@ filter_expr_optimizer_run(FilterExprNode *self, FilterExprOptimizer *optimizer)
       if (cookie != NULL)
         {
           msg_debug("Running filter-optimizer", evt_tag_str("name", optimizer->name));
-          filter_expr_traversal(dummy_root, NULL, optimizer->cb, cookie);
+          filter_expr_traversal(self, dummy_root, optimizer->cb, cookie);
           optimizer->deinit(cookie);
           return filter_call_next(dummy_root);
         }
