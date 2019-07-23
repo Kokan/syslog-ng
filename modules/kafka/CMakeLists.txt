@@ -25,6 +25,7 @@ add_library(kafka SHARED
   kafka-dest-worker.c
   kafka-plugin.c
   kafka-props.c
+  rdkafka-common.c
   kafka-source.c
   kafka-source.h
   ${CMAKE_CURRENT_BINARY_DIR}/kafka-grammar.c

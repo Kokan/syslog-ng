@@ -27,6 +27,7 @@
 #include "kafka-dest-driver.h"
 #include "kafka-props.h"
 #include "kafka-dest-worker.h"
+#include "rdkafka-common.h"
 
 #include <librdkafka/rdkafka.h>
 #include <stdlib.h>
@@ -136,14 +137,6 @@ _format_persist_name(const LogPipe *d)
   return persist_name;
 }
 
-void
-_kafka_log_callback(const rd_kafka_t *rkt, int level, const char *fac, const char *msg)
-{
-  gchar *buf = g_strdup_printf("librdkafka: %s(%d): %s", fac, level, msg);
-  msg_event_send(msg_event_create(level, buf, NULL));
-  g_free(buf);
-}
-
 static void
 _kafka_delivery_report_cb(rd_kafka_t *rk,
                           void *payload, size_t len,
@@ -183,39 +176,9 @@ _kafka_delivery_report_cb(rd_kafka_t *rk,
     }
 }
 
-static void
-_conf_set_prop(rd_kafka_conf_t *conf, const gchar *name, const gchar *value)
-{
-  gchar errbuf[1024];
-
-  msg_debug("kafka: setting librdkafka config property",
-            evt_tag_str("name", name),
-            evt_tag_str("value", value));
-  if (rd_kafka_conf_set(conf, name, value, errbuf, sizeof(errbuf)) < 0)
-    {
-      msg_error("kafka: error setting librdkafka config property",
-                evt_tag_str("name", name),
-                evt_tag_str("value", value),
-                evt_tag_str("error", errbuf));
-    }
-}
-
 /*
  * Main thread
  */
-
-static gboolean
-_apply_config_props(rd_kafka_conf_t *conf, KafkaProperties *props)
-{
-  GList *ll;
-
-  for (ll = props; ll != NULL; ll = g_list_next(ll))
-    {
-      KafkaProperty *kp = ll->data;
-      _conf_set_prop(conf, kp->name, kp->value);
-    }
-  return TRUE;
-}
 
 static rd_kafka_t *
 _construct_client(KafkaDestDriver *self)
@@ -224,14 +187,12 @@ _construct_client(KafkaDestDriver *self)
   rd_kafka_conf_t *conf;
   gchar errbuf[1024];
 
-  conf = rd_kafka_conf_new();
-  _conf_set_prop(conf, "metadata.broker.list", self->rdkafka.bootstrap_servers);
-  _conf_set_prop(conf, "topic.partitioner", "murmur2_random");
+  conf = _construct_kafka_conf(self->rdkafka.properties, self->rdkafka.bootstrap_servers);
+  _conf_set_prop(conf, "topic.partitioner", "murmur2_random");//TODO: this should be append to properties in new phase
 
-  _apply_config_props(conf, self->rdkafka.properties);
-  rd_kafka_conf_set_log_cb(conf, _kafka_log_callback);
   rd_kafka_conf_set_dr_cb(conf, _kafka_delivery_report_cb);
   rd_kafka_conf_set_opaque(conf, self);
+
   client = rd_kafka_new(RD_KAFKA_PRODUCER, conf, errbuf, sizeof(errbuf));
   if (!client)
     {
@@ -242,14 +203,6 @@ _construct_client(KafkaDestDriver *self)
                 log_pipe_location_tag(&self->super.super.super.super));
     }
   return client;
-}
-
-rd_kafka_topic_t *
-_construct_topic(KafkaDestDriver *self)
-{
-  g_assert(self->rdkafka.kafka != NULL);
-
-  return rd_kafka_topic_new(self->rdkafka.kafka, self->rdkafka.topic_name, NULL);
 }
 
 static LogThreadedDestWorker *
@@ -351,7 +304,7 @@ kafka_dd_init(LogPipe *s)
       return FALSE;
     }
 
-  self->rdkafka.topic = _construct_topic(self);
+  self->rdkafka.topic = _construct_kafka_topic(self->rdkafka.kafka, self->rdkafka.topic_name);
   if (self->rdkafka.topic == NULL)
     {
       msg_error("kafka: error constructing the kafka topic object",

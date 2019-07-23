@@ -11,6 +11,8 @@ modules_kafka_libkafka_la_SOURCES = \
   modules/kafka/kafka-parser.h \
   modules/kafka/kafka-props.c \
   modules/kafka/kafka-props.h \
+  modules/kafka/rdkafka-common.c \
+  modules/kafka/rdkafka-common.h \
   modules/kafka/kafka-dest-driver.h \
   modules/kafka/kafka-dest-driver.c \
   modules/kafka/kafka-dest-worker.h \

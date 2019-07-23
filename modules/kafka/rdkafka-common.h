@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2018 Kokan <kokaipeter@gmail.com>
  * Copyright (c) 2014 Pierre-Yves Ritschard <pyr@spootnik.org>
- * Copyright (c) 2019 Balabit
+ * Copyright (c) 2013-2019 Balabit
  * Copyright (c) 2019 Balazs Scheidler
+ * Copyright (c) 2019 Kokan <kokaipeter@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 as published
@@ -23,33 +23,17 @@
  *
  */
 
-#ifndef KAFKA_PROPS_H_INCLUDED
-#define KAFKA_PROPS_H_INCLUDED
+#ifndef RDKAFKA_COMMON_H_INCLUDED
+#define RDKAFKA_COMMON_H_INCLUDED
 
-#include "syslog-ng.h"
+#include <librdkafka/rdkafka.h>
+#include "kafka-props.h"
 
-typedef struct _KafkaProperty
-{
-  gchar *name;
-  gchar *value;
-} KafkaProperty;
+void _conf_set_prop(rd_kafka_conf_t *conf, const gchar *name, const gchar *value);
+gboolean rd_kafka_conf_apply_properties(rd_kafka_conf_t *conf, KafkaProperties *props);
+rd_kafka_conf_t *_construct_kafka_conf(KafkaProperties *properties, const gchar *bootstrap_servers);
+rd_kafka_topic_t *_construct_kafka_topic(rd_kafka_t *kafka, const gchar *topic_name);
 
-typedef GList KafkaProperties;
 
-KafkaProperty *kafka_property_new(const gchar *name, const gchar *value);
-void kafka_property_free(KafkaProperty *self);
-
-void kafka_properties_free(KafkaProperties *self);
-KafkaProperties *kafka_read_properties_file(const char *path);
-
-KafkaProperties *kafka_translate_java_properties(KafkaProperties *prop_list);
-
-static inline KafkaProperties *
-kafka_properties_new_empty(void)
-{
-  return NULL;
-}
-
-KafkaProperties *kafka_properties_merge(KafkaProperties *a, KafkaProperties *b);
 
 #endif
