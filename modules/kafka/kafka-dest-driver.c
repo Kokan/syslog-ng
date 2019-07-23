@@ -45,11 +45,11 @@ kafka_dd_set_topic(LogDriver *d, const gchar *topic)
 }
 
 void
-kafka_dd_merge_config(LogDriver *d, GList *props)
+kafka_dd_merge_config(LogDriver *d, KafkaProperties *props)
 {
   KafkaDestDriver *self = (KafkaDestDriver *)d;
 
-  self->config = g_list_concat(self->config, props);
+  self->properties = kafka_properties_merge(self->properties, props);
 }
 
 void
@@ -205,7 +205,7 @@ _conf_set_prop(rd_kafka_conf_t *conf, const gchar *name, const gchar *value)
  */
 
 static gboolean
-_apply_config_props(rd_kafka_conf_t *conf, GList *props)
+_apply_config_props(rd_kafka_conf_t *conf, KafkaProperties *props)
 {
   GList *ll;
 
@@ -228,7 +228,7 @@ _construct_client(KafkaDestDriver *self)
   _conf_set_prop(conf, "metadata.broker.list", self->bootstrap_servers);
   _conf_set_prop(conf, "topic.partitioner", "murmur2_random");
 
-  _apply_config_props(conf, self->config);
+  _apply_config_props(conf, self->properties);
   rd_kafka_conf_set_log_cb(conf, _kafka_log_callback);
   rd_kafka_conf_set_dr_cb(conf, _kafka_delivery_report_cb);
   rd_kafka_conf_set_opaque(conf, self);
@@ -404,7 +404,7 @@ kafka_dd_free(LogPipe *d)
   if (self->topic_name)
     g_free(self->topic_name);
   g_free(self->bootstrap_servers);
-  kafka_property_list_free(self->config);
+  kafka_properties_free(self->properties);
   log_threaded_dest_driver_free(d);
 }
 

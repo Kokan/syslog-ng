@@ -27,6 +27,7 @@
 
 #include "logthrdest/logthrdestdrv.h"
 #include <librdkafka/rdkafka.h>
+#include "kafka-props.h"
 
 typedef struct
 {
@@ -37,7 +38,7 @@ typedef struct
   LogTemplate *message;
 
   gchar *topic_name;
-  GList *config;
+  KafkaProperties *properties;
   gchar *bootstrap_servers;
   rd_kafka_topic_t *topic;
   rd_kafka_t *kafka;

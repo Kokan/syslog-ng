@@ -47,11 +47,17 @@ kafka_property_free(KafkaProperty *self)
 }
 
 void
-kafka_property_list_free(GList *l)
+kafka_properties_free(KafkaProperties *self)
 {
-  g_list_foreach(l, (GFunc) kafka_property_free, NULL);
+  g_list_foreach(self, (GFunc) kafka_property_free, NULL);
 
-  g_list_free(l);
+  g_list_free(self);
+}
+
+KafkaProperties *
+kafka_properties_merge(KafkaProperties *a, KafkaProperties *b)
+{
+  return g_list_concat(a, b);
 }
 
 
@@ -241,10 +247,10 @@ kafka_properties_file_reader_extract_value(KafkaPropertyFileReader *self, const 
   return kafka_properties_file_reader_deescape(self, value_offset, self->line->len);
 }
 
-static GList *
+static KafkaProperties *
 kafka_properties_file_reader_parse(KafkaPropertyFileReader *self)
 {
-  GList *prop_list = NULL;
+  KafkaProperties *properties = kafka_properties_new_empty();
 
   g_string_truncate(self->line, 0);
   while (kafka_properties_file_reader_get_line(self))
@@ -262,20 +268,20 @@ kafka_properties_file_reader_parse(KafkaPropertyFileReader *self)
 
           gchar *key = kafka_properties_file_reader_extract_key(self, separator);
           gchar *value = kafka_properties_file_reader_extract_value(self, separator);
-          prop_list = g_list_prepend(prop_list, kafka_property_new(key, value));
+          properties = g_list_prepend(properties, kafka_property_new(key, value));
           g_free(key);
           g_free(value);
         }
       g_string_truncate(self->line, 0);
     }
-  return g_list_reverse(prop_list);
+  return g_list_reverse(properties);
 }
 
-GList *
+KafkaProperties *
 kafka_read_properties_file(const char *path)
 {
   KafkaPropertyFileReader reader;
-  GList *result = NULL;
+  KafkaProperties *result = kafka_properties_new_empty();
 
   kafka_properties_file_reader_init(&reader);
   if (kafka_properties_file_reader_open(&reader, path))
@@ -285,7 +291,7 @@ kafka_read_properties_file(const char *path)
 }
 
 static gboolean
-kafka_translate_and_prepend_java_property(GList **prop_list, GList *prop_elem)
+kafka_translate_and_prepend_java_property(KafkaProperties **properties, GList *prop_elem)
 {
   KafkaProperty *prop = (KafkaProperty *) prop_elem->data;
 
@@ -310,8 +316,8 @@ kafka_translate_and_prepend_java_property(GList **prop_list, GList *prop_elem)
                     evt_tag_str("property", prop->name),
                     evt_tag_str("value", prop->value));
 
-          *prop_list = g_list_prepend(*prop_list, kafka_property_new("sasl.username", sasl_user));
-          *prop_list = g_list_prepend(*prop_list, kafka_property_new("sasl.password", sasl_pass));
+          *properties = g_list_prepend(*properties, kafka_property_new("sasl.username", sasl_user));
+          *properties = g_list_prepend(*properties, kafka_property_new("sasl.password", sasl_pass));
           g_list_free_1(prop_elem);
           kafka_property_free(prop);
           return TRUE;
@@ -324,7 +330,7 @@ kafka_translate_and_prepend_java_property(GList **prop_list, GList *prop_elem)
           return FALSE;
         }
     }
-  *prop_list = g_list_concat(prop_elem, *prop_list);
+  *properties = g_list_concat(prop_elem, *properties);
   return TRUE;
 }
 
@@ -346,8 +352,8 @@ kafka_translate_java_properties(GList *prop_list)
           g_list_free_1(p);
 
           /* free both lists */
-          kafka_property_list_free(prop_list);
-          kafka_property_list_free(result);
+          kafka_properties_free(prop_list);
+          kafka_properties_free(result);
 
           /* indicate failure */
           return NULL;

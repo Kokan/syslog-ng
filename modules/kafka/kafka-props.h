@@ -34,12 +34,22 @@ typedef struct _KafkaProperty
   gchar *value;
 } KafkaProperty;
 
+typedef GList KafkaProperties;
+
 KafkaProperty *kafka_property_new(const gchar *name, const gchar *value);
 void kafka_property_free(KafkaProperty *self);
-void kafka_property_list_free(GList *l);
-GList *kafka_read_properties_file(const char *path);
 
-GList *kafka_translate_java_properties(GList *prop_list);
+void kafka_properties_free(KafkaProperties *self);
+KafkaProperties* kafka_read_properties_file(const char *path);
 
+KafkaProperties* kafka_translate_java_properties(KafkaProperties *prop_list);
+
+static inline KafkaProperties *
+kafka_properties_new_empty(void)
+{
+   return NULL;
+}
+
+KafkaProperties *kafka_properties_merge(KafkaProperties *a, KafkaProperties *b);
 
 #endif

@@ -70,7 +70,7 @@ Test(kafka_props, kafka_prop_list_allocation_and_destruction)
   _assert_nth_prop_equals(pl, 1, "name2", "value2");
   _assert_nth_prop_equals(pl, 0, "name1", "value1");
 
-  kafka_property_list_free(pl);
+  kafka_properties_free(pl);
 }
 
 Test(kafka_props, kafka_read_properties_file_gets_keys_from_the_file)
@@ -87,7 +87,7 @@ Test(kafka_props, kafka_read_properties_file_gets_keys_from_the_file)
   _assert_nth_prop_equals(pl, 6, "namethatincludenewline\nhere", "value");
   _assert_nth_prop_equals(pl, 7, "namethatincludetab\there", "value");
   _assert_nth_prop_equals(pl, 8, "namethatincludeunicode@here", "value");
-  kafka_property_list_free(pl);
+  kafka_properties_free(pl);
 }
 
 Test(kafka_props, kafka_translate_properties_returns_unknown_properties_unmodified)
@@ -103,7 +103,7 @@ Test(kafka_props, kafka_translate_properties_returns_unknown_properties_unmodifi
   _assert_nth_prop_equals(pl, 2, "name3", "value3");
   _assert_nth_prop_equals(pl, 1, "name2", "value2");
   _assert_nth_prop_equals(pl, 0, "name1", "value1");
-  kafka_property_list_free(pl);
+  kafka_properties_free(pl);
 }
 
 Test(kafka_props, kafka_translate_ssl_endpoint_identification_algorithm_fails_if_set_to_non_empty)
@@ -130,7 +130,7 @@ Test(kafka_props, kafka_translate_sasl_jaas_config_extracts_username_into_sasl_u
   _assert_nth_prop_equals(pl, 0, "sasl.username", "foo");
   _assert_nth_prop_equals(pl, 1, "sasl.password", "bar");
 
-  kafka_property_list_free(pl);
+  kafka_properties_free(pl);
 }
 
 Test(kafka_props, kafka_translate_ssl_endpoint_identification_algorithm_accepts_empty)
@@ -140,7 +140,7 @@ Test(kafka_props, kafka_translate_ssl_endpoint_identification_algorithm_accepts_
   pl = g_list_append(pl, kafka_property_new("ssl.endpoint.identification.algorithm", ""));
   pl = kafka_translate_java_properties(pl);
   cr_assert_not_null(pl);
-  kafka_property_list_free(pl);
+  kafka_properties_free(pl);
 }
 
 static void
