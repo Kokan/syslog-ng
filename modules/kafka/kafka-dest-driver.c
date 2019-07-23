@@ -40,8 +40,8 @@ kafka_dd_set_topic(LogDriver *d, const gchar *topic)
 {
   KafkaDestDriver *self = (KafkaDestDriver *)d;
 
-  g_free(self->topic_name);
-  self->topic_name = g_strdup(topic);
+  g_free(self->rdkafka.topic_name);
+  self->rdkafka.topic_name = g_strdup(topic);
 }
 
 void
@@ -49,7 +49,7 @@ kafka_dd_merge_config(LogDriver *d, KafkaProperties *props)
 {
   KafkaDestDriver *self = (KafkaDestDriver *)d;
 
-  self->properties = kafka_properties_merge(self->properties, props);
+  self->rdkafka.properties = kafka_properties_merge(self->rdkafka.properties, props);
 }
 
 void
@@ -57,8 +57,8 @@ kafka_dd_set_bootstrap_servers(LogDriver *d, const gchar *bootstrap_servers)
 {
   KafkaDestDriver *self = (KafkaDestDriver *)d;
 
-  g_free(self->bootstrap_servers);
-  self->bootstrap_servers = g_strdup(bootstrap_servers);
+  g_free(self->rdkafka.bootstrap_servers);
+  self->rdkafka.bootstrap_servers = g_strdup(bootstrap_servers);
 }
 
 void
@@ -119,7 +119,7 @@ _format_stats_instance(LogThreadedDestDriver *d)
   KafkaDestDriver *self = (KafkaDestDriver *)d;
   static gchar stats_name[1024];
 
-  g_snprintf(stats_name, sizeof(stats_name), "kafka,%s", self->topic_name);
+  g_snprintf(stats_name, sizeof(stats_name), "kafka,%s", self->rdkafka.topic_name);
   return stats_name;
 }
 
@@ -132,7 +132,7 @@ _format_persist_name(const LogPipe *d)
   if (d->persist_name)
     g_snprintf(persist_name, sizeof(persist_name), "kafka.%s", d->persist_name);
   else
-    g_snprintf(persist_name, sizeof(persist_name), "kafka(%s)", self->topic_name);
+    g_snprintf(persist_name, sizeof(persist_name), "kafka(%s)", self->rdkafka.topic_name);
   return persist_name;
 }
 
@@ -163,7 +163,7 @@ _kafka_delivery_report_cb(rd_kafka_t *rk,
       LogPathOptions path_options = LOG_PATH_OPTIONS_INIT;
 
       msg_debug("kafka: delivery report for message came back with an error, putting it back to our queue",
-                evt_tag_str("topic", self->topic_name),
+                evt_tag_str("topic", self->rdkafka.topic_name),
                 evt_tag_printf("message", "%.*s", (int) MIN(len, 128), (char *) payload),
                 evt_tag_str("error", rd_kafka_err2str(err)),
                 evt_tag_str("driver", self->super.super.super.id),
@@ -174,7 +174,7 @@ _kafka_delivery_report_cb(rd_kafka_t *rk,
   else
     {
       msg_debug("kafka: delivery report successful",
-                evt_tag_str("topic", self->topic_name),
+                evt_tag_str("topic", self->rdkafka.topic_name),
                 evt_tag_printf("message", "%.*s", (int) MIN(len, 128), (char *) payload),
                 evt_tag_str("error", rd_kafka_err2str(err)),
                 evt_tag_str("driver", self->super.super.super.id),
@@ -225,10 +225,10 @@ _construct_client(KafkaDestDriver *self)
   gchar errbuf[1024];
 
   conf = rd_kafka_conf_new();
-  _conf_set_prop(conf, "metadata.broker.list", self->bootstrap_servers);
+  _conf_set_prop(conf, "metadata.broker.list", self->rdkafka.bootstrap_servers);
   _conf_set_prop(conf, "topic.partitioner", "murmur2_random");
 
-  _apply_config_props(conf, self->properties);
+  _apply_config_props(conf, self->rdkafka.properties);
   rd_kafka_conf_set_log_cb(conf, _kafka_log_callback);
   rd_kafka_conf_set_dr_cb(conf, _kafka_delivery_report_cb);
   rd_kafka_conf_set_opaque(conf, self);
@@ -236,7 +236,7 @@ _construct_client(KafkaDestDriver *self)
   if (!client)
     {
       msg_error("kafka: error constructing the kafka connection object",
-                evt_tag_str("topic", self->topic_name),
+                evt_tag_str("topic", self->rdkafka.topic_name),
                 evt_tag_str("error", errbuf),
                 evt_tag_str("driver", self->super.super.super.id),
                 log_pipe_location_tag(&self->super.super.super.super));
@@ -247,9 +247,9 @@ _construct_client(KafkaDestDriver *self)
 rd_kafka_topic_t *
 _construct_topic(KafkaDestDriver *self)
 {
-  g_assert(self->kafka != NULL);
+  g_assert(self->rdkafka.kafka != NULL);
 
-  return rd_kafka_topic_new(self->kafka, self->topic_name, NULL);
+  return rd_kafka_topic_new(self->rdkafka.kafka, self->rdkafka.topic_name, NULL);
 }
 
 static LogThreadedDestWorker *
@@ -271,29 +271,29 @@ static void
 _flush_inflight_messages(KafkaDestDriver *self)
 {
   rd_kafka_resp_err_t err;
-  gint outq_len = rd_kafka_outq_len(self->kafka);
+  gint outq_len = rd_kafka_outq_len(self->rdkafka.kafka);
   gint timeout = _get_flush_timeout(self);
 
   if (outq_len > 0)
     {
       msg_notice("kafka: shutting down kafka producer, while messages are still in-flight, waiting for messages to flush",
-                 evt_tag_str("topic", self->topic_name),
+                 evt_tag_str("topic", self->rdkafka.topic_name),
                  evt_tag_int("outq_len", outq_len),
                  evt_tag_int("timeout", timeout),
                  evt_tag_str("driver", self->super.super.super.id),
                  log_pipe_location_tag(&self->super.super.super.super));
     }
-  err = rd_kafka_flush(self->kafka, timeout);
+  err = rd_kafka_flush(self->rdkafka.kafka, timeout);
   if (err != RD_KAFKA_RESP_ERR_NO_ERROR)
     {
       msg_error("kafka: error flushing accumulated messages during shutdown, rd_kafka_flush() returned failure, this might indicate that some in-flight messages are lost",
-                evt_tag_str("topic", self->topic_name),
-                evt_tag_int("outq_len", rd_kafka_outq_len(self->kafka)),
+                evt_tag_str("topic", self->rdkafka.topic_name),
+                evt_tag_int("outq_len", rd_kafka_outq_len(self->rdkafka.kafka)),
                 evt_tag_str("error", rd_kafka_err2str(err)),
                 evt_tag_str("driver", self->super.super.super.id),
                 log_pipe_location_tag(&self->super.super.super.super));
     }
-  outq_len = rd_kafka_outq_len(self->kafka);
+  outq_len = rd_kafka_outq_len(self->rdkafka.kafka);
 
   if (outq_len != 0)
     msg_notice("kafka: timeout while waiting for the librdkafka queue to empty, the "
@@ -312,10 +312,10 @@ _purge_remaining_messages(KafkaDestDriver *self)
 
   /* FIXME: Need to check their order!!!! */
 
-  rd_kafka_purge(self->kafka, RD_KAFKA_PURGE_F_QUEUE | RD_KAFKA_PURGE_F_INFLIGHT);
-  rd_kafka_poll(self->kafka, 0);
+  rd_kafka_purge(self->rdkafka.kafka, RD_KAFKA_PURGE_F_QUEUE | RD_KAFKA_PURGE_F_INFLIGHT);
+  rd_kafka_poll(self->rdkafka.kafka, 0);
 
-  gint outq_len = rd_kafka_outq_len(self->kafka);
+  gint outq_len = rd_kafka_outq_len(self->rdkafka.kafka);
   if (outq_len != 0)
     msg_notice("kafka: failed to completely empty rdkafka queues, as we still have entries in "
                "the queue after flush() and purge(), this is probably causing a memory leak, "
@@ -333,7 +333,7 @@ kafka_dd_init(LogPipe *s)
   if (!log_threaded_dest_driver_init_method(s))
     return FALSE;
 
-  if (!self->topic_name)
+  if (!self->rdkafka.topic_name)
     {
       msg_error("kafka: the topic() argument is required for kafka destinations",
                 evt_tag_str("driver", self->super.super.super.id),
@@ -341,21 +341,21 @@ kafka_dd_init(LogPipe *s)
       return FALSE;
     }
 
-  self->kafka = _construct_client(self);
-  if (self->kafka == NULL)
+  self->rdkafka.kafka = _construct_client(self);
+  if (self->rdkafka.kafka == NULL)
     {
       msg_error("kafka: error constructing kafka connection object, perhaps metadata.broker.list property is missing?",
-                evt_tag_str("topic", self->topic_name),
+                evt_tag_str("topic", self->rdkafka.topic_name),
                 evt_tag_str("driver", self->super.super.super.id),
                 log_pipe_location_tag(&self->super.super.super.super));
       return FALSE;
     }
 
-  self->topic = _construct_topic(self);
-  if (self->topic == NULL)
+  self->rdkafka.topic = _construct_topic(self);
+  if (self->rdkafka.topic == NULL)
     {
       msg_error("kafka: error constructing the kafka topic object",
-                evt_tag_str("topic", self->topic_name),
+                evt_tag_str("topic", self->rdkafka.topic_name),
                 evt_tag_str("driver", self->super.super.super.id),
                 log_pipe_location_tag(&self->super.super.super.super));
       return FALSE;
@@ -369,7 +369,7 @@ kafka_dd_init(LogPipe *s)
 
   log_template_options_init(&self->template_options, cfg);
   msg_verbose("kafka: Kafka destination initialized",
-              evt_tag_str("topic", self->topic_name),
+              evt_tag_str("topic", self->rdkafka.topic_name),
               evt_tag_str("key", self->key ? self->key->template : "NULL"),
               evt_tag_str("message", self->message->template),
               evt_tag_str("driver", self->super.super.super.id),
@@ -397,14 +397,14 @@ kafka_dd_free(LogPipe *d)
 
   log_template_unref(self->key);
   log_template_unref(self->message);
-  if (self->topic)
-    rd_kafka_topic_destroy(self->topic);
-  if (self->kafka)
-    rd_kafka_destroy(self->kafka);
-  if (self->topic_name)
-    g_free(self->topic_name);
-  g_free(self->bootstrap_servers);
-  kafka_properties_free(self->properties);
+  if (self->rdkafka.topic)
+    rd_kafka_topic_destroy(self->rdkafka.topic);
+  if (self->rdkafka.kafka)
+    rd_kafka_destroy(self->rdkafka.kafka);
+  if (self->rdkafka.topic_name)
+    g_free(self->rdkafka.topic_name);
+  g_free(self->rdkafka.bootstrap_servers);
+  kafka_properties_free(self->rdkafka.properties);
   log_threaded_dest_driver_free(d);
 }
 

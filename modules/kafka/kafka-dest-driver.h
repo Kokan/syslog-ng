@@ -37,11 +37,14 @@ typedef struct
   LogTemplate *key;
   LogTemplate *message;
 
-  gchar *topic_name;
-  KafkaProperties *properties;
-  gchar *bootstrap_servers;
-  rd_kafka_topic_t *topic;
-  rd_kafka_t *kafka;
+  struct {
+    gchar *topic_name;
+    KafkaProperties *properties;
+    gchar *bootstrap_servers;
+    rd_kafka_topic_t *topic;
+    rd_kafka_t *kafka;
+  } rdkafka;
+
   gint flush_timeout_on_shutdown;
   gint flush_timeout_on_reload;
   gint poll_timeout;

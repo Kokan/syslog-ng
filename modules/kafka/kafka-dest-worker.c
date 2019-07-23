@@ -61,7 +61,7 @@ _publish_message(KafkaDestWorker *self, LogMessage *msg)
   });
   GString *message = self->message;
 
-  if (rd_kafka_produce(owner->topic,
+  if (rd_kafka_produce(owner->rdkafka.topic,
                        RD_KAFKA_PARTITION_UA,
                        RD_KAFKA_MSG_F_FREE | RD_KAFKA_MSG_F_BLOCK,
                        message->str, message->len,
@@ -69,7 +69,7 @@ _publish_message(KafkaDestWorker *self, LogMessage *msg)
                        log_msg_ref(msg)) == -1)
     {
       msg_error("kafka: failed to publish message",
-                evt_tag_str("topic", owner->topic_name),
+                evt_tag_str("topic", owner->rdkafka.topic_name),
                 evt_tag_str("error", rd_kafka_err2str(rd_kafka_last_error())),
                 evt_tag_str("driver", owner->super.super.super.id),
                 log_pipe_location_tag(&owner->super.super.super.super));
@@ -78,7 +78,7 @@ _publish_message(KafkaDestWorker *self, LogMessage *msg)
     }
 
   msg_debug("kafka: message published",
-            evt_tag_str("topic", owner->topic_name),
+            evt_tag_str("topic", owner->rdkafka.topic_name),
             evt_tag_str("key", key->str ? : "NULL"),
             evt_tag_str("message", message->str),
             evt_tag_str("driver", owner->super.super.super.id),
@@ -118,11 +118,11 @@ _drain_responses(KafkaDestWorker *self)
   if (self->super.worker_index != 0)
     return;
 
-  gint count = rd_kafka_poll(owner->kafka, 0);
+  gint count = rd_kafka_poll(owner->rdkafka.kafka, 0);
   if (count != 0)
     {
       msg_trace("kafka: destination side rd_kafka_poll() processed some responses",
-                evt_tag_str("topic", owner->topic_name),
+                evt_tag_str("topic", owner->rdkafka.topic_name),
                 evt_tag_int("count", count),
                 evt_tag_str("driver", owner->super.super.super.id),
                 log_pipe_location_tag(&owner->super.super.super.super));
