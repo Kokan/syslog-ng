@@ -54,11 +54,13 @@ fop_cmp_eval(FilterExprNode *s, LogMessage **msgs, gint num_msg)
 
   log_template_format_with_context(self->left, msgs, num_msg, NULL, LTZ_LOCAL, 0, NULL, left_buf);
   log_template_format_with_context(self->right, msgs, num_msg, NULL, LTZ_LOCAL, 0, NULL, right_buf);
+  gchar *left_template  = left_buf->str;
+  gchar *right_template = right_buf->str;
 
   msg_trace("cmp() evaluation started",
-            evt_tag_str("left", left_buf->str),
+            evt_tag_str("left", left_template),
             evt_tag_str("operator", self->super.type),
-            evt_tag_str("right", right_buf->str),
+            evt_tag_str("right", right_template),
             evt_tag_printf("msg", "%p", msgs[num_msg - 1]));
 
   gboolean result = FALSE;
@@ -68,8 +70,8 @@ fop_cmp_eval(FilterExprNode *s, LogMessage **msgs, gint num_msg)
     {
       gint l, r;
 
-      l = atoi(left_buf->str);
-      r = atoi(right_buf->str);
+      l = atoi(left_template);
+      r = atoi(right_template);
       if (l == r)
         cmp = 0;
       else if (l < r)
@@ -79,7 +81,7 @@ fop_cmp_eval(FilterExprNode *s, LogMessage **msgs, gint num_msg)
     }
   else
     {
-      cmp = strcmp(left_buf->str, right_buf->str);
+      cmp = strcmp(left_template, right_template);
     }
 
   if (cmp == 0)
