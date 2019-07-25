@@ -46,7 +46,8 @@ fop_cmp_eval(FilterExprNode *s, LogMessage **msgs, gint num_msg)
 {
   FilterCmp *self = (FilterCmp *) s;
   ScratchBuffersMarker marker;
-  GString *left_buf = scratch_buffers_alloc_and_mark(&marker);
+  scratch_buffers_mark(&marker);
+  GString *left_buf = scratch_buffers_alloc();
   GString *right_buf = scratch_buffers_alloc();
   gboolean result = FALSE;
   gint cmp;
