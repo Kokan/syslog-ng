@@ -45,12 +45,12 @@ static gboolean
 fop_cmp_eval(FilterExprNode *s, LogMessage **msgs, gint num_msg)
 {
   FilterCmp *self = (FilterCmp *) s;
+
   ScratchBuffersMarker marker;
   scratch_buffers_mark(&marker);
+
   GString *left_buf = scratch_buffers_alloc();
   GString *right_buf = scratch_buffers_alloc();
-  gboolean result = FALSE;
-  gint cmp;
 
   log_template_format_with_context(self->left, msgs, num_msg, NULL, LTZ_LOCAL, 0, NULL, left_buf);
   log_template_format_with_context(self->right, msgs, num_msg, NULL, LTZ_LOCAL, 0, NULL, right_buf);
@@ -60,6 +60,9 @@ fop_cmp_eval(FilterExprNode *s, LogMessage **msgs, gint num_msg)
             evt_tag_str("operator", self->super.type),
             evt_tag_str("right", right_buf->str),
             evt_tag_printf("msg", "%p", msgs[num_msg - 1]));
+
+  gboolean result = FALSE;
+  gint cmp;
 
   if (self->cmp_op & FCMP_NUM)
     {
