@@ -54,6 +54,31 @@ _format_template(LogTemplate *template, LogMessage **msgs, gint num_msg)
   return buffer->str;
 }
 
+static gint
+fop_compare(FilterCmp *self, const gchar *left, const gchar *right)
+{
+  gint cmp;
+  if (self->cmp_op & FCMP_NUM)
+    {
+      gint l, r;
+
+      l = atoi(left);
+      r = atoi(right);
+      if (l == r)
+        cmp = 0;
+      else if (l < r)
+        cmp = -1;
+      else
+        cmp = 1;
+    }
+  else
+    {
+      cmp = strcmp(left, right);
+    }
+
+  return cmp;
+}
+
 static gboolean
 fop_cmp_eval(FilterExprNode *s, LogMessage **msgs, gint num_msg)
 {
@@ -72,25 +97,8 @@ fop_cmp_eval(FilterExprNode *s, LogMessage **msgs, gint num_msg)
             evt_tag_printf("msg", "%p", msgs[num_msg - 1]));
 
   gboolean result = FALSE;
-  gint cmp;
 
-  if (self->cmp_op & FCMP_NUM)
-    {
-      gint l, r;
-
-      l = atoi(left_template);
-      r = atoi(right_template);
-      if (l == r)
-        cmp = 0;
-      else if (l < r)
-        cmp = -1;
-      else
-        cmp = 1;
-    }
-  else
-    {
-      cmp = strcmp(left_template, right_template);
-    }
+  gint cmp = fop_compare(self, left_template, right_template);
 
   if (cmp == 0)
     {
