@@ -41,6 +41,16 @@ typedef struct _FilterCmp
   gint cmp_op;
 } FilterCmp;
 
+static const gchar *
+_format_template(LogTemplate *template, LogMessage **msgs, gint num_msg)
+{
+  GString *buffer = scratch_buffers_alloc();
+
+  log_template_format_with_context(template, msgs, num_msg, NULL, LTZ_LOCAL, 0, NULL, buffer);
+
+  return buffer->str;
+}
+
 static gboolean
 fop_cmp_eval(FilterExprNode *s, LogMessage **msgs, gint num_msg)
 {
@@ -49,13 +59,8 @@ fop_cmp_eval(FilterExprNode *s, LogMessage **msgs, gint num_msg)
   ScratchBuffersMarker marker;
   scratch_buffers_mark(&marker);
 
-  GString *left_buf = scratch_buffers_alloc();
-  GString *right_buf = scratch_buffers_alloc();
-
-  log_template_format_with_context(self->left, msgs, num_msg, NULL, LTZ_LOCAL, 0, NULL, left_buf);
-  log_template_format_with_context(self->right, msgs, num_msg, NULL, LTZ_LOCAL, 0, NULL, right_buf);
-  gchar *left_template  = left_buf->str;
-  gchar *right_template = right_buf->str;
+  const gchar *left_template  = _format_template(self->left, msgs, num_msg);
+  const gchar *right_template = _format_template(self->right, msgs, num_msg);
 
   msg_trace("cmp() evaluation started",
             evt_tag_str("left", left_template),
