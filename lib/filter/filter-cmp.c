@@ -44,6 +44,9 @@ typedef struct _FilterCmp
 static const gchar *
 _format_template(LogTemplate *template, LogMessage **msgs, gint num_msg)
 {
+  if (log_template_is_trivial(template))
+     return log_template_get_trivial_value(template, msgs[num_msg - 1], NULL);
+
   GString *buffer = scratch_buffers_alloc();
 
   log_template_format_with_context(template, msgs, num_msg, NULL, LTZ_LOCAL, 0, NULL, buffer);
