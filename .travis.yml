@@ -80,7 +80,7 @@ before_script:
 matrix:
   include:
     - env: B=distcheck
-      dist: trusty
+      dist: bionic
       compiler: gcc
       script:
         - set -e
@@ -91,7 +91,7 @@ matrix:
         - find . -name test-suite.log | xargs cat
 
     - env: B=autotools-clang
-      dist: trusty
+      dist: bionic
       compiler: clang
       script:
         - set -e
@@ -108,7 +108,7 @@ matrix:
         - make pytest-check
 
     - env: B=style-check
-      dist: trusty
+      dist: bionic
       sudo: required
       addons:
       before_install:
@@ -143,7 +143,7 @@ matrix:
 
     - env: B=cmake-submodules-and-pytest
       compiler: gcc
-      dist: trusty
+      dist: bionic
       sudo: required
       before_script:
       git:
@@ -168,7 +168,7 @@ matrix:
 
     - env: B=cmake
       compiler: clang
-      dist: trusty
+      dist: bionic
       sudo: required
       before_script:
       script:
