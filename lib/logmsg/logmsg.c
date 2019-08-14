@@ -240,6 +240,14 @@ log_msg_make_writable(LogMessage **pself, const LogPathOptions *path_options)
   return *pself;
 }
 
+EVTTAG *
+evt_log_msg_id_tag(const LogMessage *msg)
+{
+  if (G_UNLIKELY(msg->rcptid > 0))
+    return evt_tag_int("message", msg->rcptid);
+
+  return evt_tag_printf("message", "%p", msg);
+}
 
 static void
 log_msg_update_sdata_slow(LogMessage *self, NVHandle handle, const gchar *name, gssize name_len)

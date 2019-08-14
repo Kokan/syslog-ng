@@ -33,6 +33,7 @@
 #include "logmsg/nvtable.h"
 #include "msg-format.h"
 #include "logmsg/tags.h"
+#include "evtlog.h"
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -222,6 +223,8 @@ LogMessage *log_msg_ref(LogMessage *m);
 void log_msg_unref(LogMessage *m);
 void log_msg_write_protect(LogMessage *m);
 void log_msg_write_unprotect(LogMessage *m);
+
+EVTTAG *evt_log_msg_id_tag(const LogMessage *msg);
 
 static inline gboolean
 log_msg_is_write_protected(const LogMessage *self)
