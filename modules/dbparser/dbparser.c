@@ -215,7 +215,7 @@ log_db_parser_process(LogParser *s, LogMessage **pmsg, const LogPathOptions *pat
       log_msg_make_writable(pmsg, path_options);
       msg_trace("db-parser message processing started",
                 evt_tag_str ("input", input),
-                evt_tag_printf("msg", "%p", *pmsg));
+                evt_log_msg_id_tag(*pmsg));
       if (G_UNLIKELY(self->super.super.template))
         matched = pattern_db_process_with_custom_message(self->db, *pmsg, input, input_len);
       else

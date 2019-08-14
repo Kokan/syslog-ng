@@ -219,7 +219,7 @@ json_parser_process(LogParser *s, LogMessage **pmsg, const LogPathOptions *path_
             evt_tag_str ("input", input),
             evt_tag_str ("prefix", self->prefix),
             evt_tag_str ("marker", self->marker),
-            evt_tag_printf("msg", "%p", *pmsg));
+            evt_log_msg_id_tag(*pmsg));
   if (self->marker)
     {
       if (strncmp(input, self->marker, self->marker_len) != 0)

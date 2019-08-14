@@ -61,7 +61,7 @@ log_filter_pipe_queue(LogPipe *s, LogMessage *msg, const LogPathOptions *path_op
   msg_trace(">>>>>> filter rule evaluation begin",
             evt_tag_str("rule", self->name),
             log_pipe_location_tag(s),
-            evt_tag_printf("msg", "%p", msg));
+            evt_log_msg_id_tag(msg));
 
   res = filter_expr_eval_root(self->expr, &msg, path_options);
 
@@ -83,7 +83,7 @@ log_filter_pipe_queue(LogPipe *s, LogMessage *msg, const LogPathOptions *path_op
             evt_tag_str("result", filter_result),
             evt_tag_str("rule", self->name),
             log_pipe_location_tag(s),
-            evt_tag_printf("msg", "%p", msg));
+            evt_log_msg_id_tag(msg));
 }
 
 static LogPipe *

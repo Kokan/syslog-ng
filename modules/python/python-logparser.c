@@ -186,7 +186,7 @@ python_parser_process(LogParser *s, LogMessage **pmsg, const LogPathOptions *pat
               evt_tag_str ("input", input),
               evt_tag_str("parser", self->super.name),
               evt_tag_str("class", self->class),
-              evt_tag_printf("msg", "%p", msg));
+              evt_log_msg_id_tag(msg));
 
     PyObject *msg_object = py_log_message_new(msg);
     result = _py_invoke_parser_process(self, msg_object);

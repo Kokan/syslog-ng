@@ -543,7 +543,7 @@ log_msg_set_value(LogMessage *self, NVHandle handle, const gchar *value, gssize 
       msg_trace("Setting value",
                 evt_tag_str("name", name),
                 evt_tag_printf("value", "%.*s", (gint) value_len, value),
-                evt_tag_printf("msg", "%p", self));
+                evt_log_msg_id_tag(self));
     }
 
   if (value_len < 0)
@@ -621,7 +621,7 @@ log_msg_set_value_indirect(LogMessage *self, NVHandle handle, NVHandle ref_handl
   if (_log_name_value_updates(self))
     {
       msg_trace("Setting indirect value",
-                evt_tag_printf("msg", "%p", self),
+                evt_log_msg_id_tag(self),
                 evt_tag_str("name", name),
                 evt_tag_int("ref_handle", ref_handle),
                 evt_tag_int("ofs", ofs),
@@ -1235,6 +1235,7 @@ log_msg_clone_cow(LogMessage *msg, const LogPathOptions *path_options)
   msg->allocated_bytes = allocated_bytes;
 
   msg_trace("Message was cloned",
+            evt_log_msg_id_tag(msg),
             evt_tag_printf("original_msg", "%p", msg),
             evt_tag_printf("new_msg", "%p", self));
 

@@ -43,7 +43,7 @@ _process(LogParser *s, LogMessage **pmsg, const LogPathOptions *path_options,
   LogMessage *msg = log_msg_make_writable(pmsg, path_options);
   msg_trace("value-pairs message processing started",
             evt_tag_str ("input", input),
-            evt_tag_printf("msg", "%p", *pmsg));
+            evt_log_msg_id_tag(*pmsg));
 
   value_pairs_foreach(self->value_pairs, _map_name_values,
                       msg,

@@ -52,7 +52,7 @@ filter_call_eval(FilterExprNode *s, LogMessage **msgs, gint num_msg)
 
   msg_trace("filter() evaluation started",
             evt_tag_str("called-rule", self->rule),
-            evt_tag_printf("msg", "%p", msgs[num_msg - 1]));
+            evt_log_msg_id_tag(msgs[num_msg - 1]));
 
   return res ^ s->comp;
 }

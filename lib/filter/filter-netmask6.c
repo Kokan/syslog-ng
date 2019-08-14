@@ -132,7 +132,7 @@ _eval(FilterExprNode *s, LogMessage **msgs, gint num_msg)
             evt_tag_inaddr6("msg_address", address),
             evt_tag_inaddr6("address", &self->address),
             evt_tag_int("prefix", self->prefix),
-            evt_tag_printf("msg", "%p", msg));
+            evt_log_msg_id_tag(msg));
   return result ^ s->comp;
 }
 
