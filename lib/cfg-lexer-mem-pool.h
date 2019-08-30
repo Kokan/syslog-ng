@@ -31,10 +31,13 @@
 
 typedef struct _CfgLexerMemPool
 {
+  GList *pool;
 } CfgLexerMemPool;
 
 CfgLexerMemPool *cfg_lexer_mem_pool_new(void);
 void cfg_lexer_mem_pool_free(CfgLexerMemPool *self);
+
+char *cfg_lexer_mem_pool_strdup(CfgLexerMemPool *self, const char *string);
 
 
 #endif

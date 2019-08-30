@@ -34,3 +34,15 @@ Test(cfg_lexer_mem_pool, create_mem_pool)
   cfg_lexer_mem_pool_free(mempool);
 }
 
+Test(cfg_lexer_mem_pool, allocate_memory)
+{
+  const char *example = "example text";
+  CfgLexerMemPool *mempool = cfg_lexer_mem_pool_new();
+
+  char *new_string = cfg_lexer_mem_pool_strdup(mempool, example);
+  cr_assert(new_string);
+  cr_assert_str_eq(new_string, example);
+
+  cfg_lexer_mem_pool_free(mempool);
+}
+

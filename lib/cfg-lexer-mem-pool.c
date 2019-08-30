@@ -33,6 +33,18 @@ CfgLexerMemPool *cfg_lexer_mem_pool_new(void)
 
 void cfg_lexer_mem_pool_free(CfgLexerMemPool *self)
 {
+  g_list_free_full(self->pool, free);
   g_free(self);
+}
+
+char *cfg_lexer_mem_pool_strdup(CfgLexerMemPool *self, const char *string)
+{
+  g_assert(string);
+
+  char *tmp = strdup(string);
+
+  self->pool = g_list_append(self->pool, tmp);
+
+  return tmp;
 }
 
