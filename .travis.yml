@@ -31,7 +31,7 @@ addons:
       - libivykis-dev
       - librabbitmq-dev
       - libmongoc-dev
-      - libjson0-dev
+      - libjson-c-dev
       - libnet1-dev
       - libriemann-client-dev
       - librdkafka-dev
