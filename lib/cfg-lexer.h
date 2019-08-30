@@ -28,6 +28,7 @@
 #include "syslog-ng.h"
 #include "cfg-args.h"
 #include "cfg-block-generator.h"
+#include "cfg-lexer-mem-pool.h"
 #include "messages.h"
 
 #include <stdio.h>
@@ -139,6 +140,7 @@ struct _CfgLexer
   GString *token_pretext;
   GString *token_text;
   GlobalConfig *cfg;
+  CfgLexerMemPool *pool;
   gboolean non_pragma_seen:1, ignore_pragma:1;
 };
 
@@ -149,6 +151,9 @@ void cfg_lexer_start_block_state(CfgLexer *self, const gchar block_boundary[2]);
 
 void cfg_lexer_append_string(CfgLexer *self, int length, char *str);
 void cfg_lexer_append_char(CfgLexer *self, char c);
+
+/* token memory pool */
+char *cfg_lexer_strdup(CfgLexer *self, const char *string);
 
 /* keyword handling */
 void cfg_lexer_set_current_keywords(CfgLexer *self, CfgLexerKeyword *keywords);
@@ -186,7 +191,7 @@ const gchar *cfg_lexer_lookup_context_name_by_type(gint id);
 /* token block objects */
 
 void cfg_token_block_add_and_consume_token(CfgTokenBlock *self, YYSTYPE *token);
-void cfg_token_block_add_token(CfgTokenBlock *self, YYSTYPE *token);
+void cfg_token_block_add_token(CfgLexer *lexer, CfgTokenBlock *self, YYSTYPE *token);
 YYSTYPE *cfg_token_block_get_token(CfgTokenBlock *self);
 
 CfgTokenBlock *cfg_token_block_new(void);

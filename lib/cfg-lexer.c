@@ -197,7 +197,7 @@ cfg_lexer_lookup_keyword(CfgLexer *self, YYSTYPE *yylval, YYLTYPE *yylloc, const
               if (strcmp(keywords[i].kw_name, CFG_KEYWORD_STOP) == 0)
                 {
                   yylval->type = LL_IDENTIFIER;
-                  yylval->cptr = strdup(token);
+                  yylval->cptr = cfg_lexer_strdup(self, token);
                   return LL_IDENTIFIER;
                 }
 
@@ -235,7 +235,7 @@ cfg_lexer_lookup_keyword(CfgLexer *self, YYSTYPE *yylval, YYLTYPE *yylloc, const
       l = l->next;
     }
   yylval->type = LL_IDENTIFIER;
-  yylval->cptr = strdup(token);
+  yylval->cptr = cfg_lexer_strdup(self, token);
   return LL_IDENTIFIER;
 }
 
@@ -778,7 +778,7 @@ cfg_lexer_find_generator_plugin(CfgLexer *self, GlobalConfig *cfg, gint context,
 }
 
 static YYSTYPE
-cfg_lexer_copy_token(const YYSTYPE *original)
+cfg_lexer_copy_token(CfgLexer *lexer, const YYSTYPE *original)
 {
   YYSTYPE dest;
   int type = original->type;
@@ -792,7 +792,7 @@ cfg_lexer_copy_token(const YYSTYPE *original)
            type == LL_STRING ||
            type == LL_BLOCK)
     {
-      dest.cptr = strdup(original->cptr);
+      dest.cptr = cfg_lexer_strdup(lexer, original->cptr);
     }
   else if (type == LL_NUMBER)
     {
@@ -812,7 +812,7 @@ cfg_lexer_unput_token(CfgLexer *self, YYSTYPE *yylval)
   CfgTokenBlock *block;
 
   block = cfg_token_block_new();
-  cfg_token_block_add_token(block, yylval);
+  cfg_token_block_add_token(self, block, yylval);
   cfg_lexer_inject_token_block(self, block);
 }
 
@@ -824,8 +824,8 @@ cfg_lexer_unput_token(CfgLexer *self, YYSTYPE *yylval)
 void
 cfg_lexer_free_token(YYSTYPE *token)
 {
-  if (token->type == LL_STRING || token->type == LL_IDENTIFIER || token->type == LL_BLOCK)
-    free(token->cptr);
+
+
 }
 
 static int
@@ -839,6 +839,12 @@ _invoke__cfg_lexer_lex(CfgLexer *self, YYSTYPE *yylval, YYLTYPE *yylloc)
       return LL_ERROR;
     }
   return _cfg_lexer_lex(yylval, yylloc, self->state);
+}
+
+char *
+cfg_lexer_strdup(CfgLexer *self, const char *string)
+{
+  return cfg_lexer_mem_pool_strdup(self->pool, string);
 }
 
 static gboolean
@@ -915,7 +921,6 @@ cfg_lexer_parse_and_run_block_generator(CfgLexer *self, Plugin *p, YYSTYPE *yylv
 
       level->lloc.first_line = saved_line;
       level->lloc.first_column = saved_column;
-      free(yylval->cptr);
       self->preprocess_suppress_tokens--;
 
       success = FALSE;
@@ -930,7 +935,6 @@ cfg_lexer_parse_and_run_block_generator(CfgLexer *self, Plugin *p, YYSTYPE *yylv
   success = cfg_block_generator_generate(gen, self->cfg, args, result,
                                          cfg_lexer_format_location(self, &level->lloc, buf, sizeof(buf)));
 
-  free(yylval->cptr);
   cfg_parser_cleanup(gen_parser, args);
 
   if (!success)
@@ -1094,6 +1098,7 @@ cfg_lexer_init(CfgLexer *self, GlobalConfig *cfg)
   self->token_text = g_string_sized_new(32);
   self->token_pretext = g_string_sized_new(32);
   self->cfg = cfg;
+  self->pool = cfg_lexer_mem_pool_new();
 
   level = &self->include_stack[0];
   level->lloc.first_line = level->lloc.last_line = 1;
@@ -1171,6 +1176,7 @@ cfg_lexer_free(CfgLexer *self)
     cfg_lexer_pop_context(self);
   g_list_foreach(self->token_blocks, (GFunc) cfg_token_block_free, NULL);
   g_list_free(self->token_blocks);
+  cfg_lexer_mem_pool_free(self->pool);
   g_free(self);
 }
 
@@ -1228,9 +1234,9 @@ cfg_token_block_add_and_consume_token(CfgTokenBlock *self, YYSTYPE *token)
 }
 
 void
-cfg_token_block_add_token(CfgTokenBlock *self, YYSTYPE *token)
+cfg_token_block_add_token(CfgLexer *lexer, CfgTokenBlock *self, YYSTYPE *token)
 {
-  YYSTYPE copied_token = cfg_lexer_copy_token(token);
+  YYSTYPE copied_token = cfg_lexer_copy_token(lexer, token);
   cfg_token_block_add_and_consume_token(self, &copied_token);
 }
 

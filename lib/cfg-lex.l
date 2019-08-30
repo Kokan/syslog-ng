@@ -352,14 +352,14 @@ word	[^ \#'"\(\)\{\}\[\]\\;\r\n\t,|\.@:]
 <string>\\[^anrtv]	   { g_string_append_c(yyextra->string_buffer, yytext[1]); }
 <string>\"		   {
 			     yy_pop_state(yyscanner);
-			     yylval->cptr = strdup(yyextra->string_buffer->str);
+			     yylval->cptr = cfg_lexer_strdup(yyextra, yyextra->string_buffer->str);
 			     return LL_STRING;
 		           }
 <string>[^"\\\r\n]+	   { g_string_append(yyextra->string_buffer, yytext); }
 <qstring>[^'\r\n]+	   { g_string_append(yyextra->string_buffer, yytext); }
 <qstring>\'		   {
 			     yy_pop_state(yyscanner);
-			     yylval->cptr = strdup(yyextra->string_buffer->str);
+			     yylval->cptr = cfg_lexer_strdup(yyextra, yyextra->string_buffer->str);
 			     return LL_STRING;
 			   }
 
@@ -402,8 +402,8 @@ word	[^ \#'"\(\)\{\}\[\]\\;\r\n\t,|\.@:]
 <block>[^{( \t\r\n]+       { YY_FATAL_ERROR("Expected opening bracket as block boundary, e.g. opening brace or parenthesis"); return LL_ERROR; }
 <block>\r?\n		   { _cfg_lex_move_token_location_to_new_line(yyextra); };
 <block>\({white}*\)        { yy_pop_state(yyscanner); yylval->cptr = NULL; return LL_BLOCK; }
-<block>\({white}*\"\"{white}*\) { yy_pop_state(yyscanner); yylval->cptr = strdup(""); return LL_BLOCK; }
-<block>\({white}*\'\'{white}*\) { yy_pop_state(yyscanner); yylval->cptr = strdup(""); return LL_BLOCK; }
+<block>\({white}*\"\"{white}*\) { yy_pop_state(yyscanner); yylval->cptr = cfg_lexer_strdup(yyextra, ""); return LL_BLOCK; }
+<block>\({white}*\'\'{white}*\) { yy_pop_state(yyscanner); yylval->cptr = cfg_lexer_strdup(yyextra, ""); return LL_BLOCK; }
 
     /* start character of the block */
 <block>[{(]                {
@@ -445,7 +445,7 @@ word	[^ \#'"\(\)\{\}\[\]\\;\r\n\t,|\.@:]
                                {
                                  yy_pop_state(yyscanner);
                                  yy_pop_state(yyscanner);
-                                 yylval->cptr = strdup(yyextra->string_buffer->str);
+                                 yylval->cptr = cfg_lexer_strdup(yyextra, yyextra->string_buffer->str);
                                  return LL_BLOCK;
                                }
                              else
