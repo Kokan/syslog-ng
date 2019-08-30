@@ -74,8 +74,6 @@ application_definition
 	  '{' application_options '}'
 	  {
 	    $$ = last_application;
-            free($2);
-            free($4);
           }
         ;
 
@@ -91,7 +89,6 @@ application_option
           { cfg_lexer_pop_context(lexer); }
           {
             application_set_filter(last_application, $3);
-            free($3);
           }
 	| KW_PARSER
           { cfg_lexer_push_context(lexer, LL_CONTEXT_BLOCK_CONTENT, NULL, "app parser block"); }
@@ -99,7 +96,6 @@ application_option
           { cfg_lexer_pop_context(lexer); }
           {
             application_set_parser(last_application, $3);
-            free($3);
           }
 	;
 

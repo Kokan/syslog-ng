@@ -516,14 +516,12 @@ source_stmt
         : KW_SOURCE string '{' source_content '}'
           {
             $$ = log_expr_node_new_source($2, $4, &@1);
-            free($2);
           }
 	;
 dest_stmt
        : KW_DESTINATION string '{' dest_content '}'
           {
             $$ = log_expr_node_new_destination($2, $4, &@1);
-            free($2);
           }
 	;
 
@@ -541,7 +539,6 @@ filter_stmt
              */
 
             $$ = log_expr_node_new_filter($2, $4, &@1);
-            free($2);
           }
         ;
 
@@ -549,7 +546,6 @@ parser_stmt
         : KW_PARSER string '{' parser_content '}'
           {
             $$ = log_expr_node_new_parser($2, $4, &@1);
-            free($2);
           }
         ;
 
@@ -557,7 +553,6 @@ rewrite_stmt
         : KW_REWRITE string '{' rewrite_content '}'
           {
             $$ = log_expr_node_new_rewrite($2, $4, &@1);
-            free($2);
           }
 
 log_stmt
@@ -583,7 +578,6 @@ plugin_stmt
             CHECK_ERROR(p, @1, "%s plugin %s not found", cfg_lexer_lookup_context_name_by_type(context), $1);
 
             result = cfg_parse_plugin(configuration, p, &@1, NULL);
-            free($1);
             if (!result)
               YYERROR;
             $$ = NULL;
@@ -622,7 +616,6 @@ source_plugin
             CHECK_ERROR(p, @1, "%s plugin %s not found", cfg_lexer_lookup_context_name_by_type(context), $1);
 
             last_driver = (LogDriver *) cfg_parse_plugin(configuration, p, &@1, NULL);
-            free($1);
             if (!last_driver)
               {
                 YYERROR;
@@ -714,7 +707,6 @@ dest_plugin
             CHECK_ERROR(p, @1, "%s plugin %s not found", cfg_lexer_lookup_context_name_by_type(context), $1);
 
             last_driver = (LogDriver *) cfg_parse_plugin(configuration, p, &@1, NULL);
-            free($1);
             if (!last_driver)
               {
                 YYERROR;
@@ -729,15 +721,15 @@ log_items
 	;
 
 log_item
-        : KW_SOURCE '(' string ')'		{ $$ = log_expr_node_new_source_reference($3, &@$); free($3); }
+        : KW_SOURCE '(' string ')'		{ $$ = log_expr_node_new_source_reference($3, &@$);  }
         | KW_SOURCE '{' source_content '}'      { $$ = log_expr_node_new_source(NULL, $3, &@$); }
-        | KW_FILTER '(' string ')'		{ $$ = log_expr_node_new_filter_reference($3, &@$); free($3); }
+        | KW_FILTER '(' string ')'		{ $$ = log_expr_node_new_filter_reference($3, &@$);  }
         | KW_FILTER '{' filter_content '}'      { $$ = log_expr_node_new_filter(NULL, $3, &@$); }
-        | KW_PARSER '(' string ')'              { $$ = log_expr_node_new_parser_reference($3, &@$); free($3); }
+        | KW_PARSER '(' string ')'              { $$ = log_expr_node_new_parser_reference($3, &@$);  }
         | KW_PARSER '{' parser_content '}'      { $$ = log_expr_node_new_parser(NULL, $3, &@$); }
-        | KW_REWRITE '(' string ')'             { $$ = log_expr_node_new_rewrite_reference($3, &@$); free($3); }
+        | KW_REWRITE '(' string ')'             { $$ = log_expr_node_new_rewrite_reference($3, &@$);  }
         | KW_REWRITE '{' rewrite_content '}'    { $$ = log_expr_node_new_rewrite(NULL, $3, &@$); }
-        | KW_DESTINATION '(' string ')'		{ $$ = log_expr_node_new_destination_reference($3, &@$); free($3); }
+        | KW_DESTINATION '(' string ')'		{ $$ = log_expr_node_new_destination_reference($3, &@$);  }
         | KW_DESTINATION '{' dest_content '}'   { $$ = log_expr_node_new_destination(NULL, $3, &@$); }
         | log_conditional			{ $$ = $1; }
         | log_junction                          { $$ = $1; }
@@ -816,7 +808,7 @@ log_flags
 	;
 
 log_flags_items
-	: normalized_flag log_flags_items	{ $$ = log_expr_node_lookup_flag($1) | $2; free($1); }
+	: normalized_flag log_flags_items	{ $$ = log_expr_node_lookup_flag($1) | $2;  }
 	|					{ $$ = 0; }
 	;
 
@@ -852,7 +844,7 @@ template_block
 	  {
 	    last_template = log_template_new(configuration, $2);
 	  }
-	  '{' template_items '}'						{ $$ = last_template; free($2); }
+	  '{' template_items '}'						{ $$ = last_template;  }
         ;
 
 template_simple
@@ -860,7 +852,7 @@ template_simple
           {
 	    last_template = log_template_new(configuration, $2);
           }
-          template_content_inner						{ $$ = last_template; free($2); }
+          template_content_inner						{ $$ = last_template;  }
 	;
 
 template_fn
@@ -868,7 +860,7 @@ template_fn
           {
 	    last_template = log_template_new(configuration, $2);
           }
-          template_content_inner						{ $$ = last_template; free($2); }
+          template_content_inner						{ $$ = last_template;  }
 	;
 
 template_items
@@ -884,17 +876,14 @@ template_content_inner
           GError *error = NULL;
 
           CHECK_ERROR(log_template_compile(last_template, $1, &error), @1, "Error compiling template (%s)", error->message);
-          free($1);
         }
         | LL_IDENTIFIER '(' string ')'
         {
           GError *error = NULL;
 
           CHECK_ERROR(log_template_compile(last_template, $3, &error), @3, "Error compiling template (%s)", error->message);
-          free($3);
 
           CHECK_ERROR(log_template_set_type_hint(last_template, $1, &error), @1, "Error setting the template type-hint (%s)", error->message);
-          free($1);
         }
         ;
 
@@ -935,9 +924,6 @@ block_stmt
 
             block = cfg_block_new(context_type, $4, $10, last_block_args, &@1);
             cfg_lexer_register_generator_plugin(&configuration->plugin_context, block);
-            free($3);
-            free($4);
-            free($10);
             last_block_args = NULL;
           }
         ;
@@ -960,7 +946,7 @@ block_arg
           LL_BLOCK
           {
             cfg_lexer_pop_context(lexer);
-            cfg_args_set(last_block_args, $1, $3); free($1); free($3);
+            cfg_args_set(last_block_args, $1, $3); 
           }
         ;
 
@@ -977,13 +963,12 @@ options_item
           {
             CHECK_ERROR(cfg_lookup_mark_mode($3) > 0 && cfg_lookup_mark_mode($3) != MM_GLOBAL, @3, "illegal global mark-mode");
             cfg_set_mark_mode(configuration, $3);
-            free($3);
           }
 	| KW_FLUSH_TIMEOUT '(' positive_integer ')'     { }
 	| KW_CHAIN_HOSTNAMES '(' yesno ')'	{ configuration->chain_hostnames = $3; }
 	| KW_KEEP_HOSTNAME '(' yesno ')'	{ configuration->keep_hostname = $3; }
 	| KW_CHECK_HOSTNAME '(' yesno ')'	{ configuration->check_hostname = $3; }
-	| KW_BAD_HOSTNAME '(' string ')'	{ cfg_bad_hostname_set(configuration, $3); free($3); }
+	| KW_BAD_HOSTNAME '(' string ')'	{ cfg_bad_hostname_set(configuration, $3);  }
 	| KW_TIME_REOPEN '(' positive_integer ')'		{ configuration->time_reopen = $3; }
 	| KW_TIME_REAP '(' nonnegative_integer ')'		{ configuration->time_reap = $3; }
 	| KW_TIME_SLEEP '(' nonnegative_integer ')'	{}
@@ -999,10 +984,10 @@ options_item
 	| KW_TRIM_LARGE_MESSAGES '(' yesno ')'	{ configuration->trim_large_messages = $3; }
 	| KW_KEEP_TIMESTAMP '(' yesno ')'	{ configuration->keep_timestamp = $3; }
 	| KW_CREATE_DIRS '(' yesno ')'		{ configuration->create_dirs = $3; }
-	| KW_CUSTOM_DOMAIN '(' string ')'	{ configuration->custom_domain = g_strdup($3); free($3); }
-	| KW_FILE_TEMPLATE '(' string ')'	{ configuration->file_template_name = g_strdup($3); free($3); }
-	| KW_PROTO_TEMPLATE '(' string ')'	{ configuration->proto_template_name = g_strdup($3); free($3); }
-	| KW_RECV_TIME_ZONE '(' string ')'	{ configuration->recv_time_zone = g_strdup($3); free($3); }
+	| KW_CUSTOM_DOMAIN '(' string ')'	{ configuration->custom_domain = g_strdup($3);  }
+	| KW_FILE_TEMPLATE '(' string ')'	{ configuration->file_template_name = g_strdup($3);  }
+	| KW_PROTO_TEMPLATE '(' string ')'	{ configuration->proto_template_name = g_strdup($3);  }
+	| KW_RECV_TIME_ZONE '(' string ')'	{ configuration->recv_time_zone = g_strdup($3);  }
 	| KW_MIN_IW_SIZE_PER_READER '(' positive_integer ')' { configuration->min_iw_size_per_reader = $3; }
 	| { last_template_options = &configuration->template_options; } template_option
 	| { last_host_resolve_options = &configuration->host_resolve_options; } host_resolve_option
@@ -1018,7 +1003,6 @@ options_item
             CHECK_ERROR(p, @1, "%s plugin %s not found", cfg_lexer_lookup_context_name_by_type(context), $1);
 
             cfg_parse_plugin(configuration, p, &@1, NULL);
-            free($1);
           }
 	;
 
@@ -1034,7 +1018,7 @@ dns_cache_option
 	| KW_DNS_CACHE_EXPIRE '(' positive_integer ')'	{ last_dns_cache_options->expire = $3; }
 	| KW_DNS_CACHE_EXPIRE_FAILED '(' positive_integer ')'
 	                                        { last_dns_cache_options->expire_failed = $3; }
-	| KW_DNS_CACHE_HOSTS '(' string ')'     { last_dns_cache_options->hosts = g_strdup($3); free($3); }
+	| KW_DNS_CACHE_HOSTS '(' string ')'     { last_dns_cache_options->hosts = g_strdup($3);  }
         ;
 
 
@@ -1114,7 +1098,7 @@ path_no_check
     ;
 	
 normalized_flag
-        : string                                { $$ = normalize_flag($1); free($1); }
+        : string                                { $$ = normalize_flag($1);  }
         ;
 
 string_list
@@ -1122,7 +1106,7 @@ string_list
         ;
 
 string_list_build
-        : string string_list_build		{ $$ = g_list_prepend($2, g_strdup($1)); free($1); }
+        : string string_list_build		{ $$ = g_list_prepend($2, g_strdup($1));  }
         |					{ $$ = NULL; }
         ;
 
@@ -1137,7 +1121,6 @@ level_string
 	    /* return the numeric value of the "level" */
 	    int n = syslog_name_lookup_level_by_name($1);
 	    CHECK_ERROR((n != -1), @1, "Unknown priority level\"%s\"", $1);
-	    free($1);
             $$ = n;
 	  }
         ;
@@ -1148,7 +1131,6 @@ facility_string
             /* return the numeric value of facility */
 	    int n = syslog_name_lookup_facility_by_name($1);
 	    CHECK_ERROR((n != -1), @1, "Unknown facility \"%s\"", $1);
-	    free($1);
 	    $$ = n;
 	  }
         | KW_SYSLOG 				{ $$ = LOG_SYSLOG; }
@@ -1162,12 +1144,11 @@ parser_opt
                                                   template = cfg_tree_check_inline_template(&configuration->tree, $3, &error);
                                                   CHECK_ERROR_GERROR(template != NULL, @3, error, "Error compiling template");
                                                   log_parser_set_template(last_parser, template);
-                                                  free($3);
                                                 }
         ;
 
 driver_option
-        : KW_PERSIST_NAME '(' string ')' { log_pipe_set_persist_name(&last_driver->super, $3); free($3); }
+        : KW_PERSIST_NAME '(' string ')' { log_pipe_set_persist_name(&last_driver->super, $3);  }
         ;
 
 /* All source drivers should incorporate this rule, implies driver_option */
@@ -1183,7 +1164,6 @@ source_driver_option
 
             value = cfg_parse_plugin(configuration, p, &@1, last_driver);
 
-            free($1);
             if (!value)
               {
                 YYERROR;
@@ -1214,7 +1194,6 @@ dest_driver_option
 
             value = cfg_parse_plugin(configuration, p, &@1, last_driver);
 
-            free($1);
             if (!value)
               {
                 YYERROR;
@@ -1241,7 +1220,7 @@ threaded_dest_driver_option
 
 /* implies source_driver_option and source_option */
 threaded_source_driver_option
-	: KW_FORMAT '(' string ')' { log_threaded_source_driver_get_parse_options(last_driver)->format = g_strdup($3); free($3); }
+	: KW_FORMAT '(' string ')' { log_threaded_source_driver_get_parse_options(last_driver)->format = g_strdup($3);  }
         | KW_FLAGS '(' threaded_source_driver_option_flags ')'
         | { last_msg_format_options = log_threaded_source_driver_get_parse_options(last_driver); } msg_format_option
         | { last_source_options = log_threaded_source_driver_get_source_options(last_driver); } source_option
@@ -1256,7 +1235,6 @@ threaded_source_driver_option_flags
 	: string threaded_source_driver_option_flags
         {
           CHECK_ERROR(msg_format_options_process_flag(log_threaded_source_driver_get_parse_options(last_driver), $1), @1, "Unknown flag %s", $1);
-          free($1);
         }
         |
         ;
@@ -1267,9 +1245,9 @@ source_option
 	: KW_LOG_IW_SIZE '(' positive_integer ')'	{ last_source_options->init_window_size = $3; }
 	| KW_CHAIN_HOSTNAMES '(' yesno ')'	{ last_source_options->chain_hostnames = $3; }
 	| KW_KEEP_HOSTNAME '(' yesno ')'	{ last_source_options->keep_hostname = $3; }
-	| KW_PROGRAM_OVERRIDE '(' string ')'	{ last_source_options->program_override = g_strdup($3); free($3); }
-	| KW_HOST_OVERRIDE '(' string ')'	{ last_source_options->host_override = g_strdup($3); free($3); }
-	| KW_LOG_PREFIX '(' string ')'	        { gchar *p = strrchr($3, ':'); if (p) *p = 0; last_source_options->program_override = g_strdup($3); free($3); }
+	| KW_PROGRAM_OVERRIDE '(' string ')'	{ last_source_options->program_override = g_strdup($3);  }
+	| KW_HOST_OVERRIDE '(' string ')'	{ last_source_options->host_override = g_strdup($3);  }
+	| KW_LOG_PREFIX '(' string ')'	        { gchar *p = strrchr($3, ':'); if (p) *p = 0; last_source_options->program_override = g_strdup($3);  }
 	| KW_KEEP_TIMESTAMP '(' yesno ')'	{ last_source_options->keep_timestamp = $3; }
 	| KW_READ_OLD_RECORDS '(' yesno ')'	{ last_source_options->read_old_records = $3; }
         | KW_TAGS '(' string_list ')'		{ log_source_options_set_tags(last_source_options, $3); }
@@ -1283,14 +1261,14 @@ source_reader_option
 	: KW_CHECK_HOSTNAME '(' yesno ')'	{ last_reader_options->check_hostname = $3; }
 	| KW_FLAGS '(' source_reader_option_flags ')'
 	| KW_LOG_FETCH_LIMIT '(' positive_integer ')'	{ last_reader_options->fetch_limit = $3; }
-        | KW_FORMAT '(' string ')'              { last_reader_options->parse_options.format = g_strdup($3); free($3); }
+        | KW_FORMAT '(' string ')'              { last_reader_options->parse_options.format = g_strdup($3);  }
         | { last_source_options = &last_reader_options->super; } source_option
         | { last_proto_server_options = &last_reader_options->proto_options.super; } source_proto_option
         | { last_msg_format_options = &last_reader_options->parse_options; } msg_format_option
 	;
 
 source_reader_option_flags
-        : string source_reader_option_flags     { CHECK_ERROR(log_reader_options_process_flag(last_reader_options, $1), @1, "Unknown flag %s", $1); free($1); }
+        : string source_reader_option_flags     { CHECK_ERROR(log_reader_options_process_flag(last_reader_options, $1), @1, "Unknown flag %s", $1);  }
         | KW_CHECK_HOSTNAME source_reader_option_flags     { log_reader_options_process_flag(last_reader_options, "check-hostname"); }
 	|
 	;
@@ -1302,7 +1280,6 @@ source_proto_option
             CHECK_ERROR(log_proto_server_options_set_encoding(last_proto_server_options, $3),
                         @3,
                         "unknown encoding %s", $3);
-            free($3);
           }
         | KW_LOG_MSG_SIZE '(' positive_integer ')'      { last_proto_server_options->max_msg_size = $3; }
         | KW_TRIM_LARGE_MESSAGES '(' yesno ')'          { last_proto_server_options->trim_large_messages = $3; }
@@ -1316,7 +1293,7 @@ host_resolve_option
 	;
 
 msg_format_option
-	: KW_TIME_ZONE '(' string ')'		{ last_msg_format_options->recv_time_zone = g_strdup($3); free($3); }
+	: KW_TIME_ZONE '(' string ')'		{ last_msg_format_options->recv_time_zone = g_strdup($3);  }
 	| KW_DEFAULT_LEVEL '(' level_string ')'
 	  {
 	    if (last_msg_format_options->default_pri == 0xFFFF)
@@ -1348,7 +1325,6 @@ dest_writer_option
 
                                                   last_writer_options->template = cfg_tree_check_inline_template(&configuration->tree, $3, &error);
                                                   CHECK_ERROR_GERROR(last_writer_options->template != NULL, @3, error, "Error compiling template");
-	                                          free($3);
 	                                        }
 	| KW_TEMPLATE_ESCAPE '(' yesno ')'	{ log_writer_options_set_template_escape(last_writer_options, $3); }
 	| KW_PAD_SIZE '(' nonnegative_integer ')'         { last_writer_options->padding = $3; }
@@ -1358,55 +1334,53 @@ dest_writer_option
 	  {
 	    CHECK_ERROR(cfg_lookup_mark_mode($3) != -1, @3, "illegal mark mode: %s", $3);
             log_writer_options_set_mark_mode(last_writer_options, $3);
-            free($3);
           }
         | { last_template_options = &last_writer_options->template_options; } template_option
 	;
 
 dest_writer_options_flags
-	: normalized_flag dest_writer_options_flags   { $$ = log_writer_options_lookup_flag($1) | $2; free($1); }
+	: normalized_flag dest_writer_options_flags   { $$ = log_writer_options_lookup_flag($1) | $2;  }
 	|					      { $$ = 0; }
 	;
 
 file_perm_option
-	: KW_OWNER '(' string_or_number ')'	{ file_perm_options_set_file_uid(last_file_perm_options, $3); free($3); }
+	: KW_OWNER '(' string_or_number ')'	{ file_perm_options_set_file_uid(last_file_perm_options, $3);  }
 	| KW_OWNER '(' ')'	                { file_perm_options_dont_change_file_uid(last_file_perm_options); }
-	| KW_GROUP '(' string_or_number ')'	{ file_perm_options_set_file_gid(last_file_perm_options, $3); free($3); }
+	| KW_GROUP '(' string_or_number ')'	{ file_perm_options_set_file_gid(last_file_perm_options, $3);  }
 	| KW_GROUP '(' ')'	                { file_perm_options_dont_change_file_gid(last_file_perm_options); }
 	| KW_PERM '(' LL_NUMBER ')'		{ file_perm_options_set_file_perm(last_file_perm_options, $3); }
 	| KW_PERM '(' ')'		        { file_perm_options_dont_change_file_perm(last_file_perm_options); }
-        | KW_DIR_OWNER '(' string_or_number ')'	{ file_perm_options_set_dir_uid(last_file_perm_options, $3); free($3); }
+        | KW_DIR_OWNER '(' string_or_number ')'	{ file_perm_options_set_dir_uid(last_file_perm_options, $3);  }
 	| KW_DIR_OWNER '(' ')'	                { file_perm_options_dont_change_dir_uid(last_file_perm_options); }
-	| KW_DIR_GROUP '(' string_or_number ')'	{ file_perm_options_set_dir_gid(last_file_perm_options, $3); free($3); }
+	| KW_DIR_GROUP '(' string_or_number ')'	{ file_perm_options_set_dir_gid(last_file_perm_options, $3);  }
 	| KW_DIR_GROUP '(' ')'	                { file_perm_options_dont_change_dir_gid(last_file_perm_options); }
 	| KW_DIR_PERM '(' LL_NUMBER ')'		{ file_perm_options_set_dir_perm(last_file_perm_options, $3); }
 	| KW_DIR_PERM '(' ')'		        { file_perm_options_dont_change_dir_perm(last_file_perm_options); }
         ;
 
 template_option
-	: KW_TS_FORMAT '(' string ')'		{ last_template_options->ts_format = cfg_ts_format_value($3); free($3); }
+	: KW_TS_FORMAT '(' string ')'		{ last_template_options->ts_format = cfg_ts_format_value($3);  }
 	| KW_FRAC_DIGITS '(' nonnegative_integer ')'	{ last_template_options->frac_digits = $3; }
-	| KW_TIME_ZONE '(' string ')'		{ last_template_options->time_zone[LTZ_SEND] = g_strdup($3); free($3); }
-	| KW_SEND_TIME_ZONE '(' string ')'      { last_template_options->time_zone[LTZ_SEND] = g_strdup($3); free($3); }
-	| KW_LOCAL_TIME_ZONE '(' string ')'     { last_template_options->time_zone[LTZ_LOCAL] = g_strdup($3); free($3); }
+	| KW_TIME_ZONE '(' string ')'		{ last_template_options->time_zone[LTZ_SEND] = g_strdup($3);  }
+	| KW_SEND_TIME_ZONE '(' string ')'      { last_template_options->time_zone[LTZ_SEND] = g_strdup($3);  }
+	| KW_LOCAL_TIME_ZONE '(' string ')'     { last_template_options->time_zone[LTZ_LOCAL] = g_strdup($3);  }
 	| KW_ON_ERROR '(' string ')'
         {
           gint on_error;
 
           CHECK_ERROR(log_template_on_error_parse($3, &on_error), @3, "Invalid on-error() setting");
-          free($3);
 
           log_template_options_set_on_error(last_template_options, on_error);
         }
 	;
 
 matcher_option
-        : KW_TYPE '(' string ')'		{ CHECK_ERROR(log_matcher_options_set_type(last_matcher_options, $3), @3, "unknown matcher type"); free($3); }
+        : KW_TYPE '(' string ')'		{ CHECK_ERROR(log_matcher_options_set_type(last_matcher_options, $3), @3, "unknown matcher type");  }
         | KW_FLAGS '(' matcher_flags ')'
         ;
 
 matcher_flags
-        : string matcher_flags			{ CHECK_ERROR(log_matcher_options_process_flag(last_matcher_options, $1), @1, "unknown matcher flag"); free($1); }
+        : string matcher_flags			{ CHECK_ERROR(log_matcher_options_process_flag(last_matcher_options, $1), @1, "unknown matcher flag");  }
         |
         ;
 
@@ -1428,25 +1402,21 @@ vp_option
         : KW_PAIR '(' string ':' template_content ')'
           {
             value_pairs_add_pair(last_value_pairs, $3, $5);
-            free($3);
           }
         | KW_PAIR '(' string template_content ')'
           {
             value_pairs_add_pair(last_value_pairs, $3, $4);
-            free($3);
           }
         | KW_KEY '(' string KW_REKEY '('
           {
             last_vp_transset = value_pairs_transform_set_new($3);
             value_pairs_add_glob_pattern(last_value_pairs, $3, TRUE);
-            free($3);
           }
           vp_rekey_options ')'                           { value_pairs_add_transforms(last_value_pairs, last_vp_transset); } ')'
 	| KW_KEY '(' string_list ')'		         { value_pairs_add_glob_patterns(last_value_pairs, $3, TRUE); }
         | KW_REKEY '(' string
           {
             last_vp_transset = value_pairs_transform_set_new($3);
-            free($3);
           }
           vp_rekey_options ')'                           { value_pairs_add_transforms(last_value_pairs, last_vp_transset); }
         | KW_EXCLUDE '(' string_list ')'                 { value_pairs_add_glob_patterns(last_value_pairs, $3, FALSE); }
@@ -1454,7 +1424,7 @@ vp_option
 	;
 
 vp_scope_list
-	: string vp_scope_list                           { value_pairs_add_scope(last_value_pairs, $1); free($1); }
+	: string vp_scope_list                           { value_pairs_add_scope(last_value_pairs, $1);  }
 	|
 	;
 
@@ -1466,8 +1436,8 @@ vp_rekey_options
 vp_rekey_option
 	: KW_SHIFT '(' positive_integer ')' { value_pairs_transform_set_add_func(last_vp_transset, value_pairs_new_transform_shift($3)); }
 	| KW_SHIFT_LEVELS '(' positive_integer ')' { value_pairs_transform_set_add_func(last_vp_transset, value_pairs_new_transform_shift_levels($3)); }
-	| KW_ADD_PREFIX '(' string ')' { value_pairs_transform_set_add_func(last_vp_transset, value_pairs_new_transform_add_prefix($3)); free($3); }
-	| KW_REPLACE_PREFIX '(' string string ')' { value_pairs_transform_set_add_func(last_vp_transset, value_pairs_new_transform_replace_prefix($3, $4)); free($3); free($4); }
+	| KW_ADD_PREFIX '(' string ')' { value_pairs_transform_set_add_func(last_vp_transset, value_pairs_new_transform_add_prefix($3));  }
+	| KW_REPLACE_PREFIX '(' string string ')' { value_pairs_transform_set_add_func(last_vp_transset, value_pairs_new_transform_replace_prefix($3, $4));  }
 	;
 
 /* END_RULES */

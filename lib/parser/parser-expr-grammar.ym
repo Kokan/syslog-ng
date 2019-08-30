@@ -72,7 +72,6 @@ parser_expr
             CHECK_ERROR(p, @1, "%s plugin %s not found", cfg_lexer_lookup_context_name_by_type(context), $1);
 
             last_parser = (LogParser *) cfg_parse_plugin(configuration, p, &@1, NULL);
-            free($1);
             if (!last_parser)
               {
                 YYERROR;

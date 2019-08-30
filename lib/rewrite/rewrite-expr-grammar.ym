@@ -90,7 +90,6 @@ rewrite_template_content
 
 	    $$ = log_template_new(configuration, $1);
 	    gboolean ok = log_template_compile($$, $1, &error);
-        free($1);
 	    if (!ok)
 	      log_template_unref($$);
 	    CHECK_ERROR_GERROR(ok, @1, error, "error compiling replacement");
@@ -107,7 +106,6 @@ rewrite_expr
           {
             GError *error = NULL;
             CHECK_ERROR_GERROR(log_rewrite_subst_compile_pattern(last_rewrite, $3, &error), @3, error, "error compiling search pattern");
-            free($3);
             $$ = last_rewrite;
           }
         | KW_SET '(' rewrite_template_content
@@ -122,8 +120,8 @@ rewrite_expr
             last_rewrite = log_rewrite_unset_new(configuration);
           }
           '(' rewrite_set_opts ')'              { $$ = last_rewrite; }
-	| KW_SET_TAG '(' string ')'             { $$ = log_rewrite_set_tag_new($3, TRUE, configuration); free($3); }
-	| KW_CLEAR_TAG '(' string ')'           { $$ = log_rewrite_set_tag_new($3, FALSE, configuration); free($3); }
+	| KW_SET_TAG '(' string ')'             { $$ = log_rewrite_set_tag_new($3, TRUE, configuration);  }
+	| KW_CLEAR_TAG '(' string ')'           { $$ = log_rewrite_set_tag_new($3, FALSE, configuration);  }
         | KW_GROUP_SET '(' rewrite_template_content
         {
             last_rewrite = log_rewrite_groupset_new($3, configuration);
@@ -143,7 +141,6 @@ rewrite_expr
             CHECK_ERROR(p, @1, "%s plugin %s not found", cfg_lexer_lookup_context_name_by_type(context), $1);
 
             last_rewrite = (LogRewrite *) cfg_parse_plugin(configuration, p, &@1, NULL);
-            free($1);
             if (!last_rewrite)
               {
                 YYERROR;
@@ -204,7 +201,6 @@ rewrite_expr_opt
             last_rewrite->value_handle = log_msg_get_value_handle(p);
             CHECK_ERROR(!log_msg_is_handle_macro(last_rewrite->value_handle), @3, "%s is read-only, it cannot be changed in rewrite rules", p);
 	    CHECK_ERROR(log_msg_is_value_name_valid(p), @3, "%s is not a valid name for a name-value pair, perhaps a misspelled .SDATA reference?", p);
-            free($3);
           }
         | rewrite_condition_opt
         ;

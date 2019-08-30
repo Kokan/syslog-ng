@@ -101,15 +101,14 @@ filter_simple_expr
 	: KW_FACILITY '(' filter_fac_list ')'	{ $$ = filter_facility_new($3);  }
 	| KW_FACILITY '(' LL_NUMBER ')'		{ $$ = filter_facility_new(0x80000000 | $3); }
 	| KW_LEVEL '(' filter_level_list ')' 	{ $$ = filter_level_new($3); }
-	| KW_FILTER '(' string ')'		{ $$ = filter_call_new($3, configuration); free($3); }
-	| KW_NETMASK '(' string ')'    { $$ = filter_netmask_new($3); free($3); }
+	| KW_FILTER '(' string ')'		{ $$ = filter_call_new($3, configuration);  }
+	| KW_NETMASK '(' string ')'    { $$ = filter_netmask_new($3);  }
   | KW_NETMASK6 '(' string ')'   {
   #if SYSLOG_NG_ENABLE_IPV6
                                     $$ = filter_netmask6_new($3);
   #else
                                     YYERROR;
   #endif
-                                    free($3);
                                   }
         | KW_TAGS '(' string_list ')'           { $$ = filter_tags_new($3); }
         | KW_IN_LIST '(' string string ')'
@@ -123,8 +122,6 @@ filter_simple_expr
                 p++;
               }
             $$ = filter_in_list_new($3, p);
-            free($3);
-            free($4);
           }
         | KW_IN_LIST '(' string KW_VALUE '(' string ')' ')'
           {
@@ -137,8 +134,6 @@ filter_simple_expr
                 p++;
               }
             $$ = filter_in_list_new($3, p);
-            free($3);
-            free($6);
           }
 	| filter_re					{ $$ = last_filter_expr; }
 	| filter_plugin
@@ -157,7 +152,6 @@ filter_plugin
             CHECK_ERROR(p, @1, "%s plugin %s not found OR you may not used double quotes in your filter expression", cfg_lexer_lookup_context_name_by_type(context), $1);
 
             node = (FilterExprNode *) cfg_parse_plugin(configuration, p, &@1, NULL);
-            free($1);
             if (!node)
               {
                 YYERROR;
@@ -177,8 +171,6 @@ filter_comparison
             CHECK_ERROR_GERROR(log_template_compile(left, $1, &error), @1, error, "compiling the left-hand-side template failed");
             CHECK_ERROR_GERROR(log_template_compile(right, $3, &error), @3, error, "compiling the right-hand-side template failed");
 
-            free($1);
-            free($3);
             $$ = fop_cmp_new(left, right, $2);
           }
         ;
@@ -212,7 +204,6 @@ filter_re_params
             GError *error = NULL;
 
             CHECK_ERROR_GERROR(filter_re_compile_pattern(last_filter_expr, $2, &error), @2, error, "compiling the regexp failed");
-            free($2);
           }
 	;
 
@@ -232,7 +223,6 @@ filter_match_params
             GError *error = NULL;
 
             CHECK_ERROR_GERROR(filter_re_compile_pattern(last_filter_expr, $2, &error), @2, error, "compiling the regexp failed");
-            free($2);
 
             if (filter_match_is_usage_obsolete(last_filter_expr))
               {
@@ -266,11 +256,9 @@ filter_match_opt
                 msg_error("value() reference for the match() filter cannot contain a full template string, use the template() option or stick to a single value",
                           evt_tag_str("value", $3),
                           cfg_lexer_format_location_tag(lexer, &@3));
-                free($3);
                 YYERROR;
               }
             filter_match_set_value_handle(last_filter_expr, log_msg_get_value_handle(p));
-            free($3);
           }
 	| KW_TEMPLATE '(' template_content ')'
 	  {
