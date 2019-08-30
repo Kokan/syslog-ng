@@ -1,6 +1,7 @@
 lib_tests_TESTS		= \
 	lib/tests/test_cfg_lexer_subst	\
 	lib/tests/test_lexer_block	\
+	lib/tests/test_lexer_mem_pool	\
 	lib/tests/test_cfg_tree		\
 	lib/tests/test_type_hints	\
 	lib/tests/test_parse_number	\
@@ -78,6 +79,11 @@ lib_tests_test_rcptid_LDADD	= \
 lib_tests_test_lexer_CFLAGS	=	\
 	$(TEST_CFLAGS)
 lib_tests_test_lexer_LDADD	=	\
+	$(TEST_LDADD)
+
+lib_tests_test_lexer_mem_pool_CFLAGS	=	\
+	$(TEST_CFLAGS)
+lib_tests_test_lexer_mem_pool_LDADD	=	\
 	$(TEST_LDADD)
 
 lib_tests_test_pragma_CFLAGS	=	\

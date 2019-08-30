@@ -104,6 +104,7 @@ pkginclude_HEADERS			+= \
 	lib/cfg.h			\
 	lib/cfg-grammar.h		\
 	lib/cfg-lexer.h			\
+	lib/cfg-lexer-mem-pool.h	\
 	lib/cfg-lexer-subst.h		\
 	lib/cfg-args.h			\
 	lib/cfg-block.h			\
@@ -194,6 +195,7 @@ lib_libsyslog_ng_la_SOURCES		= \
 	lib/cfg-block.c			\
 	lib/cfg-block-generator.c	\
 	lib/cfg-lexer.c			\
+	lib/cfg-lexer-mem-pool.c	\
 	lib/cfg-lexer-subst.c		\
 	lib/cfg-parser.c		\
 	lib/cfg-path.c			\

@@ -69,6 +69,7 @@ set (LIB_HEADERS
     cache.h
     cfg.h
     cfg-lexer.h
+    cfg-lexer-mem-pool.h
     cfg-lexer-subst.h
     cfg-args.h
     cfg-block.h
@@ -161,6 +162,7 @@ set(LIB_SOURCES
     cfg-block.c
     cfg-block-generator.c
     cfg-lexer.c
+    cfg-lexer-mem-pool.c
     cfg-lexer-subst.c
     cfg-parser.c
     cfg-path.c
