@@ -82,7 +82,6 @@ threaded_diskq_source_option
   : KW_FILE '(' string ')'
     {
       threaded_diskq_sd_set_file(last_driver, $3);
-      free($3);
     }
   | threaded_source_driver_option
   | threaded_fetcher_driver_option

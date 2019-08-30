@@ -263,7 +263,7 @@ source_afunix_dgram_params
 	  {
             create_and_set_unix_dgram_or_systemd_syslog_source($1, configuration);
 	  }
-	  source_afunix_options			{ $$ = last_driver; free($1); }
+	  source_afunix_options			{ $$ = last_driver;  }
 	;
 
 source_afunix_stream_params
@@ -271,7 +271,7 @@ source_afunix_stream_params
 	  {
             create_and_set_unix_stream_or_systemd_syslog_source($1, configuration);
 	  }
-	  source_afunix_options			{ $$ = last_driver; free($1); }
+	  source_afunix_options			{ $$ = last_driver;  }
 	;
 
 /* options are common between dgram & stream */
@@ -336,10 +336,10 @@ source_afinet_udp_option
 	;
 
 source_afinet_option
-	: KW_LOCALIP '(' string ')'		{ afinet_sd_set_localip(last_driver, $3); free($3); }
-	| KW_IP '(' string ')'			{ afinet_sd_set_localip(last_driver, $3); free($3); }
-	| KW_LOCALPORT '(' string_or_number ')'	{ afinet_sd_set_localport(last_driver, $3); free($3); }
-	| KW_PORT '(' string_or_number ')'	{ afinet_sd_set_localport(last_driver, $3); free($3); }
+	: KW_LOCALIP '(' string ')'		{ afinet_sd_set_localip(last_driver, $3);  }
+	| KW_IP '(' string ')'			{ afinet_sd_set_localip(last_driver, $3);  }
+	| KW_LOCALPORT '(' string_or_number ')'	{ afinet_sd_set_localport(last_driver, $3);  }
+	| KW_PORT '(' string_or_number ')'	{ afinet_sd_set_localport(last_driver, $3);  }
 	| source_reader_option
 	| source_driver_option
 	| inet_socket_option
@@ -466,7 +466,7 @@ source_afsocket_transport
               }
             transport_mapper_set_transport(last_transport_mapper, $3);
           }
-        ')'	{ free($3); }
+        ')'
 	| KW_TLS
 	  {
             gchar buf[256];
@@ -521,7 +521,7 @@ dest_afunix_dgram_params
 
       afunix_grammar_set_dest_driver(d);
 	  }
-	  dest_afunix_options			{ $$ = last_driver; free($1); }
+	  dest_afunix_options			{ $$ = last_driver;  }
 	;
 
 dest_afunix_stream_params
@@ -531,7 +531,7 @@ dest_afunix_stream_params
 
       afunix_grammar_set_dest_driver(d);
 	  }
-	  dest_afunix_options			{ $$ = last_driver; free($1); }
+	  dest_afunix_options			{ $$ = last_driver;  }
 	;
 
 dest_afunix_options
@@ -560,7 +560,7 @@ dest_afinet_udp_params
 
       afinet_grammar_set_dest_driver(d);
 	  }
-	  dest_afinet_udp_options		{ $$ = last_driver; free($1); }
+	  dest_afinet_udp_options		{ $$ = last_driver;  }
 	;
 
 dest_afinet_udp6_params
@@ -570,7 +570,7 @@ dest_afinet_udp6_params
 
 	    afinet_grammar_set_dest_driver(d);
 	  }
-	  dest_afinet_udp_options		{ $$ = last_driver; free($1); }
+	  dest_afinet_udp_options		{ $$ = last_driver;  }
 	;
 
 
@@ -581,10 +581,10 @@ dest_afinet_udp_options
 
 
 dest_afinet_option
-	: KW_LOCALIP '(' string ')'		{ afinet_dd_set_localip(last_driver, $3); free($3); }
-	| KW_LOCALPORT '(' string_or_number ')'	{ afinet_dd_set_localport(last_driver, $3); free($3); }
-	| KW_PORT '(' string_or_number ')'	{ afinet_dd_set_destport(last_driver, $3); free($3); }
-	| KW_DESTPORT '(' string_or_number ')'	{ afinet_dd_set_destport(last_driver, $3); free($3); }
+	: KW_LOCALIP '(' string ')'		{ afinet_dd_set_localip(last_driver, $3);  }
+	| KW_LOCALPORT '(' string_or_number ')'	{ afinet_dd_set_localport(last_driver, $3);  }
+	| KW_PORT '(' string_or_number ')'	{ afinet_dd_set_destport(last_driver, $3);  }
+	| KW_DESTPORT '(' string_or_number ')'	{ afinet_dd_set_destport(last_driver, $3);  }
 	| KW_FAILOVER_SERVERS { afinet_dd_enable_failover(last_driver); } '(' string_list ')'	{ afinet_dd_add_failovers(last_driver, $4); }
 	| KW_FAILOVER { afinet_dd_enable_failover(last_driver); } '(' dest_failover_options ')'	{ $$ = $4; }
 	| inet_socket_option
@@ -630,7 +630,7 @@ dest_afinet_tcp_params
 
       afinet_grammar_set_dest_driver(d);
 	  }
-	  dest_afinet_tcp_options		{ $$ = last_driver; free($1); }
+	  dest_afinet_tcp_options		{ $$ = last_driver;  }
 	;
 
 dest_afinet_tcp6_params
@@ -640,7 +640,7 @@ dest_afinet_tcp6_params
 
 	    afinet_grammar_set_dest_driver(d);
 	  }
-	  dest_afinet_tcp_options		{ $$ = last_driver; free($1); }
+	  dest_afinet_tcp_options		{ $$ = last_driver;  }
 	;
 
 dest_afinet_tcp_options
@@ -681,7 +681,7 @@ dest_afsyslog_params
 
             afinet_grammar_set_dest_driver(d);
 	  }
-	  dest_afsyslog_options			{ $$ = last_driver; free($1); }
+	  dest_afsyslog_options			{ $$ = last_driver;  }
         ;
 
 
@@ -706,7 +706,7 @@ dest_afnetwork_params
 
             afinet_grammar_set_dest_driver(d);
 	  }
-	  dest_afnetwork_options			{ $$ = last_driver; free($1); }
+	  dest_afnetwork_options			{ $$ = last_driver;  }
         ;
 
 dest_afnetwork_options
@@ -738,7 +738,7 @@ dest_afsocket_transport
               }
             transport_mapper_set_transport(last_transport_mapper, $3);
           }
-        ')'	{ free($3); }
+        ')'
 	| KW_SPOOF_SOURCE '(' yesno ')'		         { afinet_dd_set_spoof_source(last_driver, $3); }
 	| KW_TLS
 	  {
@@ -778,37 +778,30 @@ tls_option
 	  {
 	    CHECK_ERROR(tls_context_set_verify_mode_by_name(last_tls_context, $3), @3,
 	                "unknown peer-verify() argument");
-            free($3);
           }
 	| KW_KEY_FILE '(' path_secret ')'
 	  {
 	    tls_context_set_key_file(last_tls_context, $3);
-            free($3);
           }
 	| KW_CERT_FILE '(' path_check ')'
 	  {
 	    tls_context_set_cert_file(last_tls_context, $3);
-            free($3);
           }
         | KW_DHPARAM_FILE '(' path_check ')'
           {
             tls_context_set_dhparam_file(last_tls_context, $3);
-            free($3);
           }
         | KW_PKCS12_FILE '(' path_check ')'
           {
             tls_context_set_pkcs12_file(last_tls_context, $3);
-            free($3);
           }
 	| KW_CA_DIR '(' string ')'
 	  {
 	    tls_context_set_ca_dir(last_tls_context, $3);
-            free($3);
           }
 	| KW_CRL_DIR '(' string ')'
 	  {
 	    tls_context_set_crl_dir(last_tls_context, $3);
-            free($3);
           }
         | KW_TRUSTED_KEYS '(' string_list ')'
           {
@@ -821,12 +814,10 @@ tls_option
 	| KW_CIPHER_SUITE '(' string ')'
 	  {
             tls_context_set_cipher_suite(last_tls_context, $3);
-            free($3);
 	  }
         | KW_ECDH_CURVE_LIST '(' string ')'
           {
             tls_context_set_ecdh_curve_list(last_tls_context, $3);
-            free($3);
           }
 	| KW_SSL_OPTIONS '(' string_list ')'
 	  {
@@ -863,7 +854,7 @@ inet_socket_option
 	| KW_IP_TTL '(' nonnegative_integer ')'               { ((SocketOptionsInet *) last_sock_options)->ip_ttl = $3; }
 	| KW_IP_TOS '(' nonnegative_integer ')'               { ((SocketOptionsInet *) last_sock_options)->ip_tos = $3; }
 	| KW_IP_FREEBIND '(' yesno ')'              { ((SocketOptionsInet *) last_sock_options)->ip_freebind = $3; }
-	| KW_INTERFACE '(' string ')'		    { socket_options_inet_set_interface_name((SocketOptionsInet *) last_sock_options, $3); free($3); }
+	| KW_INTERFACE '(' string ')'		    { socket_options_inet_set_interface_name((SocketOptionsInet *) last_sock_options, $3);  }
 	| KW_TCP_KEEPALIVE_TIME '(' nonnegative_integer ')'   { ((SocketOptionsInet *) last_sock_options)->tcp_keepalive_time = $3; }
 	| KW_TCP_KEEPALIVE_INTVL '(' nonnegative_integer ')'  { ((SocketOptionsInet *) last_sock_options)->tcp_keepalive_intvl = $3; }
 	| KW_TCP_KEEPALIVE_PROBES '(' nonnegative_integer ')' { ((SocketOptionsInet *) last_sock_options)->tcp_keepalive_probes = $3; }

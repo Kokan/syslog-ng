@@ -102,7 +102,7 @@ parser_db_opts
 
 /* NOTE: we don't support parser_opt as we don't want the user to specify a template */
 parser_db_opt
-        : KW_FILE '(' path_no_check ')'                		{ log_db_parser_set_db_file(((LogDBParser *) last_parser), $3); free($3); }
+        : KW_FILE '(' path_no_check ')'                		{ log_db_parser_set_db_file(((LogDBParser *) last_parser), $3); }
 	| KW_DROP_UNMATCHED '(' yesno ')'			{ log_db_parser_set_drop_unmatched(((LogDBParser *) last_parser), $3); };
         | KW_PROGRAM_TEMPLATE '(' template_content ')'
           {
@@ -122,7 +122,6 @@ stateful_parser_inject_mode
 	  {
             $$ = stateful_parser_lookup_inject_mode($1);
             CHECK_ERROR($$ != -1, @1, "Unknown inject-mode %s", $1);
-            free($1);
           }
 	| KW_INTERNAL				{ $$ = stateful_parser_lookup_inject_mode("internal"); }
 	;
@@ -182,17 +181,15 @@ synthetic_message_opt
 	| KW_VALUE '(' string template_content ')'
 	  {
 	    synthetic_message_add_value_template(last_message, $3, $4);
-	    free($3);
             log_template_unref($4);
 	  }
-	| KW_TAGS '(' string ')'				{ synthetic_message_add_tag(last_message, $3); free($3); }
+	| KW_TAGS '(' string ')'				{ synthetic_message_add_tag(last_message, $3); }
 	;
 
 inherit_mode
         : string
           {
             $$ = synthetic_message_lookup_inherit_mode($1);
-            free($1);
             CHECK_ERROR($$ >= 0, @1, "unknown inherit-mode()");
           }
         ;
@@ -201,7 +198,6 @@ context_scope
         : string
           {
             $$ = correllation_key_lookup_scope($1);
-            free($1);
             CHECK_ERROR($$ >= 0, @1, "unknown context-scope()");
           }
         ;

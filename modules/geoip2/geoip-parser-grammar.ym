@@ -79,14 +79,14 @@ parser_expr_maxminddb
             log_parser_set_template(last_parser, template);
           }
           parser_geoip_opts
-          ')'					{ $$ = last_parser; free($4); }
+          ')'					{ $$ = last_parser;  }
         ;
 
 parser_geoip_opt
         : KW_PREFIX '(' string ')'
-          { geoip_parser_set_prefix(last_parser, $3); free($3); }
+          { geoip_parser_set_prefix(last_parser, $3);  }
         | KW_DATABASE '(' path_check ')'
-          { geoip_parser_set_database_path(last_parser, $3); free($3); }
+          { geoip_parser_set_database_path(last_parser, $3);  }
         ;
 
 /* INCLUDE_RULES */

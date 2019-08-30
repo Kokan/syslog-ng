@@ -96,7 +96,6 @@ source_threaded_random_generator_option
   | KW_TYPE '(' string ')'
     {
       CHECK_ERROR(threaded_random_generator_sd_set_type(last_driver, $3), @3, "unknown type() argument");
-      free($3);
     }
   | threaded_source_driver_option
   ;

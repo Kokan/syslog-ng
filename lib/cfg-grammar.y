@@ -332,7 +332,7 @@ extern struct _StatsOptions *last_stats_options;
 %token <token> LL_TOKEN               10434
 %token <cptr> LL_BLOCK                10435
 
-%destructor { free($$); } <cptr>
+%destructor {  } <cptr>
 
 /* value pairs */
 %token KW_VALUE_PAIRS                 10500
@@ -1071,8 +1071,8 @@ positive_integer
 
 string_or_number
         : string                                { $$ = $1; }
-        | LL_NUMBER                             { $$ = strdup(lexer->token_text->str); }
-        | LL_FLOAT                              { $$ = strdup(lexer->token_text->str); }
+        | LL_NUMBER                             { $$ = cfg_lexer_strdup(lexer, lexer->token_text->str); }
+        | LL_FLOAT                              { $$ = cfg_lexer_strdup(lexer, lexer->token_text->str); }
         ;
 
 path

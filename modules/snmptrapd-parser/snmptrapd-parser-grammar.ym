@@ -78,7 +78,7 @@ snmptrapd_parser_options
         ;
 
 snmptrapd_parser_option
-        : KW_PREFIX '(' string ')'              { snmptrapd_parser_set_prefix(last_parser, $3); free($3); }
+        : KW_PREFIX '(' string ')'              { snmptrapd_parser_set_prefix(last_parser, $3); }
         | KW_SET_MESSAGE_MACRO '(' yesno ')'    { snmptrapd_parser_set_set_message_macro(last_parser, $3); }
         | parser_opt
         ;

@@ -76,7 +76,6 @@ afsmtp_option
         : KW_HOST '(' string ')'
           {
             afsmtp_dd_set_host(last_driver, $3);
-            free($3);
           }
         | KW_PORT '(' positive_integer ')' { afsmtp_dd_set_port(last_driver, $3); }
         | KW_SUBJECT '(' template_content ')'
@@ -92,7 +91,6 @@ afsmtp_option
         | KW_HEADER '(' string template_content ')'
           {
             afsmtp_dd_add_header(last_driver, $3, $4);
-            free($3);
             log_template_unref($4);
           }
         | KW_FROM '(' template_content ')'

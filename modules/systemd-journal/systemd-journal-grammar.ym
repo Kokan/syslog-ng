@@ -104,7 +104,6 @@ source_systemd_journal_option
             if (last_journal_reader_options->recv_time_zone)
               free(last_journal_reader_options->recv_time_zone);
             last_journal_reader_options->recv_time_zone = strdup($3);
-            free($3);
           }
 
         | KW_PREFIX '(' string ')'
@@ -112,7 +111,6 @@ source_systemd_journal_option
             if (last_journal_reader_options->prefix)
               free(last_journal_reader_options->prefix);
             last_journal_reader_options->prefix = strdup($3);
-            free($3);
           }
         | KW_MAX_FIELD_SIZE '(' positive_integer ')'
           {
