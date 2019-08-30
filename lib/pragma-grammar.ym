@@ -82,7 +82,6 @@ version_stmt
         : KW_VERSION ':' string_or_number
           {
             configuration->parsed_version = process_version_string($3);
-            free($3);
             if (configuration->parsed_version == 0)
                 PRAGMA_ERROR();
           }
@@ -91,7 +90,6 @@ include_stmt
         : KW_INCLUDE string LL_EOL
           {
             CHECK_ERROR(cfg_lexer_include_file(lexer, $2), @2, "Error including %s", $2);
-            free($2);
           }
         ;
 
@@ -99,13 +97,12 @@ define_stmt
 	: KW_DEFINE LL_IDENTIFIER string_or_number		{ msg_debug("Global value changed",
                                                                             evt_tag_str("define", $2),
                                                                             evt_tag_str("value", $3));
-								  cfg_args_set(configuration->globals, $2, $3); free($2); free($3); }
+								  cfg_args_set(configuration->globals, $2, $3);  }
 
 module_stmt
 	: KW_MODULE string { last_module_args = cfg_args_new(); } module_param module_params
           {
             gboolean success = plugin_load_module(&configuration->plugin_context, $2, last_module_args);
-            free($2);
 
             cfg_args_unref(last_module_args);
             last_module_args = NULL;
@@ -116,7 +113,6 @@ module_stmt
 	| KW_MODULE string
           {
             plugin_load_module(&configuration->plugin_context, $2, NULL);
-            free($2);
           }
 	;
 
@@ -130,7 +126,6 @@ requires_stmt
                     msg_error("Cannot load required module ",
                                 evt_tag_str("module", $2),
                                 cfg_lexer_format_location_tag(lexer,&@1));
-                    free($2);
                     PRAGMA_ERROR();
                   }
                 else
@@ -141,7 +136,6 @@ requires_stmt
                     cfg_lexer_start_next_include(lexer);
                   }
               }
-            free($2);
           }
 	;
 
@@ -151,7 +145,7 @@ module_params
 	;
 
 module_param
-	: LL_IDENTIFIER '(' string_or_number ')'		{ cfg_args_set(last_module_args, $1, $3); free($1); free($3); }
+	: LL_IDENTIFIER '(' string_or_number ')'		{ cfg_args_set(last_module_args, $1, $3);  }
 	;
 
 /* INCLUDE_RULES */
