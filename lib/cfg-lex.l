@@ -402,8 +402,8 @@ word	[^ \#'"\(\)\{\}\[\]\\;\r\n\t,|\.@:]
 <block>[^{( \t\r\n]+       { YY_FATAL_ERROR("Expected opening bracket as block boundary, e.g. opening brace or parenthesis"); return LL_ERROR; }
 <block>\r?\n		   { _cfg_lex_move_token_location_to_new_line(yyextra); };
 <block>\({white}*\)        { yy_pop_state(yyscanner); yylval->cptr = NULL; return LL_BLOCK; }
-<block>\({white}*\"\"{white}*\) { yy_pop_state(yyscanner); yylval->cptr = g_strdup(""); return LL_BLOCK; }
-<block>\({white}*\'\'{white}*\) { yy_pop_state(yyscanner); yylval->cptr = g_strdup(""); return LL_BLOCK; }
+<block>\({white}*\"\"{white}*\) { yy_pop_state(yyscanner); yylval->cptr = strdup(""); return LL_BLOCK; }
+<block>\({white}*\'\'{white}*\) { yy_pop_state(yyscanner); yylval->cptr = strdup(""); return LL_BLOCK; }
 
     /* start character of the block */
 <block>[{(]                {
