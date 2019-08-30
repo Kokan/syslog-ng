@@ -23,6 +23,7 @@
  */
 
 #include "cfg-lexer-mem-pool.h"
+#include <string.h>
 
 CfgLexerMemPool *cfg_lexer_mem_pool_new(void)
 {
