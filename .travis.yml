@@ -17,6 +17,8 @@ addons:
         key_url: 'http://download.opensuse.org/repositories/home:/laszlo_budai:/syslog-ng/xUbuntu_14.04/Release.key'
     packages:
       - autoconf-archive
+      - openjdk-8-jdk-headless
+      - openjdk-8-jre-headless
       - bison
       - docbook-xsl
       - flex
