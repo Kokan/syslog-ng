@@ -218,6 +218,8 @@ matrix:
             - libxml2-utils
             - doxygen
             - libsnmp-dev
+      git:
+        submodules: false
       before_script:
       script:
         - set -e
