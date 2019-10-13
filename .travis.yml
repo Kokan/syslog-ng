@@ -208,6 +208,7 @@ matrix:
             - librabbitmq-dev
             - libmongoc-dev
             - libjson-c-dev
+            - python-dev
             - libnet1-dev
             - libriemann-client-dev
             - librdkafka-dev
