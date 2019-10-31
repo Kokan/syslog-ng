@@ -188,6 +188,7 @@ matrix:
       compiler: gcc
       sudo: required
       arch: arm64
+      install:
       addons:
         apt:
           packages:
