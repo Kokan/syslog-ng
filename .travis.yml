@@ -142,6 +142,7 @@ matrix:
         submodules: false
         depth: false
       script:
+        - env
         - tests/commits/check.sh "${TRAVIS_COMMIT_RANGE}"
 
     - env: B=cmake-submodules-and-pytest
