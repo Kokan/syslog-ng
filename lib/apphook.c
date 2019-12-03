@@ -215,8 +215,10 @@ app_shutdown(void)
   afinter_global_deinit();
   stats_destroy();
   child_manager_deinit();
-  g_list_foreach(application_hooks, (GFunc) g_free, NULL);
-  g_list_free(application_hooks);
+//  if (application_hooks) {
+//  g_list_foreach(application_hooks, (GFunc) g_free, NULL);
+//  g_list_free(application_hooks);
+//  }
   dns_caching_thread_deinit();
   dns_caching_global_deinit();
   hostname_global_deinit();
