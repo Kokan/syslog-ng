@@ -131,6 +131,9 @@ _read_header(SerializeArchive *sa, NVTable **nvtable)
   if (!serialize_read_uint32(sa, &res->used))
     goto error;
 
+  if (res->used > res->size)
+    goto error;
+
   if (!serialize_read_uint16(sa, &res->index_size))
     goto error;
 
