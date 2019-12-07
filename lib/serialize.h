@@ -235,9 +235,11 @@ serialize_read_string(SerializeArchive *archive, GString *str)
         {
           gchar *p;
 
-          p = g_try_realloc(str->str, len + 1);
+          p = g_try_malloc0(len + 1);
           if (!p)
             return FALSE;
+
+          g_free(str->str);
           str->str = p;
           str->str[len] = 0;
           str->len = len;
