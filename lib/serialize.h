@@ -231,6 +231,17 @@ serialize_read_string(SerializeArchive *archive, GString *str)
 
   if (serialize_read_uint32(archive, &len))
     {
+      /*
+       * The aim here is to protect against potention ill-formed input.
+       * The len in theory could be any big number, but still limited by
+       * the system memory's limit.
+       * Also by the number prepresentation is used here (uint32).
+       */
+      const guint64 two_gb_memory = 2 * 1024 * 1024;
+      if ((guint64)len > two_gb_memory)
+        return FALSE;
+
+
       if (len > str->allocated_len)
         {
           gchar *p;
