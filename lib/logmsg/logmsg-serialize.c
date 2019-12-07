@@ -113,6 +113,19 @@ _deserialize_sdata(LogMessageSerializationState *state)
   if (!serialize_read_uint8(sa, &self->alloc_sdata))
     return FALSE;
 
+  if (self->num_sdata != 0 || self->alloc_sdata != 0)
+    {
+      gint alloc_sdata = MAX(self->num_sdata + 1, STRICT_ROUND_TO_NEXT_EIGHT(self->num_sdata));
+      if (alloc_sdata > 255)
+        alloc_sdata = 255;
+
+      if (alloc_sdata != self->alloc_sdata)
+        {
+          msg_error("size mismatch", evt_tag_int("alloc_sdata", self->alloc_sdata), evt_tag_int("alloc_sdata", alloc_sdata));
+          return FALSE;
+        }
+    }
+
   g_assert(!self->sdata);
   self->sdata = (NVHandle *) g_malloc(sizeof(NVHandle)*self->alloc_sdata);
 
