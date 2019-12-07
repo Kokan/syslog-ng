@@ -280,10 +280,12 @@ serialize_read_cstring(SerializeArchive *archive, gchar **str, gsize *str_len)
 
   if (serialize_read_uint32(archive, &len))
     {
-      *str = g_try_malloc(len + 1);
-
-      if (!(*str))
+      gchar *tmp = g_try_malloc(len + 1);
+      if (!tmp)
         return FALSE;
+
+      *str = tmp;
+
       (*str)[len] = 0;
       if (str_len)
         *str_len = len;
