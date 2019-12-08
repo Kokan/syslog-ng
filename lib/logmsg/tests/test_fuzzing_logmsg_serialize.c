@@ -15,6 +15,12 @@ _reset_log_msg_registry(void)
   log_msg_registry_init();
 }
 
+void
+msg_send_formatted_message(int prio, const char *msg)
+{
+}
+
+
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
   if (size <= 1) return 0;
