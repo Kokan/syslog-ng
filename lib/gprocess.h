@@ -54,7 +54,7 @@ typedef gpointer cap_t;
 
 #define g_process_enable_cap(cap)
 #define g_process_cap_save() NULL
-#define g_process_cap_restore(cap) cap = cap
+#define g_process_cap_restore(cap)
 
 #endif
 
