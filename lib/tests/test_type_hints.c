@@ -23,7 +23,7 @@
 
 #include "type-hinting.h"
 #include "apphook.h"
-#include <glib.h>
+#include "compat/glib.h"
 
 #include <criterion/criterion.h>
 #include <criterion/parameterized.h>

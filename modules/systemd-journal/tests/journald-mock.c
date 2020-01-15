@@ -26,7 +26,7 @@
 
 #include <fcntl.h>
 #include <unistd.h>
-#include <glib.h>
+#include "compat/glib.h"
 #include <errno.h>
 #include <string.h>
 #include <stdio.h>

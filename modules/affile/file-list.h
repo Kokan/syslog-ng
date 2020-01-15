@@ -23,7 +23,7 @@
 #ifndef MODULES_AFFILE_FILE_LIST_H_
 #define MODULES_AFFILE_FILE_LIST_H_
 
-#include <glib.h>
+#include "compat/glib.h"
 
 typedef struct _PendingFileList PendingFileList;
 

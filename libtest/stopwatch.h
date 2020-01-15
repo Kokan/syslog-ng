@@ -26,7 +26,7 @@
 #ifndef STOPWATCH_H_INCLUDED
 #define STOPWATCH_H_INCLUDED 1
 
-#include <glib.h>
+#include "compat/glib.h"
 
 void start_stopwatch(void);
 guint64 stop_stopwatch_and_get_result(void);

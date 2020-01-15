@@ -26,7 +26,7 @@
 #ifndef LIBTEST_H_INCLUDED
 #define LIBTEST_H_INCLUDED
 
-#include <glib.h>
+#include "compat/glib.h"
 #include <sys/time.h>
 #include <stdlib.h>
 #include <stdio.h>

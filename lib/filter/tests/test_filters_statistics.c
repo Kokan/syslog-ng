@@ -21,7 +21,7 @@
  *
  */
 
-#include <glib.h>
+#include "compat/glib.h"
 
 #include <criterion/criterion.h>
 #include "plugin.h"

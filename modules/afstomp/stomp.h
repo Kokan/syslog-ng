@@ -25,7 +25,7 @@
 #define STOMP_H
 
 #include "gsocket.h"
-#include <glib.h>
+#include "compat/glib.h"
 
 typedef struct stomp_connection
 {

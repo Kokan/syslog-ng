@@ -23,7 +23,7 @@
  */
 
 #include <stdlib.h>
-#include <glib.h>
+#include "compat/glib.h"
 
 #include "cfg.h"
 #include "messages.h"

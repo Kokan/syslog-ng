@@ -33,7 +33,7 @@
 #include "scratch-buffers.h"
 #include "plugin-types.h"
 
-#include <glib.h>
+#include "compat/glib.h"
 #include <stomp.h>
 #include "logthrdest/logthrdestdrv.h"
 

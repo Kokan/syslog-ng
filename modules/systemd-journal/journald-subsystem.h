@@ -25,7 +25,7 @@
 #define JOURNAL_SOURCE_INTERFACE_H_
 
 #include <stdlib.h>
-#include <glib.h>
+#include "compat/glib.h"
 #include "syslog-ng-config.h"
 
 #if SYSLOG_NG_SYSTEMD_JOURNAL_MODE == SYSLOG_NG_JOURNALD_SYSTEM

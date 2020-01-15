@@ -26,7 +26,7 @@
 #ifndef RESOLVED_CONFIGURABLE_PATHS_H_INCLUDED
 #define RESOLVED_CONFIGURABLE_PATHS_H_INCLUDED
 
-#include <glib.h>
+#include "compat/glib.h"
 
 typedef struct _ResolvedConfigurablePaths
 {

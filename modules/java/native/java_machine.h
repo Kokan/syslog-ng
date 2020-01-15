@@ -26,7 +26,7 @@
 #define JAVA_MACHINE_H 1
 
 #include <jni.h>
-#include <glib.h>
+#include "compat/glib.h"
 #include "java-class-loader.h"
 
 #define CALL_JAVA_FUNCTION_VOID(env, function, ...) (*(env))->function(env)

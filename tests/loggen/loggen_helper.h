@@ -29,7 +29,6 @@
 
 #include <stddef.h>
 #include <stdio.h>
-#include <glib.h>
 #include <sys/un.h>
 #include <netdb.h>
 #include <openssl/ssl.h>

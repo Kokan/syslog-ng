@@ -22,7 +22,7 @@
  */
 
 #include "journald-subsystem.h"
-#include <glib.h>
+#include "compat/glib.h"
 #include <gmodule.h>
 
 #if SYSLOG_NG_SYSTEMD_JOURNAL_MODE == SYSLOG_NG_JOURNALD_SYSTEM

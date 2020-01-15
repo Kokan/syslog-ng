@@ -25,7 +25,7 @@
 #ifndef RINGBUFFER_H_INCLUDED
 #define RINGBUFFER_H_INCLUDED
 
-#include <glib.h>
+#include "compat/glib.h"
 
 typedef struct _RingBuffer
 {

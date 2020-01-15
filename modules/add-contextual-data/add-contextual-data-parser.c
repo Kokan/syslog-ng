@@ -26,7 +26,7 @@
 #include "logpipe.h"
 #include "parser/parser-expr.h"
 #include "syslog-ng-config.h"
-#include <glib.h>
+#include "compat/glib.h"
 
 extern int add_contextual_data_debug;
 

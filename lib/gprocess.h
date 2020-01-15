@@ -28,7 +28,7 @@
 #include "syslog-ng.h"
 
 #include <sys/types.h>
-#include <glib.h>
+#include "compat/glib.h"
 
 #if SYSLOG_NG_ENABLE_LINUX_CAPS
 #  include <sys/capability.h>

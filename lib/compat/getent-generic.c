@@ -25,7 +25,7 @@
 
 #ifndef SYSLOG_NG_HAVE_GETPROTOBYNUMBER_R
 
-#include <glib.h>
+#include "compat/glib.h"
 #include <errno.h>
 
 G_LOCK_DEFINE_STATIC(getproto);

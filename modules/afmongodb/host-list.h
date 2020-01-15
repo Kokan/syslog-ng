@@ -24,7 +24,7 @@
 #define HOST_LIST_H_
 
 #include "syslog-ng.h"
-#include <glib.h>
+#include "compat/glib.h"
 
 typedef GList HostList;
 
