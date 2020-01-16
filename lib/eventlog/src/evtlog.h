@@ -48,7 +48,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <glib.h>
+#include "compat/glib.h"
 
 #include "evtmaps.h"
 

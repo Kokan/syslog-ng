@@ -14,6 +14,7 @@ target_include_directories(eventlog
     ${CMAKE_CURRENT_SOURCE_DIR}/src
   PRIVATE
     ${GLIB_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../
 )
 
 target_link_libraries(eventlog
