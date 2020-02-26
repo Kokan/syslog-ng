@@ -19,6 +19,7 @@ set(SCL_DIRS
     logmatic
     mbox
     netskope
+    network
     nodejs
     osquery
     pacct
