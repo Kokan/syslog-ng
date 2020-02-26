@@ -197,11 +197,6 @@ systemd_syslog_grammar_set_source_driver(SystemDSyslogSourceDriver *sd)
 %type	<ptr> source_afunix
 %type	<ptr> source_afunix_dgram_params
 %type	<ptr> source_afunix_stream_params
-%type	<ptr> source_afinet
-%type	<ptr> source_afinet_udp_params
-%type	<ptr> source_afinet_tcp_params
-%type	<ptr> source_afinet_udp6_params
-%type	<ptr> source_afinet_tcp6_params
 %type   <ptr> source_afsyslog
 %type   <ptr> source_afsyslog_params
 %type	<ptr> source_afnetwork
@@ -213,11 +208,6 @@ systemd_syslog_grammar_set_source_driver(SystemDSyslogSourceDriver *sd)
 %type	<ptr> dest_afunix
 %type	<ptr> dest_afunix_dgram_params
 %type	<ptr> dest_afunix_stream_params
-%type	<ptr> dest_afinet
-%type	<ptr> dest_afinet_udp_params
-%type	<ptr> dest_afinet_tcp_params
-%type	<ptr> dest_afinet_udp6_params
-%type	<ptr> dest_afinet_tcp6_params
 %type   <ptr> dest_afsyslog
 %type   <ptr> dest_afsyslog_params
 %type   <ptr> dest_afnetwork
@@ -244,12 +234,10 @@ start
 
 driver
         : LL_CONTEXT_SOURCE source_afunix                     { $$ = $2; }
-        | LL_CONTEXT_SOURCE source_afinet                     { $$ = $2; }
         | LL_CONTEXT_SOURCE source_afsyslog                   { $$ = $2; }
         | LL_CONTEXT_SOURCE source_afnetwork                  { $$ = $2; }
         | LL_CONTEXT_SOURCE source_systemd_syslog             { $$ = $2; }
         | LL_CONTEXT_DESTINATION dest_afunix                  { $$ = $2; }
-        | LL_CONTEXT_DESTINATION dest_afinet                  { $$ = $2; }
         | LL_CONTEXT_DESTINATION dest_afsyslog                { $$ = $2; }
         | LL_CONTEXT_DESTINATION dest_afnetwork               { $$ = $2; }
         ;
@@ -301,33 +289,6 @@ source_afunix_option
 	  }
 	;
 
-source_afinet
-	: KW_UDP '(' source_afinet_udp_params ')'		{ $$ = $3; }
-	| KW_TCP '(' source_afinet_tcp_params ')'		{ $$ = $3; }
-	| KW_UDP6 '(' source_afinet_udp6_params ')'		{ $$ = $3; }
-	| KW_TCP6 '(' source_afinet_tcp6_params ')'		{ $$ = $3; }
-        ;
-
-source_afinet_udp_params
-        :
-          {
-            AFInetSourceDriver *d = afinet_sd_new_udp(configuration);
-
-            afinet_grammar_set_source_driver(d);
-	  }
-	  source_afinet_udp_options		{ $$ = last_driver; }
-	;
-
-source_afinet_udp6_params
-        :
-          {
-            AFInetSourceDriver *d = afinet_sd_new_udp6(configuration);
-
-            afinet_grammar_set_source_driver(d);
-          }
-          source_afinet_udp_options		{ $$ = last_driver; }
-        ;
-
 source_afinet_udp_options
 	: source_afinet_udp_option source_afinet_udp_options
 	|
@@ -345,26 +306,6 @@ source_afinet_option
 	| source_reader_option
 	| source_driver_option
 	| inet_socket_option
-	;
-
-source_afinet_tcp_params
-	:
-	  {
-	    AFInetSourceDriver *d = afinet_sd_new_tcp(configuration);
-
-	    afinet_grammar_set_source_driver(d);
-	  }
-	  source_afinet_tcp_options	{ $$ = last_driver; }
-	;
-
-source_afinet_tcp6_params
-	:
-	  {
-	    AFInetSourceDriver *d = afinet_sd_new_tcp6(configuration);
-
-	    afinet_grammar_set_source_driver(d);
-	  }
-	  source_afinet_tcp_options	{ $$ = last_driver; }
 	;
 
 source_afinet_tcp_options
@@ -548,40 +489,6 @@ dest_afunix_option
 	| dest_driver_option
 	;
 
-dest_afinet
-	: KW_UDP '(' dest_afinet_udp_params ')'			{ $$ = $3; }
-	| KW_TCP '(' dest_afinet_tcp_params ')'			{ $$ = $3; }
-	| KW_UDP6 '(' dest_afinet_udp6_params ')'		{ $$ = $3; }
-	| KW_TCP6 '(' dest_afinet_tcp6_params ')'		{ $$ = $3; }
-	;
-
-dest_afinet_udp_params
-	: string
-	  {
-	    AFInetDestDriver *d = afinet_dd_new_udp($1, configuration);
-
-      afinet_grammar_set_dest_driver(d);
-	  }
-	  dest_afinet_udp_options		{ $$ = last_driver; free($1); }
-	;
-
-dest_afinet_udp6_params
-	: string
-	  {
-	    AFInetDestDriver *d = afinet_dd_new_udp6($1, configuration);
-
-	    afinet_grammar_set_dest_driver(d);
-	  }
-	  dest_afinet_udp_options		{ $$ = last_driver; free($1); }
-	;
-
-
-dest_afinet_udp_options
-        : dest_afinet_udp_options dest_afinet_udp_option
-	|
-	;
-
-
 dest_afinet_option
 	: KW_LOCALIP '(' string ')'		{ afinet_dd_set_localip(last_driver, $3); free($3); }
 	| KW_LOCALPORT '(' string_or_number ')'	{ afinet_dd_set_localport(last_driver, $3); free($3); }
@@ -618,32 +525,6 @@ dest_failback_probe_option
 	| KW_SUCCESSFUL_PROBES_REQUIRED '(' positive_integer ')' { afinet_dd_set_failback_successful_probes_required(last_driver, $3); }
 	;
 
-
-dest_afinet_udp_option
-	: dest_afinet_option
-	| KW_SPOOF_SOURCE '(' yesno ')'		{ afinet_dd_set_spoof_source(last_driver, $3); }
-	| KW_SPOOF_SOURCE_MAX_MSGLEN '(' positive_integer ')' { afinet_dd_set_spoof_source_max_msglen(last_driver, $3); }
-	;
-
-dest_afinet_tcp_params
-	: string
-	  {
-	    AFInetDestDriver *d = afinet_dd_new_tcp($1, configuration);
-
-      afinet_grammar_set_dest_driver(d);
-	  }
-	  dest_afinet_tcp_options		{ $$ = last_driver; free($1); }
-	;
-
-dest_afinet_tcp6_params
-	: string
-	  {
-	    AFInetDestDriver *d = afinet_dd_new_tcp6($1, configuration);
-
-	    afinet_grammar_set_dest_driver(d);
-	  }
-	  dest_afinet_tcp_options		{ $$ = last_driver; free($1); }
-	;
 
 dest_afinet_tcp_options
 	: dest_afinet_tcp_options dest_afinet_tcp_option
