@@ -27,6 +27,7 @@ from messagecheck import *
 from control import flush_files, stop_syslogng
 
 config = """@version: %(syslog_ng_version)s
+@include "scl.conf"
 
 options { ts_format(iso); chain_hostnames(no); keep_hostname(yes); threaded(yes); };
 

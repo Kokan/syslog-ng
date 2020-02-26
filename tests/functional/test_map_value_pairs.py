@@ -28,6 +28,7 @@ from control import flush_files, stop_syslogng
 import os
 
 config = """@version: %(syslog_ng_version)s
+@include "scl.conf"
 
 options { keep-hostname(yes); };
 
