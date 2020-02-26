@@ -46,8 +46,16 @@ start
         : {
             *result = cfg_args_new();
           }
-          '(' block_args ')'                                    { YYACCEPT; }
+          '(' single_value block_args ')'                                    { YYACCEPT; }
 	;
+
+single_value
+        : LL_STRING
+          {
+            cfg_args_set(*result, "__single_value", $1); free($1);
+          }
+        |
+        ;
 
 block_args
         : block_arg block_args

@@ -216,5 +216,6 @@ cfg_block_new(gint context, const gchar *name, const gchar *content, CfgArgs *ar
   self->line = lloc->first_line;
   self->column = lloc->first_column;
   self->arg_defs = arg_defs;
+  cfg_args_set(self->arg_defs, "__single_value", "");
   return &self->super;
 }
