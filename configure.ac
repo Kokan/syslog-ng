@@ -336,6 +336,10 @@ AC_ARG_WITH(python2-home,
               [  --with-python2-home=path Use path as a hard-coded Python home directory that can not be overwritten by the PYTHONHOME environment variable],
               python2_home_dir=$with_python2_home)
 
+AC_ARG_WITH(xmllint-dir,
+              [  --with-xmllint-dir=path Path to use when invoking xmllint by pdbtool, empty path means system default],
+              xmllint_dir=$with_xmllint_dir)
+
 AC_ARG_WITH(nosetests,
               [  --with-nosetests=ABSOLUTE_PATH    Specify nosetests location])
 
@@ -1823,6 +1827,7 @@ AC_DEFINE_UNQUOTED(LICENSE_VERSION, "$LICENSE_VERSION", [Required license versio
 
 AC_DEFINE_UNQUOTED(PATH_PREFIX, "$prefix", [prefix directory])
 AC_DEFINE_UNQUOTED(PATH_EXECPREFIX, "$exec_prefix", [execprefix directory])
+AC_DEFINE_UNQUOTED(PATH_XMLLINT, "$xmllint_dir", [default xmllint path])
 
 AC_DEFINE_UNQUOTED(PATH_SYSCONFDIR, "$sysconfdir", [sysconfdir])
 AC_DEFINE_UNQUOTED(PATH_LOCALSTATEDIR, "$localstatedir", [local state directory])
