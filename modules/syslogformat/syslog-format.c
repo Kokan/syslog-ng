@@ -59,6 +59,21 @@ _process_any_char(const guchar **data, gint *left)
   return TRUE;
 }
 
+static inline gboolean
+_process_char(const guchar **data, gint *left, const guchar c)
+{
+  if (*left < 1)
+    return FALSE;
+
+  if (**data != c)
+    return FALSE;
+
+  (*data)++;
+  (*left)--;
+
+  return TRUE;
+}
+
 
 static gboolean
 log_msg_parse_pri(LogMessage *self, const guchar **data, gint *length, guint flags, guint16 default_pri)
@@ -68,9 +83,8 @@ log_msg_parse_pri(LogMessage *self, const guchar **data, gint *length, guint fla
   const guchar *src = *data;
   gint left = *length;
 
-  if (left && src[0] == '<')
+  if (_process_char(&src, &left, '<'))
     {
-      _process_any_char(&src, &left);
       pri = 0;
       while (left && *src != '>')
         {
@@ -123,21 +137,7 @@ log_msg_parse_skip_chars(LogMessage *self, const guchar **data, gint *length, co
 static gboolean
 log_msg_parse_skip_space(LogMessage *self, const guchar **data, gint *length)
 {
-  const guchar *src = *data;
-  gint left = *length;
-
-  if (left > 0 && *src == ' ')
-    {
-      _process_any_char(&src, &left);
-    }
-  else
-    {
-      return FALSE;
-    }
-
-  *data = src;
-  *length = left;
-  return TRUE;
+  return _process_char(data, length, ' ');
 }
 
 static gint
@@ -225,17 +225,15 @@ log_msg_parse_cisco_timestamp_attributes(LogMessage *self, const guchar **data, 
 
   /* Cisco timestamp extensions, the first '*' indicates that the clock is
    * unsynced, '.' if it is known to be synced */
-  if (G_UNLIKELY(src[0] == '*'))
+  if (G_UNLIKELY(_process_char(&src, &left, '*')))
     {
       if (!(parse_flags & LP_NO_PARSE_DATE))
         log_msg_set_value(self, handles.is_synced, "0", 1);
-      _process_any_char(&src, &left);
     }
-  else if (G_UNLIKELY(src[0] == '.'))
+  else if (G_UNLIKELY(_process_char(&src, &left, '.')))
     {
       if (!(parse_flags & LP_NO_PARSE_DATE))
         log_msg_set_value(self, handles.is_synced, "1", 1);
-      _process_any_char(&src, &left);
     }
   *data = src;
   *length = left;
@@ -251,11 +249,9 @@ log_msg_parse_timestamp(UnixTime *stamp, const guchar **data, gint *length, guin
     result = scan_rfc3164_timestamp(data, length, &wct);
   else
     {
-      if (G_UNLIKELY(*length >= 1 && (*data)[0] == '-'))
+      if (G_UNLIKELY(_process_char(data, length, '-')))
         {
           unix_time_set_now(stamp);
-          (*data)++;
-          (*length)--;
           return TRUE;
         }
       result = scan_rfc5424_timestamp(data, length, &wct);
@@ -330,9 +326,9 @@ log_msg_parse_legacy_program_name(LogMessage *self, const guchar **data, gint *l
       _process_any_char(&src, &left);
     }
   log_msg_set_value(self, LM_V_PROGRAM, (gchar *) prog_start, src - prog_start);
-  if (left > 0 && *src == '[')
+  if (_process_char(&src, &left, '['))
     {
-      const guchar *pid_start = src + 1;
+      const guchar *pid_start = src;
       while (left && *src != ' ' && *src != ']' && *src != ':')
         {
           _process_any_char(&src, &left);
@@ -341,19 +337,10 @@ log_msg_parse_legacy_program_name(LogMessage *self, const guchar **data, gint *l
         {
           log_msg_set_value(self, LM_V_PID, (gchar *) pid_start, src - pid_start);
         }
-      if (left > 0 && *src == ']')
-        {
-          _process_any_char(&src, &left);
-        }
+      _process_char(&src, &left, ']');
     }
-  if (left > 0 && *src == ':')
-    {
-      _process_any_char(&src, &left);
-    }
-  if (left > 0 && *src == ' ')
-    {
-      _process_any_char(&src, &left);
-    }
+  _process_char(&src, &left, ':');
+  _process_char(&src, &left, ' ');
   if ((flags & LP_STORE_LEGACY_MSGHDR))
     {
       log_msg_set_value(self, LM_V_LEGACY_MSGHDR, (gchar *) *data, *length - left);
