@@ -612,78 +612,63 @@ log_msg_parse_sd(LogMessage *self, const guchar **data, gint *length, const MsgF
               strncpy(&sd_value_name[logmsg_sd_prefix_len + 1 + sd_id_len], sd_param_name,
                       sizeof(sd_value_name) - logmsg_sd_prefix_len - 1 - sd_id_len);
 
-              if (left && *src == '=')
-                _process_any_char(&src, &left);
-              else
+              if (!_process_char(&src, &left, '='))
                 goto error;
 
               /* read sd-param-value */
 
-              if (left && *src == '"')
-                {
-                  gboolean quote = FALSE;
-                  /* opening quote */
-                  _process_any_char(&src, &left);
-                  pos = 0;
-
-                  while (left && (*src != '"' || quote))
-                    {
-                      if (!quote && *src == '\\')
-                        {
-                          quote = TRUE;
-                        }
-                      else
-                        {
-                          if (quote && *src != '"' && *src != ']' && *src != '\\' && pos < sizeof(sd_param_value) - 1)
-                            {
-                              sd_param_value[pos] = '\\';
-                              pos++;
-                            }
-                          else if (!quote &&  *src == ']')
-                            {
-                              _process_any_char(&src, &left);
-                              goto error;
-                            }
-                          if (pos < sizeof(sd_param_value) - 1)
-                            {
-                              sd_param_value[pos] = *src;
-                              pos++;
-                            }
-                          quote = FALSE;
-                        }
-                      _process_any_char(&src, &left);
-                    }
-                  sd_param_value[pos] = 0;
-                  sd_param_value_len = pos;
-
-                  if (left && *src == '"')/* closing quote */
-                    _process_any_char(&src, &left);
-                  else
-                    goto error;
-                }
-              else
-                {
+              if (!_process_char(&src, &left, '"'))
                   goto error;
+
+              gboolean quote = FALSE;
+              /* opening quote */
+              pos = 0;
+
+              while (left && (*src != '"' || quote))
+                {
+                  if (!quote && *src == '\\')
+                    {
+                      quote = TRUE;
+                    }
+                  else
+                    {
+                      if (quote && *src != '"' && *src != ']' && *src != '\\' && pos < sizeof(sd_param_value) - 1)
+                        {
+                          sd_param_value[pos] = '\\';
+                          pos++;
+                        }
+                      else if (!quote &&  *src == ']')
+                        {
+                          _process_any_char(&src, &left);
+                          goto error;
+                        }
+                      if (pos < sizeof(sd_param_value) - 1)
+                        {
+                          sd_param_value[pos] = *src;
+                          pos++;
+                        }
+                      quote = FALSE;
+                    }
+                  _process_any_char(&src, &left);
                 }
+              sd_param_value[pos] = 0;
+              sd_param_value_len = pos;
+
+              if (!_process_char(&src, &left, '"')) /* closing quote */
+                goto error;
 
               log_msg_set_value_by_name(self, sd_value_name, sd_param_value, sd_param_value_len);
             }
 
-          if (left && *src == ']')
-            {
-              _process_any_char(&src, &left);
-              open_sd--;
-            }
-          else
-            {
+          if (!_process_char(&src, &left,  ']'))
               goto error;
-            }
+
+           open_sd--;
 
           /* if any other sd then continue*/
-          if (left && *src == '[')
+          if (_process_char(&src, &left,  '['))
             {
               /* new structured data begins, thus continue iteration */
-              _process_any_char(&src, &left);
               open_sd++;
             }
         }
