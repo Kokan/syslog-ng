@@ -321,18 +321,12 @@ log_msg_parse_legacy_program_name(LogMessage *self, const guchar **data, gint *l
   src = *data;
   left = *length;
   prog_start = src;
-  while (left && *src != ' ' && *src != '[' && *src != ':')
-    {
-      _process_any_char(&src, &left);
-    }
+  log_msg_parse_skip_chars_until(self, &src, &left, " [:");
   log_msg_set_value(self, LM_V_PROGRAM, (gchar *) prog_start, src - prog_start);
   if (_process_char(&src, &left, '['))
     {
       const guchar *pid_start = src;
-      while (left && *src != ' ' && *src != ']' && *src != ':')
-        {
-          _process_any_char(&src, &left);
-        }
+      log_msg_parse_skip_chars_until(self, &src, &left, " ]:");
       if (left)
         {
           log_msg_set_value(self, LM_V_PID, (gchar *) pid_start, src - pid_start);
