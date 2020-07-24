@@ -580,11 +580,9 @@ log_msg_parse_sd(LogMessage *self, const guchar **data, gint *length, const MsgF
           /* read sd-element */
           while (left && *src != ']')
             {
-              if (left && *src == ' ') /* skip the ' ' before the parameter name */
-                _process_any_char(&src, &left);
-              else
+              if (!_process_char(&src, &left, ' ')) /* skip the ' ' before the parameter name */
                 goto error;
-
+                
               if (!isascii(*src) || *src == '=' || *src == ' ' || *src == ']' || *src == '"')
                 goto error;
 
