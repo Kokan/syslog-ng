@@ -582,7 +582,7 @@ log_msg_parse_sd(LogMessage *self, const guchar **data, gint *length, const MsgF
             {
               if (!_process_char(&src, &left, ' ')) /* skip the ' ' before the parameter name */
                 goto error;
-                
+
               if (!isascii(*src) || *src == '=' || *src == ' ' || *src == ']' || *src == '"')
                 goto error;
 
@@ -616,7 +616,7 @@ log_msg_parse_sd(LogMessage *self, const guchar **data, gint *length, const MsgF
               /* read sd-param-value */
 
               if (!_process_char(&src, &left, '"'))
-                  goto error;
+                goto error;
 
               gboolean quote = FALSE;
               /* opening quote */
@@ -659,9 +659,9 @@ log_msg_parse_sd(LogMessage *self, const guchar **data, gint *length, const MsgF
             }
 
           if (!_process_char(&src, &left,  ']'))
-              goto error;
+            goto error;
 
-           open_sd--;
+          open_sd--;
 
           /* if any other sd then continue*/
           if (_process_char(&src, &left,  '['))
