@@ -523,35 +523,87 @@ log_msg_parse_sd(LogMessage *self, const guchar **data, gint *length, const MsgF
   guint open_sd = 0;
   gint left = *length, pos;
 
-  if (left && src[0] == '-')
+  if (_process_char(&src, &left, '-'))
     {
       /* Nothing to do here */
-      _process_any_char(&src, &left);
+      ret = TRUE;
+      goto error;
     }
-  else if (left && src[0] == '[')
+
+  if (!_process_char(&src, &left, '['))
     {
-      _process_any_char(&src, &left);
-      open_sd++;
-      do
+      ret = TRUE;
+      goto error;
+    }
+
+  open_sd++;
+  do
+    {
+      if (!isascii(*src) || *src == '=' || *src == ' ' || *src == ']' || *src == '"')
+        goto error;
+      /* read sd_id */
+      pos = 0;
+      while (left && *src != ' ' && *src != ']')
         {
+          /* the sd_id_name is max 32, the other chars are only stored in the self->sd_str*/
+          if (pos < sizeof(sd_id_name) - 1)
+            {
+              if (isascii(*src) && *src != '=' && *src != ' ' && *src != ']' && *src != '"')
+                {
+                  sd_id_name[pos] = *src;
+                  pos++;
+                }
+              else
+                {
+                  goto error;
+                }
+            }
+          else
+            {
+              goto error;
+            }
+          _process_any_char(&src, &left);
+        }
+
+      if (pos == 0)
+        goto error;
+
+      sd_id_name[pos] = 0;
+      sd_id_len = pos;
+      strcpy(sd_value_name, logmsg_sd_prefix);
+      /* this strcat is safe, as sd_id_name is at most 32 chars */
+      strncpy(sd_value_name + logmsg_sd_prefix_len, sd_id_name, sizeof(sd_value_name) - logmsg_sd_prefix_len);
+      if (*src == ']')
+        {
+          log_msg_set_value_by_name(self, sd_value_name, "", 0);
+        }
+      else
+        {
+          sd_value_name[logmsg_sd_prefix_len + pos] = '.';
+        }
+
+      /* read sd-element */
+      while (left && *src != ']')
+        {
+          if (!_process_char(&src, &left, ' ')) /* skip the ' ' before the parameter name */
+            goto error;
+
           if (!isascii(*src) || *src == '=' || *src == ' ' || *src == ']' || *src == '"')
             goto error;
-          /* read sd_id */
+
+          /* read sd-param */
           pos = 0;
-          while (left && *src != ' ' && *src != ']')
+          while (left && *src != '=')
             {
-              /* the sd_id_name is max 32, the other chars are only stored in the self->sd_str*/
-              if (pos < sizeof(sd_id_name) - 1)
+              if (pos < sizeof(sd_param_name) - 1)
                 {
                   if (isascii(*src) && *src != '=' && *src != ' ' && *src != ']' && *src != '"')
                     {
-                      sd_id_name[pos] = *src;
+                      sd_param_name[pos] = *src;
                       pos++;
                     }
                   else
-                    {
-                      goto error;
-                    }
+                    goto error;
                 }
               else
                 {
@@ -559,119 +611,71 @@ log_msg_parse_sd(LogMessage *self, const guchar **data, gint *length, const MsgF
                 }
               _process_any_char(&src, &left);
             }
+          sd_param_name[pos] = 0;
+          strncpy(&sd_value_name[logmsg_sd_prefix_len + 1 + sd_id_len], sd_param_name,
+                  sizeof(sd_value_name) - logmsg_sd_prefix_len - 1 - sd_id_len);
 
-          if (pos == 0)
+          if (!_process_char(&src, &left, '='))
             goto error;
 
-          sd_id_name[pos] = 0;
-          sd_id_len = pos;
-          strcpy(sd_value_name, logmsg_sd_prefix);
-          /* this strcat is safe, as sd_id_name is at most 32 chars */
-          strncpy(sd_value_name + logmsg_sd_prefix_len, sd_id_name, sizeof(sd_value_name) - logmsg_sd_prefix_len);
-          if (*src == ']')
-            {
-              log_msg_set_value_by_name(self, sd_value_name, "", 0);
-            }
-          else
-            {
-              sd_value_name[logmsg_sd_prefix_len + pos] = '.';
-            }
+          /* read sd-param-value */
 
-          /* read sd-element */
-          while (left && *src != ']')
+          if (!_process_char(&src, &left, '"'))
+            goto error;
+
+          gboolean quote = FALSE;
+          /* opening quote */
+          pos = 0;
+
+          while (left && (*src != '"' || quote))
             {
-              if (!_process_char(&src, &left, ' ')) /* skip the ' ' before the parameter name */
-                goto error;
-
-              if (!isascii(*src) || *src == '=' || *src == ' ' || *src == ']' || *src == '"')
-                goto error;
-
-              /* read sd-param */
-              pos = 0;
-              while (left && *src != '=')
+              if (!quote && *src == '\\')
                 {
-                  if (pos < sizeof(sd_param_name) - 1)
+                  quote = TRUE;
+                }
+              else
+                {
+                  if (quote && *src != '"' && *src != ']' && *src != '\\' && pos < sizeof(sd_param_value) - 1)
                     {
-                      if (isascii(*src) && *src != '=' && *src != ' ' && *src != ']' && *src != '"')
-                        {
-                          sd_param_name[pos] = *src;
-                          pos++;
-                        }
-                      else
-                        goto error;
+                      sd_param_value[pos] = '\\';
+                      pos++;
                     }
-                  else
+                  else if (!quote &&  *src == ']')
                     {
+                      _process_any_char(&src, &left);
                       goto error;
                     }
-                  _process_any_char(&src, &left);
-                }
-              sd_param_name[pos] = 0;
-              strncpy(&sd_value_name[logmsg_sd_prefix_len + 1 + sd_id_len], sd_param_name,
-                      sizeof(sd_value_name) - logmsg_sd_prefix_len - 1 - sd_id_len);
-
-              if (!_process_char(&src, &left, '='))
-                goto error;
-
-              /* read sd-param-value */
-
-              if (!_process_char(&src, &left, '"'))
-                goto error;
-
-              gboolean quote = FALSE;
-              /* opening quote */
-              pos = 0;
-
-              while (left && (*src != '"' || quote))
-                {
-                  if (!quote && *src == '\\')
+                  if (pos < sizeof(sd_param_value) - 1)
                     {
-                      quote = TRUE;
+                      sd_param_value[pos] = *src;
+                      pos++;
                     }
-                  else
-                    {
-                      if (quote && *src != '"' && *src != ']' && *src != '\\' && pos < sizeof(sd_param_value) - 1)
-                        {
-                          sd_param_value[pos] = '\\';
-                          pos++;
-                        }
-                      else if (!quote &&  *src == ']')
-                        {
-                          _process_any_char(&src, &left);
-                          goto error;
-                        }
-                      if (pos < sizeof(sd_param_value) - 1)
-                        {
-                          sd_param_value[pos] = *src;
-                          pos++;
-                        }
-                      quote = FALSE;
-                    }
-                  _process_any_char(&src, &left);
+                  quote = FALSE;
                 }
-              sd_param_value[pos] = 0;
-              sd_param_value_len = pos;
-
-              if (!_process_char(&src, &left, '"')) /* closing quote */
-                goto error;
-
-              log_msg_set_value_by_name(self, sd_value_name, sd_param_value, sd_param_value_len);
+              _process_any_char(&src, &left);
             }
+          sd_param_value[pos] = 0;
+          sd_param_value_len = pos;
 
-          if (!_process_char(&src, &left,  ']'))
+          if (!_process_char(&src, &left, '"')) /* closing quote */
             goto error;
 
-          open_sd--;
-
-          /* if any other sd then continue*/
-          if (_process_char(&src, &left,  '['))
-            {
-              /* new structured data begins, thus continue iteration */
-              open_sd++;
-            }
+          log_msg_set_value_by_name(self, sd_value_name, sd_param_value, sd_param_value_len);
         }
-      while (left && open_sd != 0);
+
+      if (!_process_char(&src, &left,  ']'))
+        goto error;
+
+      open_sd--;
+
+      /* if any other sd then continue*/
+      if (_process_char(&src, &left,  '['))
+        {
+          /* new structured data begins, thus continue iteration */
+          open_sd++;
+        }
     }
+  while (left && open_sd != 0);
   ret = TRUE;
 error:
   /* FIXME: what happens if an error occurs? there's no way to return a
