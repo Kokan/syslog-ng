@@ -29,5 +29,7 @@
 
 AckTracker *batched_ack_tracker_new(LogSource *source, gint min_batch_size, gint timeout);
 
+void batched_ack_tracker_save_batched_acks(AckTracker *s);
+
 #endif
 

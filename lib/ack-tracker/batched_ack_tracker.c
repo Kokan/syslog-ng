@@ -117,7 +117,7 @@ _ack_record_save_bookmark(gpointer p)
   g_free(self);
 }
 
-static void
+void
 batched_ack_tracker_save_batched_acks(AckTracker *s)
 {
   BatchedAckTracker *self = (BatchedAckTracker *)s;
