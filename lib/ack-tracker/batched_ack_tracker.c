@@ -150,7 +150,6 @@ batched_ack_tracker_manage_msg_ack(AckTracker *s, LogMessage *msg, AckType ack_t
   if (ack_type != AT_ABORTED)
     {
       self->acked_records = g_list_append(self->acked_records, msg->ack_record);
-      batched_ack_tracker_save_batched_acks(s);
     }
 
   log_msg_unref(msg);
