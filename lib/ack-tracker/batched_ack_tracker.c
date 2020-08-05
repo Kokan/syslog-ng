@@ -164,6 +164,9 @@ batched_ack_tracker_free(AckTracker *s)
 {
   BatchedAckTracker *self = (BatchedAckTracker *)s;
 
+  if (self->pending_ack_record)
+    _free_and_destroy_ack_record(self->pending_ack_record);
+
   g_list_free_full(self->acked_records, _free_and_destroy_ack_record);
 
   g_mutex_clear(&self->mutex);
