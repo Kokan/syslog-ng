@@ -453,6 +453,7 @@ _create_ack_tracker_if_not_exists(LogSource *self)
   if (self->ack_tracker)
     return;
 
+  self->pos_track_type = 2;
   switch (self->pos_track_type)
     {
     case 0:

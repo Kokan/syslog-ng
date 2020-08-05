@@ -32,6 +32,7 @@
 #include "parse-number.h"
 #include "journal-reader.h"
 #include "timeutils/misc.h"
+#include "ack-tracker/batched_ack_tracker.h"
 
 #include <stdlib.h>
 #include <iv_event.h>
@@ -523,6 +524,7 @@ static void
 _work_perform(gpointer s, GIOCondition cond)
 {
   JournalReader *self = (JournalReader *) s;
+  batched_ack_tracker_save_batched_acks(self->super.ack_tracker);
   self->notify_code = _fetch_log(self);
 }
 
