@@ -66,7 +66,7 @@ struct _LogSource
   LogPipe super;
   LogSourceOptions *options;
   gboolean threaded;
-  gboolean pos_tracked;
+  gboolean pos_track_type;
   gchar *name;
   gchar *stats_id;
   gchar *stats_instance;
