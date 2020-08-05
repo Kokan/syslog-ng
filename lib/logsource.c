@@ -453,10 +453,17 @@ _create_ack_tracker_if_not_exists(LogSource *self)
   if (self->ack_tracker)
     return;
 
-  if (self->pos_track_type)
-    self->ack_tracker = late_ack_tracker_new(self);
-  else
-    self->ack_tracker = early_ack_tracker_new(self);
+  switch (self->pos_track_type)
+    {
+    case 0:
+      self->ack_tracker = early_ack_tracker_new(self);
+      break;
+    case 1:
+      self->ack_tracker = late_ack_tracker_new(self);
+      break;
+    default:
+      g_assert_not_reached();
+    }
 }
 
 gboolean
