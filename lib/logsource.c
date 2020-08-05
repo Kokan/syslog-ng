@@ -461,6 +461,9 @@ _create_ack_tracker_if_not_exists(LogSource *self)
     case 1:
       self->ack_tracker = late_ack_tracker_new(self);
       break;
+    case 2:
+      self->ack_tracker = batched_ack_tracker_new(self, 12, 5);
+      break;
     default:
       g_assert_not_reached();
     }

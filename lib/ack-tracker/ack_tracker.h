@@ -45,6 +45,7 @@ struct _AckRecord
 
 AckTracker *late_ack_tracker_new(LogSource *source);
 AckTracker *early_ack_tracker_new(LogSource *source);
+AckTracker *batched_ack_tracker_new(LogSource *source, gint min_batch_size, gint timeout);
 
 static inline void
 ack_tracker_free(AckTracker *self)
