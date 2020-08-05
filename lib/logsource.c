@@ -450,13 +450,13 @@ _unregister_window_stats(LogSource *self)
 static inline void
 _create_ack_tracker_if_not_exists(LogSource *self)
 {
-  if (!self->ack_tracker)
-    {
-      if (self->pos_tracked)
-        self->ack_tracker = late_ack_tracker_new(self);
-      else
-        self->ack_tracker = early_ack_tracker_new(self);
-    }
+  if (self->ack_tracker)
+    return;
+
+  if (self->pos_tracked)
+    self->ack_tracker = late_ack_tracker_new(self);
+  else
+    self->ack_tracker = early_ack_tracker_new(self);
 }
 
 gboolean
