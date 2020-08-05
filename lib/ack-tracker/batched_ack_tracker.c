@@ -38,6 +38,7 @@ typedef struct BatchedAckTracker
   GMutex mutex;
   GList *acked_records;
   BatchedAckRecord *pending_ack_record;
+  gint min_batch_size;
 } BatchedAckTracker;
 
 void
@@ -124,6 +125,12 @@ batched_ack_tracker_save_batched_acks(AckTracker *s)
 
   batched_ack_tracker_lock(s);
   {
+    gint number_of_acked_msg = g_list_length(self->acked_records);
+    if (number_of_acked_msg < self->min_batch_size)
+      {
+        batched_ack_tracker_unlock(s);
+        return;
+      }
     g_list_free_full(self->acked_records, _ack_record_save_bookmark);
     self->acked_records = NULL;
   }
@@ -178,6 +185,8 @@ AckTracker *
 batched_ack_tracker_new(LogSource *source, gint min_batch_size, gint timeout)
 {
   BatchedAckTracker *self = g_new0(BatchedAckTracker, 1);
+
+  self->min_batch_size = min_batch_size;
 
   source->ack_tracker = (AckTracker *)self;
   self->super.source = source;
