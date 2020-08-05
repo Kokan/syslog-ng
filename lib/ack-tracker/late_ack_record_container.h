@@ -51,8 +51,7 @@ struct _LateAckRecordContainer
 static inline void
 late_ack_record_destroy(LateAckRecord *self)
 {
-  if (self->bookmark.destroy)
-    self->bookmark.destroy(&(self->bookmark));
+  bookmark_destroy(&self->bookmark);
 }
 
 LateAckRecordContainer *late_ack_record_container_static_new(gsize size);
