@@ -55,6 +55,11 @@ static gchar *serial = "CAC7119N43";
 static gchar *prefix = "slog/";
 static gchar *context_id = "test-context-id";
 
+void
+msg_send_formatted_message(int prio, const char *msg)
+{
+}
+
 // Data needed to run a test
 typedef struct _testData
 {
