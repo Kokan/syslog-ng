@@ -443,6 +443,8 @@ ParameterizedTest(struct TestNVPairPrefix *param, add_contextual_data, test_impo
       "selector1",
       &param->expected,
       1);
+
+  context_info_db_unref(db);
 }
 
 Test(add_contextual_data, test_ignore_case_on)
