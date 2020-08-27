@@ -31,8 +31,7 @@
 static AddContextualDataSelector *
 _create_glob_selector(const gchar *template_string, const gchar *glob1, ...)
 {
-  GlobalConfig *cfg = cfg_new_snippet();
-  LogTemplate *glob_template = log_template_new(cfg, NULL);
+  LogTemplate *glob_template = log_template_new(NULL, NULL);
 
   cr_assert(log_template_compile(glob_template, template_string, NULL));
   AddContextualDataSelector *selector = add_contextual_data_glob_selector_new(glob_template);
@@ -42,7 +41,7 @@ _create_glob_selector(const gchar *template_string, const gchar *glob1, ...)
   add_contextual_data_selector_init(selector, string_vargs_to_list_va(glob1, va));
   va_end(va);
 
-  AddContextualDataSelector *cloned = add_contextual_data_selector_clone(selector, cfg);
+  AddContextualDataSelector *cloned = add_contextual_data_selector_clone(selector, NULL);
   add_contextual_data_selector_free(selector);
   return cloned;
 }
