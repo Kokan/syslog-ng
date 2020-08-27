@@ -477,6 +477,7 @@ void test_slog_verification(void)
   verifyMessages(testData->hostKey, testData->macFile->str, &output, &msg, num);
 
   log_template_unref(slog_templ);
+  log_msg_unref(msg);
 
   closure(testData);
 }
