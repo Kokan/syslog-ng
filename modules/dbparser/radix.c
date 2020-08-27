@@ -293,7 +293,7 @@ r_parser_email(gchar *str, gint *len, const gchar *param, gpointer state, RParse
 
   end = *len;
   if (param)
-    while (strchr(param, str[*len]))
+    while (str[*len] && strchr(param, str[*len]))
       (*len)++;
 
   if (match)
