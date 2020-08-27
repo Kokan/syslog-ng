@@ -26,7 +26,7 @@
 #include <unistd.h>
 #include <criterion/criterion.h>
 
-#include "apphook.h"
+#include "lib/apphook.h"
 #include "cfg.h"
 #include "logmatcher.h"
 #include "libtest/cr_template.h"

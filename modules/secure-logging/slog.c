@@ -1009,8 +1009,6 @@ int iterateBuffer(guint64 entriesInBuffer, GString **input, guint64 *nextLogEntr
               g_free(tmp);
             }
 
-          len = len - (COUNTER_LENGTH+1);
-
           if (logEntryOnDisk != *nextLogEntry)
             {
               if (tab != NULL)
@@ -1079,7 +1077,7 @@ int iterateBuffer(guint64 entriesInBuffer, GString **input, guint64 *nextLogEntr
 
                   if (tab != NULL)
                     {
-                      char *key = g_new0(char, CTR_LEN_SIMPLE+1);
+                      char *key = g_new0(char, CTR_LEN_SIMPLE+1);//TODO:
                       snprintf(key, CTR_LEN_SIMPLE+1, "%"G_GUINT64_FORMAT, logEntryOnDisk);
 
                       if (g_hash_table_insert(tab, key, (gpointer)logEntryOnDisk) == FALSE)
@@ -1201,7 +1199,7 @@ int initVerify(guint64 entriesInFile, unsigned char *mainKey, guint64 *nextLogEn
       return 0;
     }
 
-  if (input[0]->len>(COUNTER_LENGTH+1))
+  if (input[0] && input[0]->len>(COUNTER_LENGTH+1))
     {
       gsize outLen;
       char buf[COUNTER_LENGTH+1];
@@ -1376,6 +1374,8 @@ int iterativeFileVerify(unsigned char *previousMAC, unsigned char *mainKey, char
   GHashTable *tab = g_hash_table_new(g_str_hash, g_str_equal);
   if (tab == NULL)
     {
+      g_free(inputBuffer);
+      g_free(outputBuffer);
       msg_error("[SLOG] ERROR: Cannot create hash table");
       return 0;
     }
@@ -1642,6 +1642,8 @@ int fileVerify(unsigned char *mainKey, char *inputFileName, char *outputFileName
 
   if ((outputBuffer==NULL)||(inputBuffer == NULL))
     {
+      g_free(inputBuffer);
+      g_free(outputBuffer);
       msg_error("[SLOG] ERROR: [fileVerify] cannot allocate memory");
 
       g_io_channel_shutdown(input, TRUE, &myError);
