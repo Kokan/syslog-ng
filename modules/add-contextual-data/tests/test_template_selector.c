@@ -61,6 +61,7 @@ _create_template_selector(const gchar *template_string)
   AddContextualDataSelector *selector = add_contextual_data_template_selector_new(selector_template);
   add_contextual_data_selector_init(selector, NULL);
 
+  cfg_free(cfg);
   return selector;
 }
 
@@ -72,6 +73,7 @@ Test(add_contextual_data_template_selector,
   gchar *resolved_selector = add_contextual_data_selector_resolve(selector, msg);
 
   cr_assert_str_eq(resolved_selector, "localhost", "");
+  g_free(resolved_selector);
   log_msg_unref(msg);
   add_contextual_data_selector_free(selector);
 }
@@ -83,6 +85,7 @@ Test(add_contextual_data_template_selector, test_template_selector_cannot_be_res
   gchar *resolved_selector = add_contextual_data_selector_resolve(selector, msg);
 
   cr_assert_str_eq(resolved_selector, "", "No template should be resolved.");
+  g_free(resolved_selector);
   log_msg_unref(msg);
   add_contextual_data_selector_free(selector);
 }
