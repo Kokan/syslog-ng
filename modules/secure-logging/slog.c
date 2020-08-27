@@ -1194,7 +1194,7 @@ int initVerify(guint64 entriesInFile, unsigned char *mainKey, guint64 *nextLogEn
                GString **input, GHashTable **tab)
 {
   // Create hash table
-  *tab = g_hash_table_new(g_str_hash, g_str_equal);
+  *tab = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
   if (*tab == NULL)
     {
       msg_error("[SLOG] ERROR: Cannot create hash table");
