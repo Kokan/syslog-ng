@@ -34,10 +34,12 @@ jobs:
             --prefix=${HOME}/install/syslog-ng
             --enable-all-modules
             --with-python=${PYTHONVERSION}
+            --with-sanitizer=address
             `[ $CC = clang ] && echo '--enable-force-gnu99' || true`
           "
           CMAKE_FLAGS="
             -DCMAKE_C_FLAGS=-Werror
+            -DSANITIZER=address
             -DCMAKE_INSTALL_PREFIX=${HOME}/install/syslog-ng
             -DPYTHON_VERSION=${PYTHONVERSION}
           "
