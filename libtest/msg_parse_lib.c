@@ -30,6 +30,8 @@
 void
 init_parse_options_and_load_syslogformat(MsgFormatOptions *parse_options)
 {
+  if (configuration)
+    cfg_free(configuration);
   configuration = cfg_new_snippet();
   cfg_load_module(configuration, "syslogformat");
   msg_format_options_defaults(parse_options);
