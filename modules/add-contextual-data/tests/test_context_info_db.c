@@ -444,6 +444,7 @@ ParameterizedTest(struct TestNVPairPrefix *param, add_contextual_data, test_impo
       &param->expected,
       1);
 
+  contextual_data_record_scanner_free(scanner);
   context_info_db_unref(db);
 }
 
