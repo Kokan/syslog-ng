@@ -26,7 +26,7 @@ DIST_SUBDIRS		=
 AM_MAKEFLAGS		= --no-print-directory
 AM_YFLAGS		= -Wno-yacc -Wno-other -Werror=conflicts-sr -Werror=conflicts-rr
 
-AM_TESTS_ENVIRONMENT	= top_srcdir="$(top_srcdir)" CRITERION_TEST_PATTERN='!(*/*performance*)' ASAN_OPTIONS="detect_odr_violation=0"
+AM_TESTS_ENVIRONMENT	= top_srcdir="$(top_srcdir)" CRITERION_TEST_PATTERN='!(*/*performance*)' PYMALLOC=malloc_debug ASAN_OPTIONS="detect_odr_violation=0"
 if ENABLE_SANITIZER
 LOG_COMPILER            = $(top_srcdir)/scripts/test-grep.sh
 endif
