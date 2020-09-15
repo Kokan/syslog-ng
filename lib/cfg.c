@@ -368,7 +368,9 @@ cfg_init(GlobalConfig *cfg)
   if (!cfg_tree_start(&cfg->tree))
     return FALSE;
 
-  g_assert(cfg_tree_on_inited(&cfg->tree));
+  if (!cfg_tree_on_inited(&cfg->tree))
+    return FALSE;
+
   return TRUE;
 }
 
