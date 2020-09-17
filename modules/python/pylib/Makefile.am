@@ -87,7 +87,7 @@ python-pylint:
 endif
 
 
-modules_python_pylib_tests_TESTS = modules/python/pylib/test_pylib.sh
+#modules_python_pylib_tests_TESTS = modules/python/pylib/test_pylib.sh
 check_SCRIPTS += $(modules_python_pylib_tests_TESTS)
 
 endif
