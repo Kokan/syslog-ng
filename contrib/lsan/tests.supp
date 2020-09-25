@@ -1,0 +1,4 @@
+# the generated configuration parser leaks a token if the configuration fails
+# there are a few unit tests that checks for invalid config, fixing the leak
+# likely requires a lot of change with not a lot of gain
+leak:_cfg_lexer_lex
