@@ -123,6 +123,7 @@ Test(add_contextual_data_filter_selector, test_matching_host_filter_selection)
 
   cr_assert_str_eq(resolved_selector, "f_localhost", "Filter name is resolved.");
   g_free(resolved_selector);
+  add_contextual_data_selector_free(selector);
   log_msg_unref(msg);
 }
 
@@ -140,6 +141,8 @@ Test(add_contextual_data_filter_selector, test_matching_msg_filter_selection)
 
   cr_assert_str_eq(resolved_selector, "f_msg", "Filter name is resolved.");
   g_free(resolved_selector);
+  add_contextual_data_selector_free(selector);
+  g_list_free(ordered_filters);
   log_msg_unref(msg);
 }
 
@@ -160,6 +163,7 @@ Test(add_contextual_data_filter_selector, test_matching_host_and_msg_filter_sele
 
   cr_assert_str_eq(resolved_selector, "f_msg", "Message filter name is resolved");
   g_free(resolved_selector);
+  add_contextual_data_selector_free(selector);
   log_msg_unref(msg);
 }
 
