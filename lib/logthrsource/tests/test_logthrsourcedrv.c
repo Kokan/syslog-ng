@@ -39,6 +39,7 @@ typedef struct _TestThreadedSourceDriver
   gboolean suspended;
   gboolean exit_requested;
   gboolean blocking_post;
+  GList *msg_queue;
 } TestThreadedSourceDriver;
 
 MainLoopOptions main_loop_options = {0};
@@ -96,6 +97,25 @@ test_threaded_source_driver_init_method(LogPipe *s)
   return TRUE;
 }
 
+static void
+_ack_msg(gpointer p)
+{
+  LogMessage *msg = (LogMessage *)p;
+  LogPathOptions path_options = LOG_PATH_OPTIONS_INIT;
+
+  log_msg_drop(msg, &path_options, AT_PROCESSED);
+}
+
+static gboolean
+test_threaded_source_driver_deinit_method(LogPipe *s)
+{
+
+  TestThreadedSourceDriver *self = (TestThreadedSourceDriver *)s;
+
+  g_list_free_full(self->msg_queue, _ack_msg);
+
+  return log_threaded_source_driver_deinit_method(s);
+}
 
 static TestThreadedSourceDriver *
 test_threaded_sd_new(GlobalConfig *cfg)
@@ -105,6 +125,7 @@ test_threaded_sd_new(GlobalConfig *cfg)
   log_threaded_source_driver_init_instance(&self->super, cfg);
 
   self->super.super.super.super.init = test_threaded_source_driver_init_method;
+  self->super.super.super.super.deinit = test_threaded_source_driver_deinit_method;
   self->super.format_stats_instance = _format_stats_instance;
   self->super.super.super.super.generate_persist_name = _generate_persist_name;
 
@@ -193,7 +214,8 @@ _request_exit(LogThreadedSourceDriver *s)
 static void
 _do_not_ack_messages(LogPipe *s, LogMessage *msg, const LogPathOptions *path_options)
 {
-  log_msg_unref(msg);
+  TestThreadedSourceDriver *self = (TestThreadedSourceDriver *) s;
+  self->msg_queue = g_list_append(self->msg_queue, msg);
 }
 
 TestSuite(logthrsourcedrv, .init = setup, .fini = teardown, .timeout = 10);
