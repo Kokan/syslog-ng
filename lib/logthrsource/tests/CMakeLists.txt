@@ -1,2 +1,2 @@
-add_unit_test(CRITERION LIBTEST TARGET test_logthrsourcedrv)
+add_unit_test(CRITERION TARGET test_logthrsourcedrv)
 add_unit_test(CRITERION LIBTEST TARGET test_logthrfetcherdrv)

@@ -31,7 +31,6 @@
 #include "cfg.h"
 #include "stats/stats-counter.h"
 #include "logsource.h"
-#include "cr_template.h"
 
 typedef struct _TestThreadedSourceDriver
 {
@@ -161,7 +160,7 @@ _run_using_blocking_posts(LogThreadedSourceDriver *s)
 
   for (gint i = 0; i < self->num_of_messages_to_generate; ++i)
     {
-      LogMessage *msg = create_sample_message();
+      LogMessage *msg = log_msg_new_empty();
       log_threaded_source_blocking_post(&self->super, msg);
     }
 }
@@ -173,7 +172,7 @@ _run_simple(LogThreadedSourceDriver *s)
 
   for (gint i = 0; i < self->num_of_messages_to_generate; ++i)
     {
-      LogMessage *msg = create_sample_message();
+      LogMessage *msg = log_msg_new_empty();
       log_threaded_source_post(&self->super, msg);
 
       if (!log_threaded_source_free_to_send(&self->super))
