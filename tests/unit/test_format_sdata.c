@@ -92,6 +92,22 @@ Test(sdata_format, sdata)
   log_msg_format_sdata(msg, result, 0);
 
   cr_assert_str_eq(result->str, "[foo.bar reason=\"TCP FIN\"][junos reason=\"TCP FIN\"]");
-
 }
 
+Test(sdata_format, enterpriseid)
+{
+  log_msg_set_value_by_name(msg, ".SDATA.test@1.2.3.log.fac", "14", -1);
+
+  log_msg_format_sdata(msg, result, 0);
+
+  cr_assert_str_eq(result->str, "[test@1.2.3 log.fac=\"14\"]");
+}
+
+Test(sdata_format, only_enterpriseid)
+{
+  log_msg_set_value_by_name(msg, ".SDATA.test@123.bar", "33", -1);
+
+  log_msg_format_sdata(msg, result, 0);
+
+  cr_assert_str_eq(result->str, "[test@123 bar=\"33\"]");
+}

@@ -943,6 +943,17 @@ find_sd_id_in_key(gint sd_id_len, const gchar *sdata_elem, const gchar *sdata_na
       return sd_id_sep;
     }
 
+  /* The SD-ID has two format, one with enterpriseId:
+   * SD-ID : <key>@<enterprise-id>[.<sub-id>]*.<sd-name> = <sd-value>
+   * Both <enterprise-id> and <sub-id> must be a number.
+   */
+  const gchar *at = memchr(sdata_name + logmsg_sd_prefix_len, '@', sdata_name_len - logmsg_sd_prefix_len);
+  if (at)
+    {
+      const gint entreprise_id_len = strspn(at + 1, ".1234567890");
+      return at + entreprise_id_len;
+    }
+
 
   return memrchr(sdata_elem, '.', sdata_name_len - 7);
 }
