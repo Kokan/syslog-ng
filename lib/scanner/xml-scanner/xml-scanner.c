@@ -180,25 +180,17 @@ _start_new_text_buffer(XMLScanner *self)
   self->text = scratch_buffers_alloc();
 }
 
-static gint
-before_last_dot(GString *str)
-{
-  const gchar *s = str->str;
-  gchar *pos = strrchr(s, '.');
-  if (!pos)
-    return 0;
-  return (pos-s);
-}
-
 static void
 _clear_current_element_from_key(XMLScanner *self)
 {
-  g_string_truncate(self->key, before_last_dot(self->key));
+  gssize previose_len = (gssize)g_queue_pop_tail(self->key_len_stack);
+  g_string_truncate(self->key, previose_len);
 }
 
 static void
 _add_current_element_to_key(XMLScanner *self, const gchar *element_name)
 {
+  g_queue_push_tail(self->key_len_stack, (gpointer)self->key->len);
   if (self->key->len > 0)
     g_string_append_c(self->key, '.');
 
@@ -372,6 +364,7 @@ xml_scanner_init(XMLScanner *self, XMLScannerOptions *options, PushCurrentKeyVal
   self->push_key_value.user_data = user_data;
   self->key = scratch_buffers_alloc();
   g_string_assign(self->key, key_prefix);
+  self->key_len_stack = g_queue_new();
   self->text = NULL;
   self->text_stack = g_queue_new();
 }
@@ -380,5 +373,6 @@ void
 xml_scanner_deinit(XMLScanner *self)
 {
   self->options = NULL;
+  g_queue_free(self->key_len_stack);
   g_queue_free(self->text_stack);
 }

@@ -52,6 +52,7 @@ struct _XMLScanner
   XMLScannerOptions *options;
   gboolean pop_next_time;
   GString *key;
+  GQueue *key_len_stack;
   GString *text;
   GQueue *text_stack;
   gboolean (*start_element_cb) (XMLScanner *self, const gchar *element_name, const gchar **attribute_names,
