@@ -134,6 +134,20 @@ xml_parser_set_prefix(LogParser *s, const gchar *prefix)
   self->prefix = g_strdup(prefix);
 }
 
+static void
+xml_parser_append_dot_in_prefix(XMLParser *self)
+{
+  GlobalConfig *cfg = log_pipe_get_config(&self->super.super);
+  gssize prefix_len = strlen(self->prefix);
+  gchar *last_prefix_char = &self->prefix[prefix_len-1];
+  if (*last_prefix_char != '.' && cfg_is_config_version_older(cfg, VERSION_VALUE_3_30))
+    {
+      gchar *old_prefix = self->prefix;
+      self->prefix = g_strdup_printf("%s.", old_prefix);
+      g_free(old_prefix);
+    }
+}
+
 LogPipe *
 xml_parser_clone(LogPipe *s)
 {
@@ -165,6 +179,9 @@ xml_parser_free(LogPipe *s)
 static gboolean
 xml_parser_init(LogPipe *s)
 {
+  XMLParser *self = (XMLParser * )s;
+  xml_parser_append_dot_in_prefix(self);
+
   return log_parser_init_method(s);
 }
 
