@@ -170,8 +170,8 @@
  * meaning of any setting in the configuration file.  Basically, it is the
  * highest value passed to any cfg_is_config_version_older() call.
  */
-#define VERSION_VALUE_LAST_SEMANTIC_CHANGE  VERSION_VALUE_3_29
-#define VERSION_STR_LAST_SEMANTIC_CHANGE    "3.29"
+#define VERSION_VALUE_LAST_SEMANTIC_CHANGE  VERSION_VALUE_3_30
+#define VERSION_STR_LAST_SEMANTIC_CHANGE    "3.30"
 
 #define version_convert_from_user(v)  (v)
 
