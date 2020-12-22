@@ -417,7 +417,6 @@ ParameterizedTestParameters(xmlparser, test_prefix)
   {
     {"<tag>default_prefix</tag>", NULL, ".xml.tag", "default_prefix"},
     {"<tag>foo</tag>", "", "tag", "foo"},
-    {"<tag>foobar</tag>", ".xmlparser", ".xmlparser.tag", "foobar"},
     {"<tag>baz</tag>", ".meta.", ".meta.tag", "baz"},
     {"<top><t1>asd</t1><t2>jkl</t2></top>", "", "top.t2", "jkl"},
     {"<top><t1>1</t1><t2><t3>3</t3></t2></top>", "", "top.t2.t3", "3"},
@@ -447,36 +446,28 @@ ParameterizedTest(PrefixTestCase *test_cases, xmlparser, test_prefix)
   log_msg_unref(msg);
 }
 
-Test(xmlparser, test_performance)
+Test(xmlparser, prefix_without_dot_suffix)
 {
-
   gchar *input = "<html><div><a href=\"foo\">bla</a><p>H</p></div></html>";
 
   LogParser *xml_parser = _construct_xml_parser((XMLParserTestOptions)
   {
-    .prefix = ".prefix."
+    .prefix = "not-dot-prefix!"
   });
 
   LogMessage *msg = log_msg_new_empty();
   log_msg_set_value(msg, LM_V_MESSAGE, input, -1);
 
   LogPathOptions path_options = LOG_PATH_OPTIONS_INIT;
-  gint iterations = 1e6;
-  start_stopwatch();
 
-  for (int i = 0; i < iterations; ++i)
-    {
-      scratch_buffers_explicit_gc();
-      log_parser_process_message(xml_parser, &msg, &path_options);
-    }
+  log_parser_process_message(xml_parser, &msg, &path_options);
 
-  stop_stopwatch_and_display_result(iterations, "serializing (without compaction) %d times took", iterations);
+  const gchar *value = log_msg_get_value_by_name(msg, "not-dot-prefix!html.div.a", NULL);
+  cr_assert_str_eq(value, "bla");
 
   log_pipe_deinit((LogPipe *)xml_parser);
   log_pipe_unref((LogPipe *)xml_parser);
   log_msg_unref(msg);
-
-
 }
 
 

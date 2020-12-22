@@ -190,9 +190,10 @@ _clear_current_element_from_key(XMLScanner *self)
 static void
 _add_current_element_to_key(XMLScanner *self, const gchar *element_name)
 {
-  g_queue_push_tail(self->key_len_stack, (gpointer)self->key->len);
-  if (self->key->len > 0)
+  const gssize curr_length = self->key->len;
+  if (g_queue_get_length(self->key_len_stack) > 0)
     g_string_append_c(self->key, '.');
+  g_queue_push_tail(self->key_len_stack, (gpointer)curr_length);
 
   g_string_append(self->key, element_name);
 }

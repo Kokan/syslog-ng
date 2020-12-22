@@ -38,15 +38,6 @@ xml_parser_get_scanner_options(LogParser *p)
 }
 
 static void
-remove_trailing_dot(gchar *str)
-{
-  if (!strlen(str))
-    return;
-  if (str[strlen(str)-1] == '.')
-    str[strlen(str)-1] = 0;
-}
-
-static void
 encode_and_append_value(GString *result, const gchar *current_value, gssize current_value_len)
 {
   if (result->len > 0)
@@ -174,8 +165,6 @@ xml_parser_free(LogPipe *s)
 static gboolean
 xml_parser_init(LogPipe *s)
 {
-  XMLParser *self = (XMLParser *)s;
-  remove_trailing_dot(self->prefix);
   return log_parser_init_method(s);
 }
 
