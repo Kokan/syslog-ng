@@ -260,7 +260,8 @@ _index_array_in_path(GArray *path, guint32 _index, GString *indexer)
 }
 
 MMDB_entry_data_list_s *
-dump_geodata_into_msg_map(LogMessage *msg, MMDB_entry_data_list_s *entry_data_list, GArray *path, gint *status)
+dump_geodata_into_msg_map(LogMessage *msg, MMDB_entry_data_list_s *entry_data_list, GArray *path,
+                          gint *status)
 {
   guint32 size = entry_data_list->entry_data.data_size;
 
@@ -292,7 +293,8 @@ dump_geodata_into_msg_map(LogMessage *msg, MMDB_entry_data_list_s *entry_data_li
 }
 
 MMDB_entry_data_list_s *
-dump_geodata_into_msg_array(LogMessage *msg, MMDB_entry_data_list_s *entry_data_list, GArray *path, gint *status)
+dump_geodata_into_msg_array(LogMessage *msg, MMDB_entry_data_list_s *entry_data_list,
+                            GArray *path, gint *status)
 {
   guint32 size = entry_data_list->entry_data.data_size;
   guint32 _index = 0;
@@ -328,7 +330,8 @@ dump_geodata_into_msg_data(LogMessage *msg, GArray *path, gchar *fmt, ...)
 }
 
 MMDB_entry_data_list_s *
-dump_geodata_into_msg(LogMessage *msg, MMDB_entry_data_list_s *entry_data_list, GArray *path, gint *status)
+dump_geodata_into_msg(LogMessage *msg, MMDB_entry_data_list_s *entry_data_list, GArray *path,
+                      gint *status)
 {
   switch (entry_data_list->entry_data.type)
     {

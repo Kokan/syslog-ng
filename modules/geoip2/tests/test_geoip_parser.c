@@ -114,7 +114,7 @@ Test(geoip2, empty_prefix)
 
   geoip_parser_set_prefix(geoip_parser, "");
   msg = parse_geoip_into_log_message("2.125.160.216");
-  assert_log_message_value(msg, log_msg_get_value_handle(".country.iso_code"), "GB");
+  assert_log_message_value(msg, log_msg_get_value_handle("country.iso_code"), "GB");
   log_msg_unref(msg);
 }
 

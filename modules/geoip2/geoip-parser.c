@@ -103,7 +103,8 @@ maxminddb_parser_process(LogParser *s, LogMessage **pmsg,
     return TRUE;
 
   GArray *path = g_array_new(TRUE, FALSE, sizeof(gchar *));
-  g_array_append_val(path, self->prefix);
+  if (self->prefix && self->prefix[0] != 0)
+    g_array_append_val(path, self->prefix);
 
   gint status;
   dump_geodata_into_msg(msg, entry_data_list, path, &status);
@@ -194,7 +195,7 @@ maxminddb_parser_new(GlobalConfig *cfg)
   self->super.super.clone = maxminddb_parser_clone;
   self->super.process = maxminddb_parser_process;
 
-  geoip_parser_set_prefix(&self->super, ".geoip2");
+  geoip_parser_set_prefix(&self->super, ".geoip2.");
 
   return &self->super;
 }
