@@ -31,7 +31,6 @@ config = """@version: %(syslog_ng_version)s
 
 options { keep-hostname(yes); };
 
-source s_int { internal(); };
 source s_tcp { tcp(port(%(port_number)d)); };
 
 destination d_python {
