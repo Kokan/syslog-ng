@@ -31,6 +31,10 @@ def render_includes(includes):
     include_lines = ['@include "{}"'.format(include) for include in includes]
     return "\n".join(include_lines)+'\n'
 
+def render_python_inline_codes(python_codes):
+    python_inline_lines = ['python {{\n{}\n}};'.format(python_code) for python_code in python_codes]
+    return "\n".join(python_inline_lines)
+
 
 def render_global_options(global_options):
     globals_options_header = "options {\n"
@@ -158,6 +162,7 @@ class ConfigRenderer(object):
 
         version = self.__syslog_ng_config["version"]
         includes = self.__syslog_ng_config["includes"]
+        python_inline_codes = self.__syslog_ng_config["python_inline_codes"]
         global_options = self.__syslog_ng_config["global_options"]
         statement_groups = self.__syslog_ng_config["statement_groups"]
         logpath_groups = self.__syslog_ng_config["logpath_groups"]
@@ -170,6 +175,8 @@ class ConfigRenderer(object):
             config += render_includes(includes)
         if global_options:
             config += render_global_options(global_options)
+        if python_inline_codes:
+            config += render_python_inline_codes(python_inline_codes)
         if statement_groups:
             config += render_statement_groups(statement_groups)
         if logpath_groups:

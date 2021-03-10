@@ -49,6 +49,7 @@ class SyslogNgConfig(object):
             "version": version,
             "includes": [],
             "global_options": {},
+            "python_inline_codes": [],
             "statement_groups": [],
             "logpath_groups": [],
         }
@@ -76,6 +77,9 @@ class SyslogNgConfig(object):
 
     def add_include(self, include):
         self.__syslog_ng_config["includes"].append(include)
+
+    def add_python_inline_codes(self, code):
+        self.__syslog_ng_config["python_inline_codes"].append(code)
 
     def update_global_options(self, **options):
         self.__syslog_ng_config["global_options"].update(options)
