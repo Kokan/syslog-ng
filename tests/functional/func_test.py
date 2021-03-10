@@ -131,6 +131,7 @@ try:
             if obj[:5] != 'test_':
                 continue
             test_case = getattr(test_module, obj)
+            print("port_number: {}", port_number);
 
             if type(test_module.config) is str:
                 test_case_name = test_module.__name__ + '.' + obj
