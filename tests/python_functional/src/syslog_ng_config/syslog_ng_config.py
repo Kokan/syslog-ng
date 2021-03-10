@@ -111,7 +111,9 @@ class SyslogNgConfig(object):
     def create_panos_parser(self, **options):
         return Parser("panos-parser", **options)
 
-    def create_python_parser(self, **options):
+    def create_python_parser(self, clazz=None, **options):
+        if clazz is not None:
+            options["class"] = clazz
         return Parser("python", **options)
 
     def create_syslog_parser(self, **options):
