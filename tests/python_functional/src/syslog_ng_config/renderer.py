@@ -29,7 +29,8 @@ def render_version(version):
 
 def render_includes(includes):
     include_lines = ['@include "{}"'.format(include) for include in includes]
-    return "\n".join(include_lines)+'\n'
+    return "\n".join(include_lines) + '\n'
+
 
 def render_python_inline_codes(python_codes):
     python_inline_lines = ['python {{\n{}\n}};'.format(python_code) for python_code in python_codes]
